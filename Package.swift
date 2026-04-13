@@ -4,7 +4,7 @@
 import PackageDescription
 
 let package = Package(
-    name: "Ryze",
+    name: "Prism",
     defaultLocalization: "pt",
     platforms: [
         .iOS(.v26),
@@ -16,64 +16,64 @@ let package = Package(
     ],
     products: [
         .library(
-            name: "Ryze",
-            targets: ["Ryze"],
+            name: "Prism",
+            targets: ["Prism"],
         ),
         .library(
-            name: "RyzeFoundation",
-            targets: ["RyzeFoundation"],
+            name: "PrismFoundation",
+            targets: ["PrismFoundation"],
         ),
         .library(
-            name: "RyzeNetwork",
-            targets: ["RyzeNetwork"],
+            name: "PrismNetwork",
+            targets: ["PrismNetwork"],
         ),
         .library(
-            name: "RyzeArchitecture",
-            targets: ["RyzeArchitecture"],
+            name: "PrismArchitecture",
+            targets: ["PrismArchitecture"],
         ),
         .library(
-            name: "RyzeUI",
-            targets: ["RyzeUI"],
+            name: "PrismUI",
+            targets: ["PrismUI"],
         ),
         .library(
-            name: "RyzeVideo",
-            targets: ["RyzeVideo"],
+            name: "PrismVideo",
+            targets: ["PrismVideo"],
         ),
         .library(
-            name: "RyzeIntelligence",
-            targets: ["RyzeIntelligence"],
+            name: "PrismIntelligence",
+            targets: ["PrismIntelligence"],
         ),
     ],
     targets: [
         .target(
-            name: "Ryze",
+            name: "Prism",
             dependencies: [
-                "RyzeFoundation",
-                "RyzeNetwork",
-                "RyzeArchitecture",
-                "RyzeUI",
-                "RyzeVideo",
-                "RyzeIntelligence",
+                "PrismFoundation",
+                "PrismNetwork",
+                "PrismArchitecture",
+                "PrismUI",
+                "PrismVideo",
+                "PrismIntelligence",
             ],
         ),
-        .target(name: "RyzeFoundation"),
+        .target(name: "PrismFoundation"),
         .target(
-            name: "RyzeNetwork",
-            dependencies: ["RyzeFoundation"],
+            name: "PrismNetwork",
+            dependencies: ["PrismFoundation"],
             resources: [
-                .process("Resource/RyzeNetworkString.xcstrings"),
-                .process("Resource/RyzeNetworkLogMessage.xcstrings"),
+                .process("Resource/PrismNetworkString.xcstrings"),
+                .process("Resource/PrismNetworkLogMessage.xcstrings"),
             ],
         ),
         .target(
-            name: "RyzeArchitecture",
-            dependencies: ["RyzeFoundation"],
+            name: "PrismArchitecture",
+            dependencies: ["PrismFoundation"],
         ),
         .target(
-            name: "RyzeUI",
+            name: "PrismUI",
             dependencies: [
-                "RyzeFoundation",
-                "RyzeArchitecture",
+                "PrismFoundation",
+                "PrismArchitecture",
             ],
             exclude: [
                 "Exports/README.md"
@@ -85,56 +85,56 @@ let package = Package(
             ],
         ),
         .target(
-            name: "RyzeVideo",
-            dependencies: ["RyzeFoundation"],
+            name: "PrismVideo",
+            dependencies: ["PrismFoundation"],
         ),
         .target(
-            name: "RyzeIntelligence",
-            dependencies: ["RyzeFoundation"],
+            name: "PrismIntelligence",
+            dependencies: ["PrismFoundation"],
         ),
         .target(
-            name: "RyzePreview",
-            dependencies: ["Ryze"],
+            name: "PrismPreview",
+            dependencies: ["Prism"],
         ),
         .executableTarget(
-            name: "RyzePlayground",
+            name: "PrismPlayground",
             dependencies: [
-                "Ryze",
-                "RyzeUI",
-                "RyzeArchitecture",
-                "RyzeIntelligence",
+                "Prism",
+                "PrismUI",
+                "PrismArchitecture",
+                "PrismIntelligence",
             ],
             resources: [
                 .process("Resources/Media.xcassets"),
             ],
         ),
         .testTarget(
-            name: "RyzeFoundationTests",
-            dependencies: ["RyzeFoundation"],
+            name: "PrismFoundationTests",
+            dependencies: ["PrismFoundation"],
         ),
         .testTarget(
-            name: "RyzeArchitectureTests",
+            name: "PrismArchitectureTests",
             dependencies: [
-                "RyzeArchitecture",
-                "RyzeUI",
+                "PrismArchitecture",
+                "PrismUI",
             ],
         ),
         .testTarget(
-            name: "RyzeNetworkTests",
-            dependencies: ["RyzeNetwork"],
+            name: "PrismNetworkTests",
+            dependencies: ["PrismNetwork"],
         ),
         .testTarget(
-            name: "RyzeUITests",
+            name: "PrismUITests",
             dependencies: [
-                "RyzeUI",
-                "RyzeArchitecture",
+                "PrismUI",
+                "PrismArchitecture",
             ],
         ),
         .testTarget(
-            name: "RyzeIntelligenceTests",
+            name: "PrismIntelligenceTests",
             dependencies: [
-                "RyzeIntelligence",
-                "RyzeFoundation",
+                "PrismIntelligence",
+                "PrismFoundation",
             ],
         ),
     ],

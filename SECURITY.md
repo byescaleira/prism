@@ -1,6 +1,6 @@
 # Security Policy
 
-If you discover a security issue in Ryze, please avoid opening a public issue with exploit details.
+If you discover a security issue in Prism, please avoid opening a public issue with exploit details.
 
 Prefer a private report through the repository maintainers or GitHub private vulnerability reporting when available.
 

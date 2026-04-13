@@ -1,6 +1,6 @@
 # Adaptive UI Guidelines
 
-RyzeUI should feel consistent across Apple platforms without pretending every platform behaves the same.
+PrismUI should feel consistent across Apple platforms without pretending every platform behaves the same.
 
 ## Principles
 
@@ -15,12 +15,12 @@ RyzeUI should feel consistent across Apple platforms without pretending every pl
 - Add platform-specific adapters only when behavior or APIs truly diverge
 - Prefer environment-driven theming and platform capability checks
 - Keep component APIs stable while adapting internals per OS
-- Resolve adaptive behavior through `RyzePlatformContext`
-- Prefer `RyzeAdaptiveScreen` for full-screen composition
-- Prefer `RyzeAdaptiveStack` for content/action groups that need to reflow between platforms
-- Prefer `RyzeScaffold` when a screen needs shared hierarchy, title, subtitle, and actions
-- Use `RyzeNavigationView` with an optional sidebar to scale from stack to split navigation
-- Keep `RyzeTabView` as the single tab API and let the component adapt its chrome per platform
+- Resolve adaptive behavior through `PrismPlatformContext`
+- Prefer `PrismAdaptiveScreen` for full-screen composition
+- Prefer `PrismAdaptiveStack` for content/action groups that need to reflow between platforms
+- Prefer `PrismScaffold` when a screen needs shared hierarchy, title, subtitle, and actions
+- Use `PrismNavigationView` with an optional sidebar to scale from stack to split navigation
+- Keep `PrismTabView` as the single tab API and let the component adapt its chrome per platform
 
 ## Platform Notes
 
@@ -33,7 +33,7 @@ RyzeUI should feel consistent across Apple platforms without pretending every pl
 ## Suggested Composition
 
 ```swift
-RyzeNavigationView(
+PrismNavigationView(
     router: router,
     sidebar: {
         SidebarView()
@@ -42,11 +42,11 @@ RyzeNavigationView(
         RouteView(route: route)
     },
     content: {
-        RyzeScaffold(
+        PrismScaffold(
             "Workspace",
             subtitle: "Um único código com comportamento adaptativo"
         ) {
-            RyzeAdaptiveStack(style: .actions) {
+            PrismAdaptiveStack(style: .actions) {
                 PrimaryAction()
                 SecondaryAction()
             }

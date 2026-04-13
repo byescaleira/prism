@@ -1,19 +1,19 @@
-# RyzeIntelligence
+# PrismIntelligence
 
-`RyzeIntelligence` agora foi reorganizado em camadas para separar treino local, inferencia local e geracao de linguagem.
+`PrismIntelligence` agora foi reorganizado em camadas para separar treino local, inferencia local e geracao de linguagem.
 
-Para consumo no app, a API recomendada passa a ser `RyzeIntelligenceClient`, que abstrai os backends local, Apple e remoto com a mesma ideia de uso:
+Para consumo no app, a API recomendada passa a ser `PrismIntelligenceClient`, que abstrai os backends local, Apple e remoto com a mesma ideia de uso:
 
 ```swift
-import RyzeIntelligence
+import PrismIntelligence
 
-let local = try await RyzeIntelligenceClient.local(modelID: "support-intent")
+let local = try await PrismIntelligenceClient.local(modelID: "support-intent")
 let label = try await local.classify(text: "Cobrar assinatura premium")
 
-let apple = RyzeIntelligenceClient.apple()
+let apple = PrismIntelligenceClient.apple()
 let summary = try await apple.generate("Resuma os pontos principais da tela.")
 
-let remote = RyzeIntelligenceClient.remote(
+let remote = PrismIntelligenceClient.remote(
     endpoint: URL(string: "https://api.example.com/v1/generate")!,
     model: "gpt-oss-120b"
 )
@@ -22,11 +22,11 @@ let answer = try await remote.generate("Crie um onboarding financeiro.")
 
 Os componentes mais baixos continuam existindo para casos em que voce queira controle fino:
 
-- `RyzeIntelligenceLocalTrainer`: treino local com `CreateML` quando disponivel.
-- `RyzeIntelligencePrediction`: inferencia local usando `CoreML`.
-- `RyzeLanguageIntelligence`: fachada unica para modelos generativos.
-- `RyzeAppleIntelligenceProvider`: integracao com Apple Intelligence via `FoundationModels`.
-- `RyzeRemoteIntelligenceProvider`: integracao com modelos externos via servidor HTTP.
+- `PrismIntelligenceLocalTrainer`: treino local com `CreateML` quando disponivel.
+- `PrismIntelligencePrediction`: inferencia local usando `CoreML`.
+- `PrismLanguageIntelligence`: fachada unica para modelos generativos.
+- `PrismAppleIntelligenceProvider`: integracao com Apple Intelligence via `FoundationModels`.
+- `PrismRemoteIntelligenceProvider`: integracao com modelos externos via servidor HTTP.
 
 ## Objetivos do modulo
 
@@ -40,9 +40,9 @@ Os componentes mais baixos continuam existindo para casos em que voce queira con
 Para classificador de texto:
 
 ```swift
-import RyzeIntelligence
+import PrismIntelligence
 
-let intelligence = RyzeTextIntelligence(
+let intelligence = PrismTextIntelligence(
     samples: [
         .init(text: "Cobrar assinatura mensal", label: "finance"),
         .init(text: "Gerar relatorio de uso", label: "analytics"),
@@ -58,9 +58,9 @@ let result = await intelligence.trainingTextClassifier(
 Para dados tabulares:
 
 ```swift
-import RyzeIntelligence
+import PrismIntelligence
 
-let intelligence = RyzeTabularIntelligence(
+let intelligence = PrismTabularIntelligence(
     rows: [
         [
             "sessions": .int(12),
@@ -83,10 +83,10 @@ let result = await intelligence.trainingClassifier(
 Depois de salvar o modelo:
 
 ```swift
-import RyzeIntelligence
+import PrismIntelligence
 
-let storedModel = RyzeIntelligenceModel.models.first!
-let prediction = await RyzeIntelligencePrediction(model: storedModel)
+let storedModel = PrismIntelligenceModel.models.first!
+let prediction = await PrismIntelligencePrediction(model: storedModel)
 
 let label = try await prediction.predictText(from: "Cobrar assinatura premium")
 ```
@@ -96,10 +96,10 @@ let label = try await prediction.predictText(from: "Cobrar assinatura premium")
 Quando o sistema suportar `FoundationModels`, o mesmo facade pode usar o modelo do sistema:
 
 ```swift
-import RyzeIntelligence
+import PrismIntelligence
 
-let service = RyzeLanguageIntelligence(
-    provider: RyzeAppleIntelligenceProvider(
+let service = PrismLanguageIntelligence(
+    provider: PrismAppleIntelligenceProvider(
         configuration: .init(
             model: .system(useCase: .general),
             instructions: "Responda de forma objetiva e segura."
@@ -121,7 +121,7 @@ let response = try await service.generate(
 Tambem e possivel usar adapters do sistema:
 
 ```swift
-let provider = RyzeAppleIntelligenceProvider(
+let provider = PrismAppleIntelligenceProvider(
     configuration: .init(
         model: .adapterName("my-domain-adapter")
     )
@@ -133,9 +133,9 @@ let provider = RyzeAppleIntelligenceProvider(
 Para um provider remoto:
 
 ```swift
-import RyzeIntelligence
+import PrismIntelligence
 
-let serializer = RyzeDefaultRemoteIntelligenceSerializer(
+let serializer = PrismDefaultRemoteIntelligenceSerializer(
     endpoint: URL(string: "https://api.example.com/v1/generate")!,
     model: "gpt-oss-120b",
     providerName: "example-ai",
@@ -144,8 +144,8 @@ let serializer = RyzeDefaultRemoteIntelligenceSerializer(
     ]
 )
 
-let service = RyzeLanguageIntelligence(
-    provider: RyzeRemoteIntelligenceProvider(serializer: serializer)
+let service = PrismLanguageIntelligence(
+    provider: PrismRemoteIntelligenceProvider(serializer: serializer)
 )
 
 let response = try await service.generate(
@@ -167,9 +167,9 @@ let response = try await service.generate(
 
 O modulo foi preparado para teste por injeção:
 
-- `RyzeIntelligenceLocalTrainer` aceita runtime interno customizado
-- `RyzeIntelligencePrediction` aceita runtime interno customizado
-- `RyzeAppleIntelligenceProvider` usa gateway isolado
-- `RyzeRemoteIntelligenceProvider` separa serializer e transport
+- `PrismIntelligenceLocalTrainer` aceita runtime interno customizado
+- `PrismIntelligencePrediction` aceita runtime interno customizado
+- `PrismAppleIntelligenceProvider` usa gateway isolado
+- `PrismRemoteIntelligenceProvider` separa serializer e transport
 
 Isso reduz acoplamento com SDKs nativos e deixa os testes deterministas.

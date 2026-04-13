@@ -1,6 +1,6 @@
-# Ryze
+# Prism
 
-Ryze is a modern Swift package for building Apple apps with a shared foundation layer, networking primitives, architecture building blocks, adaptive UI components, media helpers, and intelligence experiments.
+Prism is a modern Swift package for building Apple apps with a shared foundation layer, networking primitives, architecture building blocks, adaptive UI components, media helpers, and intelligence experiments.
 
 ## Vision
 
@@ -20,30 +20,65 @@ Ryze is a modern Swift package for building Apple apps with a shared foundation 
   - tvOS 26
   - watchOS 26
 
-The current deployment targets intentionally follow the latest SDK generation because `RyzeUI` already adopts newer SwiftUI capabilities such as `glassEffect`.
+The current deployment targets intentionally follow the latest SDK generation because `PrismUI` already adopts newer SwiftUI capabilities such as `glassEffect`.
 
 ## Public Products
 
-- `Ryze`: umbrella module that re-exports the core Ryze modules for app-level convenience.
-- `RyzeFoundation`: shared defaults, resources, formatting, logging, locale helpers, and lightweight entities.
-- `RyzeNetwork`: HTTP/socket infrastructure, endpoints, caching, logging, and FIX transport support.
-- `RyzeArchitecture`: router, store, reducer, and middleware primitives.
-- `RyzeUI`: theme system, atoms, molecules, modifiers, accessibility helpers, and app-facing SwiftUI components.
-- `RyzeVideo`: video download helpers and media-related entities.
-- `RyzeIntelligence`: local training and prediction with CreateML/CoreML plus Apple Intelligence and remote language model providers.
+- `Prism`: umbrella module that re-exports the core Prism modules for app-level convenience.
+- `PrismFoundation`: shared defaults, resources, formatting, logging, locale helpers, and lightweight entities.
+- `PrismNetwork`: HTTP/socket infrastructure, endpoints, caching, logging, and FIX transport support.
+- `PrismArchitecture`: router, store, reducer, and middleware primitives.
+- `PrismUI`: theme system, atoms, molecules, modifiers, accessibility helpers, and app-facing SwiftUI components.
+- `PrismVideo`: video download helpers and media-related entities.
+- `PrismIntelligence`: local training and prediction with CreateML/CoreML plus Apple Intelligence and remote language model providers.
 
-The recommended entry point for app-side consumption is `RyzeIntelligenceClient`, which offers one simple facade across local, Apple Intelligence, and remote model backends.
+The recommended entry point for app-side consumption is `PrismIntelligenceClient`, which offers one simple facade across local, Apple Intelligence, and remote model backends.
+
+## Naming Protocol: The Celestial Standard
+
+This document defines the naming hierarchy for the ecosystem, ensuring a premium, cohesive, and scalable identity across all future developments.
+
+### The Core: **AXIS**
+**AXIS** is the foundational Library. It acts as the central point of rotation for all technology.
+* **Modules:** Intelligence, UI, Network, Architecture.
+* **Code Standard:** Prefix internal components with the core name (e.g., `AxisUI`, `AxisNet`).
+
+| Sector | Codename | Concept |
+| :--- | :--- | :--- |
+| **Foundation (Core)** | **AXIS** | The central line connecting all points. |
+| **Investments** | **ZENITH** | The highest point; peak financial performance. |
+| **Health** | **VITAL** | Essential for life; core biometrics. |
+| **Commerce** | **ORBIT** | Continuous flow of goods and transactions. |
+| **Consultancy** | **BEACON** | A guiding light; strategic direction. |
+
+
+```text
+                     [ AXIS ]
+                 (The Core Lib)
+                       |
+      _________________|_________________
+     |         |             |           |
+ [ ZENITH ] [ VITAL ]    [ ORBIT ]   [ BEACON ]
+ (Finance)  (Health)    (Commerce)  (Advisory)
+     |         |             |           |
+  [ YIELD ] [ AURA ]      [ FLOW ]    [ STRATUM ]
+```
+
+1.  **Abstract, Not Literal:** Use concepts (e.g., `ORBIT`), never descriptions (e.g., `ShopApp`).
+2.  **Brevity:** Maximum 2 syllables for clarity and impact.
+3.  **Premium Feel:** Select nouns that evoke stability, future, or space.
+4.  **Implementation:** Use the codename for app-specific modules (e.g., `ZenithEngine`, `VitalAuth`).
 
 ## Adaptive UI Strategy
 
-RyzeUI is being structured as a latest-SDK-first design system:
+PrismUI is being structured as a latest-SDK-first design system:
 
 - Shared tokens for color, spacing, radius, and size.
 - SwiftUI-first APIs that can adapt to touch, pointer, focus, and remote-based interaction models.
 - Platform-aware wrappers for UIKit/AppKit differences when behavior diverges.
 - Explicit compatibility decisions instead of pretending every component behaves the same on every Apple OS.
 
-The next evolution of `RyzeUI` should continue in this direction: one visual language, native interaction patterns per platform.
+The next evolution of `PrismUI` should continue in this direction: one visual language, native interaction patterns per platform.
 
 ## Quality Gates
 
@@ -68,25 +103,25 @@ dependencies: [
 Then depend on the product you need:
 
 ```swift
-.product(name: "Ryze", package: "ryze")
+.product(name: "Prism", package: "prism")
 ```
 
 You can import the umbrella module:
 
 ```swift
-import Ryze
+import Prism
 ```
 
 Or only the focused modules you want:
 
 ```swift
-import RyzeFoundation
-import RyzeUI
+import PrismFoundation
+import PrismUI
 ```
 
 ## Development
 
-Ryze ships with a small command surface for day-to-day development:
+Prism ships with a small command surface for day-to-day development:
 
 ```bash
 make format
@@ -97,6 +132,8 @@ make validate
 ```
 
 Those commands wrap the scripts in `scripts/` so the same checks run locally and in CI.
+
+
 
 ## Commercial Readiness Checklist
 
@@ -109,10 +146,10 @@ Those commands wrap the scripts in `scripts/` so the same checks run locally and
 
 Still recommended before calling the package production-ready:
 
-- Expand tests across `RyzeNetwork`, `RyzeArchitecture`, and `RyzeUI`
+- Expand tests across `PrismNetwork`, `PrismArchitecture`, and `PrismUI`
 - Validate the Apple platform matrix in dedicated Xcode builds outside this sandboxed environment
 - Tighten the public API surface further and document stability guarantees
 
 ## License
 
-Ryze is available under the MIT license. See [LICENSE](LICENSE).
+Prism is available under the MIT license. See [LICENSE](LICENSE).

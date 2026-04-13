@@ -1,6 +1,6 @@
 # Contributing
 
-Thanks for contributing to Ryze.
+Thanks for contributing to Prism.
 
 ## Toolchain
 
@@ -31,7 +31,7 @@ make test
 - Prefer modern Swift and SwiftUI APIs that match the package baseline.
 - Keep public API additions intentional. If something does not need to be public, keep it internal.
 - Preserve adaptive behavior across Apple platforms. Do not add platform-specific behavior without a clear fallback or rationale.
-- Add tests whenever you change behavior in `RyzeFoundation`, `RyzeNetwork`, `RyzeArchitecture`, or `RyzeUI`.
+- Add tests whenever you change behavior in `PrismFoundation`, `PrismNetwork`, `PrismArchitecture`, or `PrismUI`.
 
 ## Pull Requests
 
