@@ -96,18 +96,6 @@ let package = Package(
             name: "PrismPreview",
             dependencies: ["Prism"],
         ),
-        .executableTarget(
-            name: "PrismPlayground",
-            dependencies: [
-                "Prism",
-                "PrismUI",
-                "PrismArchitecture",
-                "PrismIntelligence",
-            ],
-            resources: [
-                .process("Resources/Media.xcassets"),
-            ],
-        ),
         .testTarget(
             name: "PrismFoundationTests",
             dependencies: ["PrismFoundation"],

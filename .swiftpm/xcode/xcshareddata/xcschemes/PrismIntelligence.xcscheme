@@ -15,9 +15,9 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "Prism"
-               BuildableName = "Prism"
-               BlueprintName = "Prism"
+               BlueprintIdentifier = "PrismIntelligence"
+               BuildableName = "PrismIntelligence"
+               BlueprintName = "PrismIntelligence"
                ReferencedContainer = "container:">
             </BuildableReference>
          </BuildActionEntry>
@@ -51,9 +51,9 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "Prism"
-            BuildableName = "Prism"
-            BlueprintName = "Prism"
+            BlueprintIdentifier = "PrismIntelligence"
+            BuildableName = "PrismIntelligence"
+            BlueprintName = "PrismIntelligence"
             ReferencedContainer = "container:">
          </BuildableReference>
       </MacroExpansion>
