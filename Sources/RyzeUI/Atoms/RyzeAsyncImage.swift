@@ -7,6 +7,57 @@
 
 import SwiftUI
 
+/// Componente de imagem assíncrona do Design System RyzeUI.
+///
+/// `RyzeAsyncImage` carrega e exibe imagens de URLs remotas com:
+/// - Cache automático de imagens (configurável via cacheInterval)
+/// - Placeholder personalizável durante o carregamento
+/// - Animação suave de aparecimento (opcional)
+/// - Acessibilidade completa (VoiceOver/TalkBack)
+/// - Testes de UI (XCUITest) via testIDs estáveis
+///
+/// ## Uso Básico
+/// ```swift
+/// RyzeAsyncImage("https://example.com/image.jpg")
+///     .ryze(width: .large)
+/// ```
+///
+/// ## Com Placeholder Personalizado
+/// ```swift
+/// RyzeAsyncImage(
+///     "https://example.com/avatar.jpg",
+///     placeholder: {
+///         RyzeShape(.circle)
+///             .ryze(background: .secondary)
+///     }
+/// )
+/// ```
+///
+/// ## Com testID para Testes
+/// ```swift
+/// RyzeAsyncImage(
+///     "https://example.com/product.png",
+///     testID: "product_image"
+/// )
+/// ```
+///
+/// ## Com Closure de Conteúdo Personalizado
+/// ```swift
+/// RyzeAsyncImage("https://example.com/banner.jpg") { image in
+///     image
+///         .resizable()
+///         .scaledToFill()
+///         .ryze(clip: .rounded(radius: .medium))
+/// }
+/// ```
+///
+/// ## Cache de Imagem
+/// O cache é automático e configurável:
+/// - `cacheInterval: .infinity` - Cache permanente (padrão)
+/// - `cacheInterval: 3600` - Cache por 1 hora
+/// - `cacheInterval: nil` - Sem cache
+///
+/// - Note: A animação de aparecimento usa `.bouncy` por padrão e pode ser desativada com `isAnimated: false`.
 public struct RyzeAsyncImage: RyzeView {
     @Environment(\.theme) var theme
 
@@ -15,17 +66,20 @@ public struct RyzeAsyncImage: RyzeView {
     let isAnimated: Bool
     let content: ((Image) -> any View)?
     let placeholder: (() -> any View)?
+    public var accessibility: RyzeAccessibilityProperties?
 
     @State var image: Image?
 
     public init(
         _ source: String?,
+        _ accessibility: RyzeAccessibilityProperties? = nil,
         cacheInterval: TimeInterval? = .infinity,
         isAnimated: Bool = true,
         content: ((Image) -> any View)? = nil,
         placeholder: (() -> any View)? = nil
     ) {
         self.url = URL(string: source ?? "")
+        self.accessibility = accessibility
         self.cacheInterval = cacheInterval
         self.isAnimated = isAnimated
         self.content = content
@@ -34,16 +88,32 @@ public struct RyzeAsyncImage: RyzeView {
 
     public init(
         _ url: URL?,
+        _ accessibility: RyzeAccessibilityProperties? = nil,
         cacheInterval: TimeInterval? = .infinity,
         isAnimated: Bool = true,
         content: ((Image) -> any View)? = nil,
         placeholder: (() -> any View)? = nil
     ) {
         self.url = url
+        self.accessibility = accessibility
         self.cacheInterval = cacheInterval
         self.isAnimated = isAnimated
         self.content = content
         self.placeholder = placeholder
+    }
+
+    public init(
+        _ source: String?,
+        testID: String,
+        cacheInterval: TimeInterval? = .infinity,
+        isAnimated: Bool = true
+    ) {
+        self.url = URL(string: source ?? "")
+        self.accessibility = RyzeAccessibility.image("Image", testID: testID)
+        self.cacheInterval = cacheInterval
+        self.isAnimated = isAnimated
+        self.content = nil
+        self.placeholder = nil
     }
 
     public var body: some View {
@@ -53,6 +123,7 @@ public struct RyzeAsyncImage: RyzeView {
                 fetchImage()
             }
             .onChange(of: url) { fetchImage() }
+            .ryze(accessibility)
     }
 
     private var contentView: some View {

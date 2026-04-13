@@ -7,15 +7,15 @@
 
 import SwiftUI
 
-struct RyzeDefaultRadius: RyzeRadiusProtocol {
-    var none: CGFloat
-    var small: CGFloat
-    var medium: CGFloat
-    var large: CGFloat
-    var extraLarge: CGFloat
-    var circle: CGFloat
+public struct RyzeDefaultRadius: RyzeRadiusProtocol {
+    public var none: CGFloat
+    public var small: CGFloat
+    public var medium: CGFloat
+    public var large: CGFloat
+    public var extraLarge: CGFloat
+    public var circle: CGFloat
 
-    init(
+    public init(
         none: CGFloat = .zero,
         small: CGFloat = 4,
         medium: CGFloat = 8,

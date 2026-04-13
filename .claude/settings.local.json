@@ -1,0 +1,18 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(make test:*)",
+      "Bash(swift build:*)",
+      "Bash(swift test:*)",
+      "Bash(find /Users/rafael.escaleira/Documents/ryze -name \"*.swift\" -exec grep -l \"RyzeAccessibility\" {} \\\\;)",
+      "Bash(swift -e 'import SwiftUI; let t: AccessibilityTraits = []')",
+      "Bash(find . -name \"*.swift\" -exec sed -i '' 's/^import RyzeMacros$//' {} \\\\;)",
+      "Bash(find . -name \"*.swift\" -exec sed -i '' '/^@DesignPrefix\\(\"Nova\"\\)$/d' {} \\\\;)",
+      "Bash(chmod +x /Users/rafael.escaleira/Documents/ryze/Scripts/GeneratePrefixAliases.swift)",
+      "Bash(swift /Users/rafael.escaleira/Documents/ryze/Scripts/GeneratePrefixAliases.swift App)",
+      "Bash(find:*)",
+      "Bash(xcodebuild -scheme RyzePlayground -destination 'platform=iOS Simulator,name=iPhone 16' build)",
+      "Bash(xcodebuild -scheme RyzePlayground -destination 'platform=iOS Simulator,name=iPhone 17' build)"
+    ]
+  }
+}

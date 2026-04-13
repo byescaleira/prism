@@ -7,7 +7,7 @@
 
 import Foundation
 
-public struct RyzeFileManager {
+public struct RyzeFileManager: @unchecked Sendable {
     private let fileManager: FileManager
     private let documentsURL: URL?
 

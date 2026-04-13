@@ -8,11 +8,11 @@
 import SwiftUI
 
 public protocol RyzeView: View, RyzeUIMock {
-    var accessibility: RyzeAccessibility? { get }
+    var accessibility: RyzeAccessibilityProperties? { get }
     var canAppear: Bool { get }
 }
 
 extension RyzeView {
-    public var accessibility: RyzeAccessibility? { nil }
+    public var accessibility: RyzeAccessibilityProperties? { nil }
     public var canAppear: Bool { true }
 }

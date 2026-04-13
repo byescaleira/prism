@@ -7,13 +7,37 @@
 
 import SwiftUI
 
-struct RyzeSkeletonModifier: RyzeViewModifier {
+/// Modificador de estado de loading (skeleton) do Design System RyzeUI.
+///
+/// `RyzeSkeletonModifier` aplica efeito de skeleton quando `isLoading` está ativo:
+/// - Usa `.redacted(reason: .placeholder)` para efeito nativo
+/// - Transição `.blurReplace` para animação suave
+/// - Animação configurada via `theme.animation`
+///
+/// ## Uso Básico
+/// ```swift
+/// RyzeText("Conteúdo")
+///     .ryzeSkeleton()  // Aplica skeleton quando isLoading = true
+/// ```
+///
+/// ## Com Estado de Loading
+/// ```swift
+/// @State var isLoading = true
+/// RyzeVStack {
+///     RyzeText("Título")
+///     RyzeText("Descrição")
+/// }
+/// .ryze(loading: isLoading)
+/// ```
+///
+/// - Note: O modifier lê o ambiente `\.isLoading` para determinar o estado.
+public struct RyzeSkeletonModifier: ViewModifier {
     @Environment(\.theme) private var theme
     @Environment(\.isLoading) private var isLoading
 
     init() {}
 
-    func body(content: Content) -> some View {
+    public func body(content: Content) -> some View {
         RyzeZStack {
             if isLoading {
                 content

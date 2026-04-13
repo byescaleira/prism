@@ -9,6 +9,40 @@ import AVFoundation
 import AVKit
 import SwiftUI
 
+/// Componente de reprodução de vídeo do Design System RyzeUI.
+///
+/// `RyzeVideoView` é um wrapper de `AVPlayer` com:
+/// - Carregamento assíncrono de URL de vídeo
+/// - Suporte a Picture in Picture (PiP)
+/// - Controles nativos de plataforma
+/// - Transição de escala ao aparecer
+/// - Multi-plataforma (iOS, tvOS, macOS)
+///
+/// ## Uso Básico
+/// ```swift
+/// @State var videoURL: URL?
+/// RyzeVideoView(url: $videoURL)
+/// ```
+///
+/// ## Com Trigger de Reprodução
+/// ```swift
+/// RyzeVStack {
+///     RyzePrimaryButton("Assistir") {
+///         videoURL = URL(string: "https://example.com/video.mp4")
+///     }
+///     RyzeVideoView(url: $videoURL)
+/// }
+/// ```
+///
+/// ## Picture in Picture
+/// - **iOS/tvOS**: Suporte automático via `canStartPictureInPictureAutomaticallyFromInline`
+/// - **macOS**: Suporte via `allowsPictureInPicturePlayback`
+///
+/// ## Comportamento por Plataforma
+/// - **iOS/tvOS**: `AVPlayerViewController` com controles touch
+/// - **macOS**: `AVPlayerView` com controles de desktop
+///
+/// - Note: O player é criado automaticamente quando `url` é definido.
 public struct RyzeVideoView: View {
     @State private var player: AVPlayer?
     @Binding private var url: URL?

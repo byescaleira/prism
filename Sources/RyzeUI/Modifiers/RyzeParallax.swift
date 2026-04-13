@@ -10,7 +10,32 @@ import SwiftUI
 #if os(iOS)
     import CoreMotion
 
-    struct RyzeParallaxModifier: RyzeViewModifier {
+    /// Modificador de efeito parallax (movimento 3D) do Design System RyzeUI.
+    ///
+    /// `RyzeParallaxModifier` cria efeito de profundidade usando o giroscópio:
+    /// - Rotação 3D baseada no movimento do dispositivo
+    /// - Brilho dinâmico (shine) que segue a inclinação
+    /// - Sensibilidade ajustável via threshold
+    /// - Suporte a customização de largura e altura
+    ///
+    /// ## Uso Básico
+    /// ```swift
+    /// RyzeSymbol("rainbow")
+    ///     .ryzeParallax(height: .medium2)
+    /// ```
+    ///
+    /// ## Como Funciona
+    /// - Usa `CMMotionManager` para ler dados do giroscópio
+    /// - Aplica rotação nos eixos X (pitch) e Y (roll)
+    /// - Cria efeito de brilho que se move com a inclinação
+    /// - Atualiza a 60Hz para animação suave
+    ///
+    /// ## Limites de Rotação
+    /// - Threshold: 35° - ângulo mínimo para ativar efeito
+    /// - Max rotation: 20° - rotação máxima aplicada
+    ///
+    /// - Note: Disponível apenas para iOS. O efeito requer dispositivo físico com giroscópio.
+    struct RyzeParallaxModifier: ViewModifier {
         @Environment(\.theme) var theme
         @State var motion: CMDeviceMotion? = nil
 

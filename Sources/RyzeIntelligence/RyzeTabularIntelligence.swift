@@ -5,24 +5,37 @@
 //  Created by Rafael Escaleira on 14/09/25.
 //
 
-import CoreML
 import Foundation
-import RyzeFoundation
-import TabularData
-
-#if targetEnvironment(simulator)
-#else
-    import CreateML
-#endif
-#if canImport(NaturalLanguage)
-    import NaturalLanguage
-#endif
 
 public final class RyzeTabularIntelligence {
-    var data: [[String: Any]]
+    private let data: [RyzeIntelligenceFeatureRow]
+    private let invalidRowCount: Int
+    private let trainer: RyzeIntelligenceLocalTrainer
 
-    public init(data: [[String: Any]]) {
-        self.data = data
+    public init(
+        data: [[String: Any]],
+        trainer: RyzeIntelligenceLocalTrainer = .init()
+    ) {
+        let converted = data.map {
+            $0.compactMapValues(RyzeIntelligenceFeatureValue.init)
+        }
+        self.data = converted
+        self.invalidRowCount =
+            zip(data, converted)
+            .filter { original, sanitized in
+                original.count != sanitized.count || sanitized.isEmpty
+            }
+            .count
+        self.trainer = trainer
+    }
+
+    public init(
+        rows: [RyzeIntelligenceFeatureRow],
+        trainer: RyzeIntelligenceLocalTrainer = .init()
+    ) {
+        self.data = rows
+        self.invalidRowCount = 0
+        self.trainer = trainer
     }
 
     public func trainingRegressor(
@@ -35,56 +48,19 @@ public final class RyzeTabularIntelligence {
         randomSeed: Int = 42,
         stepSize: Double = 0.01
     ) async -> RyzeIntelligenceResult {
-        guard let jsonData = try? JSONSerialization.data(withJSONObject: data),
-            let trainingData = try? DataFrame(jsonData: jsonData)
-        else { return .error }
-
-        #if targetEnvironment(simulator)
-            return .error
-        #else
-            let parameters = MLBoostedTreeRegressor.ModelParameters(
-                validation: .dataFrame(trainingData),
+        await train(
+            kind: .tabularRegressor,
+            configuration: RyzeTabularTrainingConfiguration(
+                id: id,
+                name: name,
                 maxDepth: maxDepth,
                 maxIterations: maxIterations,
                 minLossReduction: minLossReduction,
                 minChildWeight: minChildWeight,
                 randomSeed: randomSeed,
-                stepSize: stepSize,
-                earlyStoppingRounds: nil,
-                rowSubsample: 1,
-                columnSubsample: 1
+                stepSize: stepSize
             )
-
-            guard
-                let regressor = try? MLBoostedTreeRegressor(
-                    trainingData: trainingData,
-                    targetColumn: "target",
-                    parameters: parameters
-                )
-            else { return .error }
-
-            let expectedRange =
-                self.data.max { lhs, rhs in
-                    let maxlhs = lhs.max(by: { $0.value as? Double ?? .zero < $1.value as? Double ?? .zero })
-                    let maxrhs = rhs.max(by: { $0.value as? Double ?? .zero < $1.value as? Double ?? .zero })
-                    return maxlhs?.value as? Double ?? .zero > maxrhs?.value as? Double ?? .zero
-                }?["target"] as? Double ?? 1.0
-
-            let evaluation = regressor.evaluation(on: trainingData)
-
-            let relativeError = evaluation.rootMeanSquaredError / expectedRange
-            let accuracy = max(0.0, 1.0 - relativeError)
-            let model = RyzeIntelligenceModel(
-                id: id,
-                name: name,
-                createDate: Date().timeIntervalSince1970,
-                updateDate: Date().timeIntervalSince1970,
-                accuracy: accuracy,
-                rootMeanSquaredError: evaluation.rootMeanSquaredError
-            )
-            await save(regressor, model: model)
-            return .saved(model: model)
-        #endif
+        )
     }
 
     public func trainingClassifier(
@@ -97,93 +73,56 @@ public final class RyzeTabularIntelligence {
         randomSeed: Int = 42,
         stepSize: Double = 0.01
     ) async -> RyzeIntelligenceResult {
-        guard let jsonData = try? JSONSerialization.data(withJSONObject: data),
-            let trainingData = try? DataFrame(jsonData: jsonData)
-        else { return .error }
-
-        #if targetEnvironment(simulator)
-            return .error
-        #else
-            let parameters = MLBoostedTreeClassifier.ModelParameters(
-                validation: .dataFrame(trainingData),
+        await train(
+            kind: .tabularClassifier,
+            configuration: RyzeTabularTrainingConfiguration(
+                id: id,
+                name: name,
                 maxDepth: maxDepth,
                 maxIterations: maxIterations,
                 minLossReduction: minLossReduction,
                 minChildWeight: minChildWeight,
                 randomSeed: randomSeed,
-                stepSize: stepSize,
-                earlyStoppingRounds: nil,
-                rowSubsample: 1,
-                columnSubsample: 1
+                stepSize: stepSize
             )
-
-            guard
-                let classifier = try? MLBoostedTreeClassifier(
-                    trainingData: trainingData,
-                    targetColumn: "target",
-                    parameters: parameters
-                )
-            else { return .error }
-
-            let model = RyzeIntelligenceModel(
-                id: id,
-                name: name,
-                createDate: Date().timeIntervalSince1970,
-                updateDate: Date().timeIntervalSince1970,
-                accuracy: 1 - classifier.validationMetrics.classificationError,
-                rootMeanSquaredError: classifier.validationMetrics.classificationError
-            )
-
-            await save(classifier, model: model)
-            return .saved(model: model)
-        #endif
+        )
     }
 
-    #if targetEnvironment(simulator)
-    #else
-        func save(
-            _ regressor: MLBoostedTreeRegressor,
-            model: RyzeIntelligenceModel
-        ) async {
-            let fileManager = RyzeFileManager()
-            guard
-                let path = fileManager.path(
-                    with: "\(model.id).mlmodel",
-                    privacy: .public
-                )
-            else { return }
-
-            do {
-                try regressor.write(to: path)
-                await save(model)
-            } catch { return }
+    private func train(
+        kind: RyzeIntelligenceModelKind,
+        configuration: RyzeTabularTrainingConfiguration
+    ) async -> RyzeIntelligenceResult {
+        if invalidRowCount > 0 {
+            return .failure(
+                .invalidTrainingData("Found \(invalidRowCount) invalid tabular training rows.")
+            )
         }
 
-        func save(
-            _ regressor: MLBoostedTreeClassifier,
-            model: RyzeIntelligenceModel
-        ) async {
-            let fileManager = RyzeFileManager()
-            guard
-                let path = fileManager.path(
-                    with: "\(model.id).mlmodel",
-                    privacy: .public
+        do {
+            let model: RyzeIntelligenceModel
+
+            switch kind {
+            case .tabularClassifier:
+                model = try await trainer.trainTabularClassifier(
+                    data: data,
+                    configuration: configuration
                 )
-            else { return }
+            case .tabularRegressor:
+                model = try await trainer.trainTabularRegressor(
+                    data: data,
+                    configuration: configuration
+                )
+            case .custom, .textClassifier, .foundationModelAdapter:
+                return .failure(
+                    .unsupportedInput("Unsupported tabular training kind: \(kind.rawValue)")
+                )
+            }
 
-            do {
-                try regressor.write(to: path)
-                await save(model)
-            } catch { return }
+            return .saved(model: model)
+        } catch let error as RyzeIntelligenceError {
+            return .failure(error)
+        } catch {
+            return .failure(.underlying(error.localizedDescription))
         }
-    #endif
-
-    func save(_ model: RyzeIntelligenceModel) async {
-        let defaults = RyzeDefaults()
-        var models: Set<RyzeIntelligenceModel> = defaults.get(for: "ryze.models") ?? []
-        if models.contains(model) { models.remove(model) }
-        models.insert(model)
-
-        defaults.set(models, for: "ryze.models")
     }
 }

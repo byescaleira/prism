@@ -7,6 +7,35 @@
 
 import SwiftUI
 
+/// Lista de rows do Design System RyzeUI.
+///
+/// `RyzeList` é um wrapper do `List` nativo com:
+/// - Suporte a seleção múltipla opcional
+/// - Integração com `RyzeSection` para agrupamentos
+/// - Estilo consistente com o Design System
+///
+/// ## Uso Básico
+/// ```swift
+/// RyzeList {
+///     RyzeSection {
+///         RyzeBodyText("Item 1")
+///         RyzeBodyText("Item 2")
+///     }
+/// }
+/// ```
+///
+/// ## Com Seleção
+/// ```swift
+/// @State var selected: Set<String> = []
+/// RyzeList(selection: $selected) {
+///     RyzeBodyText("Item 1")
+///         .tag("item1")
+///     RyzeBodyText("Item 2")
+///         .tag("item2")
+/// }
+/// ```
+///
+/// - Note: Use `RyzeSection` dentro da lista para agrupar conteúdo com header/footer.
 public struct RyzeList<SelectionValue: Hashable>: RyzeView {
     let content: any View
     let selection: Binding<Set<SelectionValue>>?

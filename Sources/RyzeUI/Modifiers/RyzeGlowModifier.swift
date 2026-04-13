@@ -7,7 +7,34 @@
 
 import SwiftUI
 
-struct RyzeGlowModifier: RyzeViewModifier {
+/// Modificador de efeito glow (brilho animado) do Design System RyzeUI.
+///
+/// `RyzeGlowModifier` aplica um brilho animado com gradiente angular:
+/// - Animação contínua de gradiente angular (6s por ciclo)
+/// - Cores dinâmicas baseadas no tema ou cor personalizada
+/// - Blur de 20pt para efeito suave
+/// - Ideal para estados de destaque ou celebração
+///
+/// ## Uso Básico
+/// ```swift
+/// RyzeText("Destaque")
+///     .ryzeGlow()
+/// ```
+///
+/// ## Com Cor Personalizada
+/// ```swift
+/// RyzeSymbol("star.fill")
+///     .ryzeGlow(for: .yellow)
+/// ```
+///
+/// ## Efeito
+/// O glow usa um gradiente angular animado que:
+/// - Gira 360° continuamente
+/// - Alterna entre cor principal e 60% de opacidade
+/// - Cria efeito de "luz em movimento"
+///
+/// - Note: O modifier usa `TimelineView` para animação suave e eficiente.
+public struct RyzeGlowModifier: ViewModifier {
     @Environment(\.theme) var theme
     let color: Color?
 
@@ -33,7 +60,7 @@ struct RyzeGlowModifier: RyzeViewModifier {
         self.color = color
     }
 
-    func body(content: Content) -> some View {
+    public func body(content: Content) -> some View {
         content
             .background(animatedAngularGradient)
     }

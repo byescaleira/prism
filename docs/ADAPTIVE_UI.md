@@ -15,6 +15,12 @@ RyzeUI should feel consistent across Apple platforms without pretending every pl
 - Add platform-specific adapters only when behavior or APIs truly diverge
 - Prefer environment-driven theming and platform capability checks
 - Keep component APIs stable while adapting internals per OS
+- Resolve adaptive behavior through `RyzePlatformContext`
+- Prefer `RyzeAdaptiveScreen` for full-screen composition
+- Prefer `RyzeAdaptiveStack` for content/action groups that need to reflow between platforms
+- Prefer `RyzeScaffold` when a screen needs shared hierarchy, title, subtitle, and actions
+- Use `RyzeNavigationView` with an optional sidebar to scale from stack to split navigation
+- Keep `RyzeTabView` as the single tab API and let the component adapt its chrome per platform
 
 ## Platform Notes
 
@@ -22,6 +28,34 @@ RyzeUI should feel consistent across Apple platforms without pretending every pl
 - macOS should feel native with keyboard, menu, and window behavior
 - tvOS should optimize for focus and remote navigation
 - watchOS should keep density, motion, and interaction lightweight
+- visionOS should favor centered canvases and spacious readable layouts
+
+## Suggested Composition
+
+```swift
+RyzeNavigationView(
+    router: router,
+    sidebar: {
+        SidebarView()
+    },
+    destination: { route in
+        RouteView(route: route)
+    },
+    content: {
+        RyzeScaffold(
+            "Workspace",
+            subtitle: "Um único código com comportamento adaptativo"
+        ) {
+            RyzeAdaptiveStack(style: .actions) {
+                PrimaryAction()
+                SecondaryAction()
+            }
+        } content: {
+            MainContent()
+        }
+    }
+)
+```
 
 ## Review Checklist
 
@@ -29,3 +63,4 @@ RyzeUI should feel consistent across Apple platforms without pretending every pl
 - Does it respect the correct interaction model for each platform?
 - Is the design token-driven instead of hardcoded for one screen class?
 - Is the public API platform-agnostic where possible?
+- Can a feature screen be composed without scattering `#if os(...)` through product code?

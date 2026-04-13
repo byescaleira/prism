@@ -7,7 +7,14 @@
 
 import SwiftUI
 
-private struct RyzeConfettiView: RyzeView {
+/// Partícula individual de confetti do Design System RyzeUI.
+///
+/// `RyzeConfettiView` representa uma única partícula com:
+/// - Cor aleatória (laranja, verde, azul, vermelho, amarelo)
+/// - Rotação 3D em dois eixos (X e Z)
+/// - Animação contínua de 360°
+/// - Velocidade aleatória para efeito natural
+private struct RyzeConfettiView: View {
     @State var animate = false
     @State var xSpeed = Double.random(in: 0.7...2)
     @State var zSpeed = Double.random(in: 1...3)
@@ -44,13 +51,9 @@ private struct RyzeConfettiView: RyzeView {
                 value: animate
             )
     }
-
-    static func mocked() -> some View {
-        RyzeConfettiView()
-    }
 }
 
-private struct RyzeConfettiContainerView: RyzeView {
+private struct RyzeConfettiContainerView: View {
     let count: Int
     @State var yPosition: CGFloat = 0
 
@@ -78,12 +81,12 @@ private struct RyzeConfettiContainerView: RyzeView {
     }
 }
 
-struct RyzeConfettiModifier: RyzeViewModifier {
+struct RyzeConfettiModifier: ViewModifier {
     let amount: Int
     let seconds: Int
     let isActive: Bool
 
-    func body(content: Content) -> some View {
+    public func body(content: Content) -> some View {
         content
             .overlay {
                 if isActive {

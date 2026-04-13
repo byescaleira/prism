@@ -9,11 +9,28 @@ import RyzeFoundation
 import SwiftUI
 
 extension EnvironmentValues {
+
+    // MARK: - State
+
     @Entry public var isLoading: Bool = false
     @Entry public var isDisabled: Bool = false
+
+    // MARK: - Screen
+
     @Entry public var screenSize: CGSize = .zero
     @Entry public var scrollPosition: CGPoint = .zero
     @Entry public var isLargeScreen: Bool = false
 
-    @Entry public var theme: RyzeThemeProtocol = RyzeDefaultTheme()
+    // MARK: - Theme
+
+    @Entry public var theme: RyzeTheme = .default
+    @Entry public var designTokens: RyzeDesignTokens = .default
+
+    // MARK: - Layout
+
+    @Entry public var platform: RyzePlatform = .current
+    @Entry public var platformContext: RyzePlatformContext = .default
+    @Entry public var layoutTier: RyzeLayoutTier = .compact
+    @Entry public var isPinnedToTop: Bool = false
+    @Entry public var isPinnedToBottom: Bool = false
 }

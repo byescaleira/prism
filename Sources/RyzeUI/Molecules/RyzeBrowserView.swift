@@ -14,6 +14,40 @@ import SwiftUI
     import SafariServices
 #endif
 
+/// View de navegação web do Design System RyzeUI.
+///
+/// `RyzeBrowserView` é um componente para exibir conteúdo web em:
+/// - Sheet modal com `SFSafariViewController` (iOS)
+/// - Navegador nativo (macOS)
+/// - Binding de URL opcional para controle de apresentação
+///
+/// ## Uso Básico
+/// ```swift
+/// @State var url: URL?
+/// RyzeBrowserView(url: $url) {
+///     RyzePrimaryButton("Abrir site") {
+///         url = URL(string: "https://example.com")
+///     }
+/// }
+/// ```
+///
+/// ## Com Conteúdo Personalizado
+/// ```swift
+/// RyzeBrowserView(url: $url) {
+///     VStack {
+///         RyzeText("Clique para abrir")
+///         RyzePrimaryButton("Visitar") {
+///             url = URL(string: "https://example.com")
+///         }
+///     }
+/// }
+/// ```
+///
+/// ## Comportamento por Plataforma
+/// - **iOS**: Abre em `SFSafariViewController` dentro de um sheet
+/// - **macOS**: Abre no navegador padrão do sistema
+///
+/// - Note: O sheet fecha automaticamente quando `url` é definido como `nil`.
 public struct RyzeBrowserView<Content: View>: View {
     @Binding private var url: URL?
     let content: Content

@@ -8,6 +8,56 @@
 import RyzeFoundation
 import SwiftUI
 
+/// Campo de texto estilizado do Design System RyzeUI.
+///
+/// `RyzeTextField` é um componente de input de texto com:
+/// - Label flutuante (animação automática ao focar/digitar)
+/// - Validação integrada com exibição de erros
+/// - Ícone opcional
+/// - Botão de limpar (aparece ao digitar)
+/// - Acessibilidade completa (VoiceOver/TalkBack)
+/// - Testes de UI (XCUITest) via testIDs estáveis
+///
+/// ## Uso Básico
+/// ```swift
+/// @State var email = ""
+/// RyzeTextField(
+///     text: $email,
+///     configuration: RyzeDefaultTextFieldConfiguration.email
+/// )
+/// ```
+///
+/// ## Com testID
+/// ```swift
+/// RyzeTextField(
+///     text: $email,
+///     label: "Email",
+///     testID: "email_field",
+///     configuration: .email
+/// )
+/// ```
+///
+/// ## Com Builder de Acessibilidade
+/// ```swift
+/// RyzeTextField(
+///     text: $email,
+///     configuration: .email,
+///     accessibility: {
+///         $0.label("Email")
+///             .hint("Digite seu email corporativo")
+///             .testID("email_field")
+///     }
+/// )
+/// ```
+///
+/// ## Validação Automática
+/// O campo valida automaticamente baseado na configuração:
+/// - `.email` - Valida formato de email
+/// - `.phone` - Valida formato de telefone
+/// - `.cpf` - Valida CPF brasileiro
+/// - etc.
+///
+/// - Note: Erros são exibidos automaticamente abaixo do campo com ícone e mensagem.
 public struct RyzeTextField: RyzeView {
     @Environment(\.theme) var theme
     @FocusState var isFocused: Bool
@@ -15,16 +65,41 @@ public struct RyzeTextField: RyzeView {
     @State var error: RyzeError?
 
     let configuration: RyzeTextFieldConfiguration
-    public var accessibility: RyzeAccessibility?
+    public var accessibility: RyzeAccessibilityProperties?
+
+    // MARK: - Initialization
 
     public init(
         text: Binding<String>,
-        _ accessibility: RyzeAccessibility? = nil,
+        _ accessibility: RyzeAccessibilityProperties? = nil,
         configuration: RyzeTextFieldConfiguration
     ) {
         self._text = text
         self.accessibility = accessibility
         self.configuration = configuration
+    }
+
+    /// Inicialização rápida com conveniência de acessibilidade
+    public init(
+        text: Binding<String>,
+        configuration: RyzeTextFieldConfiguration,
+        accessibility: (RyzeAccessibilityConfig) -> RyzeAccessibilityConfig = { $0 }
+    ) {
+        self._text = text
+        self.configuration = configuration
+        self.accessibility = accessibility(RyzeAccessibilityConfig()).build()
+    }
+
+    /// Inicialização com conveniência estática
+    public init(
+        text: Binding<String>,
+        label: LocalizedStringKey,
+        testID: String,
+        configuration: RyzeTextFieldConfiguration
+    ) {
+        self._text = text
+        self.configuration = configuration
+        self.accessibility = RyzeAccessibility.textField(label, testID: testID)
     }
 
     var needFocus: Bool {
@@ -36,21 +111,30 @@ public struct RyzeTextField: RyzeView {
     }
 
     public var body: some View {
-        Button {
-            isFocused = true
-        } label: {
-            RyzeVStack(alignment: .leading) {
-                contentTextField
-                    .overlay(alignment: .topLeading) { placeholderView }
+        RyzeVStack(alignment: .leading, spacing: .small) {
+            contentTextField
+                .overlay(alignment: .topLeading) { placeholderView }
+                .contentShape(.rect)
+                .onTapGesture {
+                    isFocused = true
+                }
+                .ryze(accessibility: accessibility ?? defaultAccessibility)
 
-                errorView
-            }
-            .animation(theme.animation, value: isFocused)
-            .animation(theme.animation, value: text.isEmpty)
-            .animation(theme.animation, value: error?.localizedDescription)
-            .onChange(of: text) { validate() }
+            errorView
         }
-        .ryze(accessibility: accessibility)
+        .animation(theme.animation, value: isFocused)
+        .animation(theme.animation, value: text.isEmpty)
+        .animation(theme.animation, value: error?.localizedDescription)
+        .onChange(of: text) { validate() }
+    }
+
+    // MARK: - Default Accessibility
+
+    private var defaultAccessibility: RyzeAccessibilityProperties {
+        RyzeAccessibility.textField(
+            LocalizedStringKey(configuration.placeholder.value),
+            testID: ""
+        )
     }
 
     var contentTextField: some View {
@@ -178,7 +262,8 @@ public struct RyzeTextField: RyzeView {
     public static func mocked() -> some View {
         RyzeTextField(
             text: .constant(""),
-            configuration: RyzeDefaultTextFieldConfiguration.email
+            configuration: RyzeDefaultTextFieldConfiguration.email,
+            accessibility: { $0 }
         )
     }
 }
@@ -187,7 +272,8 @@ public struct RyzeTextField: RyzeView {
     @Previewable @State var text: String = ""
     RyzeTextField(
         text: $text,
-        configuration: RyzeDefaultTextFieldConfiguration.email
+        configuration: RyzeDefaultTextFieldConfiguration.email,
+        accessibility: { $0 }
     )
     .ryzePadding()
 }

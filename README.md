@@ -30,7 +30,9 @@ The current deployment targets intentionally follow the latest SDK generation be
 - `RyzeArchitecture`: router, store, reducer, and middleware primitives.
 - `RyzeUI`: theme system, atoms, molecules, modifiers, accessibility helpers, and app-facing SwiftUI components.
 - `RyzeVideo`: video download helpers and media-related entities.
-- `RyzeIntelligence`: Natural Language and Core ML powered intelligence helpers.
+- `RyzeIntelligence`: local training and prediction with CreateML/CoreML plus Apple Intelligence and remote language model providers.
+
+The recommended entry point for app-side consumption is `RyzeIntelligenceClient`, which offers one simple facade across local, Apple Intelligence, and remote model backends.
 
 ## Adaptive UI Strategy
 

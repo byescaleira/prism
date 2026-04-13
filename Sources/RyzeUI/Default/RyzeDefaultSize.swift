@@ -7,23 +7,23 @@
 
 import SwiftUI
 
-struct RyzeDefaultSize: RyzeSizeProtocol {
-    var ultraSmall: CGFloat
-    var ultraSmall2: CGFloat
-    var extraSmall: CGFloat
-    var extraSmall2: CGFloat
-    var small: CGFloat
-    var small2: CGFloat
-    var medium: CGFloat
-    var medium2: CGFloat
-    var large: CGFloat
-    var large2: CGFloat
-    var extraLarge: CGFloat
-    var extraLarge2: CGFloat
-    var ultraLarge: CGFloat
-    var max: CGFloat
+public struct RyzeDefaultSize: RyzeSizeProtocol {
+    public var ultraSmall: CGFloat
+    public var ultraSmall2: CGFloat
+    public var extraSmall: CGFloat
+    public var extraSmall2: CGFloat
+    public var small: CGFloat
+    public var small2: CGFloat
+    public var medium: CGFloat
+    public var medium2: CGFloat
+    public var large: CGFloat
+    public var large2: CGFloat
+    public var extraLarge: CGFloat
+    public var extraLarge2: CGFloat
+    public var ultraLarge: CGFloat
+    public var max: CGFloat
 
-    init(
+    public init(
         ultraSmall: CGFloat = 12,
         ultraSmall2: CGFloat = 16,
         extraSmall: CGFloat = 24,

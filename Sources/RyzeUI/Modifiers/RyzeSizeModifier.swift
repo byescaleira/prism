@@ -7,7 +7,38 @@
 
 import SwiftUI
 
-struct RyzeSizeModifier: RyzeViewModifier {
+/// Modificador de tamanho do Design System RyzeUI.
+///
+/// `RyzeSizeModifier` aplica dimensões usando tokens semânticos:
+/// - Largura e altura via `RyzeSize` tokens
+/// - Suporte a `.max` para preenchimento total
+/// - Alinhamento configurável
+/// - Integração com `theme.size` para consistência
+///
+/// ## Uso Básico
+/// ```swift
+/// RyzeShape(.circle)
+///     .ryze(width: .large, height: .large)
+/// ```
+///
+/// ## Largura Máxima
+/// ```swift
+/// RyzeTextField(text: $text)
+///     .ryze(width: .max)  // Ocupa toda largura disponível
+/// ```
+///
+/// ## Tamanho Fixo
+/// ```swift
+/// RyzeSymbol("star")
+///     .ryze(width: .medium, height: .medium)
+/// ```
+///
+/// ## Tamanhos Disponíveis
+/// - `.small`, `.medium`, `.large`, `.extraLarge`, `.extraExtraLarge`
+/// - `.max` - Preenchimento máximo
+///
+/// - Note: O modifier combina múltiplos `.frame()` calls para suportar `.max` corretamente.
+public struct RyzeSizeModifier: ViewModifier {
     @Environment(\.theme) var theme
 
     let width: RyzeSize?
@@ -23,7 +54,7 @@ struct RyzeSizeModifier: RyzeViewModifier {
     var widthValue: CGFloat? { width?.rawValue(for: theme.size) }
     var heightValue: CGFloat? { height?.rawValue(for: theme.size) }
 
-    func body(content: Content) -> some View {
+    public func body(content: Content) -> some View {
         content
             .ryze(if: width == .max && height == .max) {
                 $0.frame(

@@ -12,6 +12,7 @@ let package = Package(
         .macCatalyst(.v26),
         .tvOS(.v26),
         .watchOS(.v26),
+        .visionOS(.v26),
     ],
     products: [
         .library(
@@ -74,6 +75,9 @@ let package = Package(
                 "RyzeFoundation",
                 "RyzeArchitecture",
             ],
+            exclude: [
+                "Exports/README.md"
+            ],
             resources: [
                 .process("Resources/Localizable.xcstrings"),
                 .process("Resources/Media.xcassets"),
@@ -92,6 +96,18 @@ let package = Package(
             name: "RyzePreview",
             dependencies: ["Ryze"],
         ),
+        .executableTarget(
+            name: "RyzePlayground",
+            dependencies: [
+                "Ryze",
+                "RyzeUI",
+                "RyzeArchitecture",
+                "RyzeIntelligence",
+            ],
+            resources: [
+                .process("Resources/Media.xcassets"),
+            ],
+        ),
         .testTarget(
             name: "RyzeFoundationTests",
             dependencies: ["RyzeFoundation"],
@@ -106,6 +122,20 @@ let package = Package(
         .testTarget(
             name: "RyzeNetworkTests",
             dependencies: ["RyzeNetwork"],
+        ),
+        .testTarget(
+            name: "RyzeUITests",
+            dependencies: [
+                "RyzeUI",
+                "RyzeArchitecture",
+            ],
+        ),
+        .testTarget(
+            name: "RyzeIntelligenceTests",
+            dependencies: [
+                "RyzeIntelligence",
+                "RyzeFoundation",
+            ],
         ),
     ],
     swiftLanguageModes: [.v6],

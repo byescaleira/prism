@@ -7,17 +7,17 @@
 
 import SwiftUI
 
-struct RyzeDefaultSpacing: RyzeSpacingProtocol {
-    var none: CGFloat = .zero
-    var extraSmall: CGFloat
-    var small: CGFloat
-    var medium: CGFloat
-    var large: CGFloat
-    var extraLarge: CGFloat
-    var ultraLarge: CGFloat
-    var section: CGFloat
+public struct RyzeDefaultSpacing: RyzeSpacingProtocol {
+    public var none: CGFloat = .zero
+    public var extraSmall: CGFloat
+    public var small: CGFloat
+    public var medium: CGFloat
+    public var large: CGFloat
+    public var extraLarge: CGFloat
+    public var ultraLarge: CGFloat
+    public var section: CGFloat
 
-    init(
+    public init(
         extraSmall: CGFloat = 4,
         small: CGFloat = 8,
         medium: CGFloat = 16,

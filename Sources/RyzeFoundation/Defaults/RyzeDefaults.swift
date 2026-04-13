@@ -7,7 +7,7 @@
 
 import Foundation
 
-public struct RyzeDefaults {
+public struct RyzeDefaults: @unchecked Sendable {
     var userDefaults: UserDefaults
 
     public init() {
