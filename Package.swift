@@ -44,6 +44,9 @@ let package = Package(
             targets: ["PrismIntelligence"],
         ),
     ],
+    dependencies: [
+        .package(url: "https://github.com/swiftlang/swift-docc-plugin", from: "1.4.3")
+    ],
     targets: [
         .target(
             name: "Prism",

@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+#
+# Auto-format all Swift sources with swift-format.
 
 set -euo pipefail
 

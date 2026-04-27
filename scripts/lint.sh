@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+#
+# Lint all Swift sources with swift-format (strict mode).
 
 set -euo pipefail
 

@@ -3,9 +3,12 @@ name: Documentation
 on:
     push:
         branches: [main]
-    pull_request:
-        branches: [main]
     workflow_dispatch:
+
+permissions:
+    contents: read
+    pages: write
+    id-token: write
 
 concurrency:
     group: docs-${{ github.ref }}
@@ -13,37 +16,75 @@ concurrency:
 
 jobs:
     build:
-        name: Build Documentation
-        runs-on: ubuntu-latest
+        name: Build DocC
+        runs-on: macos-15
         steps:
             - uses: actions/checkout@v4
 
-            - name: Set up Python
-              uses: actions/setup-python@v5
-              with:
-                  python-version: '3.12'
-
-            - name: Install dependencies
-              run: pip install -r docs-site/requirements.txt
+            - name: Select Xcode
+              run: sudo xcode-select -s /Applications/Xcode_16.4.app
 
             - name: Build documentation
               run: |
-                  cd docs-site
-                  mkdocs build
+                  targets=(PrismFoundation PrismNetwork PrismArchitecture PrismUI PrismVideo PrismIntelligence Prism)
+                  for target in "${targets[@]}"; do
+                      echo "Building $target..."
+                      swift package generate-documentation \
+                          --target "$target" \
+                          --disable-indexing \
+                          --transform-for-static-hosting
+                  done
 
-            - name: Upload documentation artifact
-              if: github.event_name == 'pull_request'
-              uses: actions/upload-artifact@v4
-              with:
-                  name: documentation
-                  path: docs-site/site/
-                  retention-days: 7
+            - name: Assemble output
+              run: |
+                  mkdir -p docs-output
+                  build_dir=".build/plugins/Swift-DocC/outputs"
+                  targets=(PrismFoundation PrismNetwork PrismArchitecture PrismUI PrismVideo PrismIntelligence Prism)
+                  for target in "${targets[@]}"; do
+                      cp -R "$build_dir/$target.doccarchive" "docs-output/$target"
+                  done
 
-            - name: Deploy to GitHub Pages
-              if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-              uses: peaceiris/actions-gh-pages@v4
+            - name: Generate index page
+              run: |
+                  cat > docs-output/index.html << 'HTML'
+                  <!DOCTYPE html>
+                  <html lang="en">
+                  <head>
+                      <meta charset="utf-8">
+                      <title>Prism Documentation</title>
+                      <style>
+                          body { font-family: -apple-system, system-ui, sans-serif; max-width: 640px; margin: 4rem auto; padding: 0 1rem; }
+                          h1 { font-size: 1.5rem; }
+                          a { display: block; padding: 0.5rem 0; color: #0066cc; text-decoration: none; }
+                          a:hover { text-decoration: underline; }
+                      </style>
+                  </head>
+                  <body>
+                      <h1>Prism Documentation</h1>
+                      <a href="Prism/documentation/prism/">Prism (umbrella)</a>
+                      <a href="PrismFoundation/documentation/prismfoundation/">PrismFoundation</a>
+                      <a href="PrismNetwork/documentation/prismnetwork/">PrismNetwork</a>
+                      <a href="PrismArchitecture/documentation/prismarchitecture/">PrismArchitecture</a>
+                      <a href="PrismUI/documentation/prismui/">PrismUI</a>
+                      <a href="PrismVideo/documentation/prismvideo/">PrismVideo</a>
+                      <a href="PrismIntelligence/documentation/prismintelligence/">PrismIntelligence</a>
+                  </body>
+                  </html>
+                  HTML
+
+            - name: Upload Pages artifact
+              uses: actions/upload-pages-artifact@v3
               with:
-                  github_token: ${{ secrets.GITHUB_TOKEN }}
-                  publish_dir: ./docs-site/site
-                  publish_branch: gh-pages
-                  force_orphan: true
+                  path: docs-output
+
+    deploy:
+        name: Deploy to GitHub Pages
+        needs: build
+        runs-on: ubuntu-latest
+        environment:
+            name: github-pages
+            url: ${{ steps.deployment.outputs.page_url }}
+        steps:
+            - name: Deploy
+              id: deployment
+              uses: actions/deploy-pages@v4

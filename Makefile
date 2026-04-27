@@ -1,6 +1,6 @@
 SWIFT ?= swift
 
-.PHONY: format lint build test validate docs
+.PHONY: format lint build test validate docs docs-serve
 
 format:
 	./scripts/format.sh
@@ -19,3 +19,6 @@ validate:
 
 docs:
 	./scripts/docs.sh
+
+docs-serve:
+	./scripts/docs.sh serve
