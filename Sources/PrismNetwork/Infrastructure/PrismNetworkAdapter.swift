@@ -12,6 +12,7 @@ private enum PrismNetworkCacheMetadata {
     static let expirationKey = "prism.network.cache.expiration"
 }
 
+/// Thread-safe: `redirectURL` is guarded by `NSLock`.
 private final class PrismNetworkRedirectCaptureDelegate: NSObject, URLSessionTaskDelegate, @unchecked Sendable {
     private let lock = NSLock()
     private var redirectURL: URL?

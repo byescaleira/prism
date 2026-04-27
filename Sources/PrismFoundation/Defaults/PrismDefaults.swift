@@ -8,8 +8,10 @@
 import Foundation
 
 /// A UserDefaults wrapper with Codable type support.
+///
+/// Thread-safe: `UserDefaults` is itself thread-safe for reads and writes.
 public struct PrismDefaults: @unchecked Sendable {
-    var userDefaults: UserDefaults
+    let userDefaults: UserDefaults
 
     public init() {
         self.userDefaults = Self.makeUserDefaults(

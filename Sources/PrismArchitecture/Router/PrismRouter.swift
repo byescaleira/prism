@@ -152,17 +152,19 @@ public final class PrismRouter<Route: PrismRoutable>: Equatable {
         path.append(route)
     }
 
-    /// Presents a route as a sheet.
+    /// Presents a route as a sheet, dismissing any active full-screen cover first.
     ///
     /// - Parameter route: The route to present.
     public func present(_ route: Route) {
+        fullScreenRoute = nil
         presentedRoute = route
     }
 
-    /// Presents a route as a full-screen cover.
+    /// Presents a route as a full-screen cover, dismissing any active sheet first.
     ///
     /// - Parameter route: The route to present.
     public func fullScreen(_ route: Route) {
+        presentedRoute = nil
         fullScreenRoute = route
     }
 }

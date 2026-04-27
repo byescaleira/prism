@@ -32,6 +32,7 @@ enum PrismNetworkSocketConnectionState: Sendable {
     case other(String)
 }
 
+/// Thread-safe: wraps `NWConnection` which serializes operations on its internal queue.
 final class PrismNetworkNWConnection: @unchecked Sendable, PrismNetworkSocketConnection {
     private let connection: NWConnection
 

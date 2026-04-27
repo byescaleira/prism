@@ -153,9 +153,11 @@ public final class PrismStore<State: Sendable, Action: Sendable> {
             return
         }
 
+        guard let reducer else { return }
+
         process(
             action,
-            using: reducer!
+            using: reducer
         )
     }
 

@@ -9,6 +9,8 @@ import PrismFoundation
 import SwiftUI
 
 /// Semantic design system color as ShapeStyle.
+///
+/// Thread-safe: `storage` is immutable after init — `KeyPath` and `Color` are value types.
 public struct PrismColor: ShapeStyle, @unchecked Sendable {
     private enum Storage {
         case themed(KeyPath<PrismColorProtocol, Color>)

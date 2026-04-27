@@ -8,6 +8,9 @@
 import Foundation
 
 /// File manager with public and private directory support.
+///
+/// Thread-safe: all stored properties are immutable after init, and `FileManager`
+/// is itself thread-safe for the directory and attribute operations used here.
 public struct PrismFileManager: @unchecked Sendable {
     private let fileManager: FileManager
     private let documentsURL: URL?
@@ -47,7 +50,9 @@ public struct PrismFileManager: @unchecked Sendable {
                     withIntermediateDirectories: true,
                     attributes: nil
                 )
-            } catch { return nil }
+            } catch {
+                return nil
+            }
             return privateURL.appendingPathComponent(name)
         }
     }

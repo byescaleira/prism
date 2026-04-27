@@ -13,15 +13,19 @@ struct PrismRouterTests {
             to: .modal,
             style: .present
         )
+
+        #expect(router.path == [.details(id: 7)])
+        #expect(router.presentedRoute == .modal)
+        #expect(router.fullScreenRoute == nil)
+        #expect(router.topRoute == .details(id: 7))
+
         router.route(
             to: .fullScreen,
             style: .full
         )
 
-        #expect(router.path == [.details(id: 7)])
-        #expect(router.presentedRoute == .modal)
+        #expect(router.presentedRoute == nil)
         #expect(router.fullScreenRoute == .fullScreen)
-        #expect(router.topRoute == .details(id: 7))
     }
 
     @Test
