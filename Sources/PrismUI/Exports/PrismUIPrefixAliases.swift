@@ -39,6 +39,8 @@ public typealias NovaShape = PrismShape
 public typealias NovaSection = PrismSection
 public typealias NovaLabel = PrismLabel
 public typealias NovaTabView = PrismTabView
+public typealias NovaDivider = PrismDivider
+public typealias NovaMenu = PrismMenu
 
 // MARK: - Molecules
 
@@ -54,6 +56,7 @@ public typealias NovaAdaptiveScreen = PrismAdaptiveScreen
 public typealias NovaScaffold = PrismScaffold
 public typealias NovaBrowserView = PrismBrowserView
 public typealias NovaVideoView = PrismVideoView
+public typealias NovaAlert = PrismAlert
 
 // MARK: - Accessibility
 
