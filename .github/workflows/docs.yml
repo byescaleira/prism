@@ -46,6 +46,16 @@ jobs:
                   --hosting-base-path "prism/$target"
           done
 
+      - name: Debug archive structure
+        run: |
+          build_dir=".build/plugins/Swift-DocC/outputs"
+          echo "=== Archive contents for PrismFoundation ==="
+          ls -la "$build_dir/PrismFoundation.doccarchive/" || true
+          echo "=== Checking for css/js ==="
+          find "$build_dir/PrismFoundation.doccarchive" -maxdepth 1 -type d | head -20
+          echo "=== index.html head ==="
+          head -30 "$build_dir/PrismFoundation.doccarchive/index.html" || true
+
       - name: Assemble output
         run: |
           mkdir -p docs-output
