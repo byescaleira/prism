@@ -68,6 +68,7 @@ import SwiftUI
 /// - Important: The carousel uses `.viewAligned` scroll behavior for precise alignment.
 public struct PrismCarousel<Item: Identifiable & Equatable, Content: View>: PrismView {
     @Environment(\.theme) var theme
+    @Environment(\.platformContext) private var platformContext
 
     let items: [Item]
     let itemWidth: CGFloat
@@ -78,6 +79,34 @@ public struct PrismCarousel<Item: Identifiable & Equatable, Content: View>: Pris
 
     @Binding var selection: Int?
     public var accessibility: PrismAccessibilityProperties?
+
+    /// The effective item width after platform adjustments.
+    ///
+    /// On macOS and visionOS with an expansive layout tier, items are scaled up
+    /// by 25 % so the carousel fills wider viewports more naturally. When the
+    /// caller supplies an explicit `itemWidth` that differs from the default
+    /// (160 pt), that value is respected as-is.
+    private var resolvedItemWidth: CGFloat {
+        let defaultWidth: CGFloat = 160
+        guard itemWidth == defaultWidth else { return itemWidth }
+        switch platformContext.platform {
+        case .macOS, .visionOS:
+            return platformContext.layoutTier == .expansive
+                ? itemWidth * 1.25
+                : itemWidth
+        default:
+            return itemWidth
+        }
+    }
+
+    /// Whether auto-scrolling is active for the current platform.
+    ///
+    /// macOS users typically control scrolling via trackpad or mouse, so
+    /// automatic advancement is disabled regardless of the `isAutoScrolling`
+    /// flag passed at init time.
+    private var resolvedAutoScrolling: Bool {
+        platformContext.platform == .macOS ? false : isAutoScrolling
+    }
 
     public enum MockView: View {
         case empty
@@ -138,14 +167,15 @@ public struct PrismCarousel<Item: Identifiable & Equatable, Content: View>: Pris
 
     public var body: some View {
         GeometryReader { proxy in
-            let horizontalInset = (proxy.size.width / 2) - (itemWidth / 2.5) + spacingValue
+            let width = resolvedItemWidth
+            let horizontalInset = (proxy.size.width - width) / 2
             let minimumScaleValue = minimumScale
 
             ScrollView(.horizontal) {
                 HStack(spacing: spacingValue) {
                     ForEach(Array(items.enumerated()), id: \.element.id) { index, _ in
                         content(index)
-                            .frame(width: itemWidth)
+                            .frame(width: width)
                             .containerRelativeFrame(.horizontal)
                             .id(index)
                             .scrollTransition(.interactive, axis: .horizontal) { view, phase in
@@ -166,9 +196,9 @@ public struct PrismCarousel<Item: Identifiable & Equatable, Content: View>: Pris
             .contentMargins(.horizontal, horizontalInset)
             .scrollTargetBehavior(.viewAligned)
             .scrollPosition(id: $selection)
-            .padding(.horizontal, -40)
+            .padding(.horizontal, -platformContext.contentMargins.horizontal)
             .animation(.bouncy(duration: 1.2), value: items)
-            .prism(if: isAutoScrolling) { $0.onReceive(timer) { _ in autoScroll() } }
+            .prism(if: resolvedAutoScrolling) { $0.onReceive(timer) { _ in autoScroll() } }
         }
         .prism(accessibility)
     }

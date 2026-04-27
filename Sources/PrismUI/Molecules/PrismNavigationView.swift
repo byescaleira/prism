@@ -92,7 +92,13 @@ public struct PrismNavigationView<Content: View, Route: PrismRoutable, Destinati
             #if os(iOS)
                 .fullScreenCover(item: $router.fullScreenRoute, content: fullScreenDestination)
             #else
-                .sheet(item: $router.fullScreenRoute, content: fullScreenDestination)
+                .sheet(
+                    item: $router.fullScreenRoute,
+                    content: { route in
+                        fullScreenDestination(for: route)
+                            .presentationSizing(.page)
+                    }
+                )
             #endif
     }
 
@@ -193,11 +199,18 @@ public struct PrismNavigationView<Content: View, Route: PrismRoutable, Destinati
 
     @ViewBuilder
     func modalDestination(for route: Route) -> some View {
-        destination(route)
+        NavigationStack {
+            destination(route)
+        }
+        #if os(macOS)
+            .presentationSizing(.form)
+        #endif
     }
 
     @ViewBuilder
     func fullScreenDestination(for route: Route) -> some View {
-        destination(route)
+        NavigationStack {
+            destination(route)
+        }
     }
 }

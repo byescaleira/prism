@@ -60,6 +60,7 @@ import SwiftUI
 /// - Note: Errors are automatically displayed below the field with an icon and message.
 public struct PrismTextField: PrismView {
     @Environment(\.theme) var theme
+    @Environment(\.platformContext) private var platformContext
     @FocusState var isFocused: Bool
     @Binding var text: String
     @State var error: PrismError?
@@ -110,6 +111,21 @@ public struct PrismTextField: PrismView {
         error == nil && !text.isEmpty ? .success : error == nil ? .secondary : .error
     }
 
+    /// Vertical offset for the floating label when focused.
+    ///
+    /// macOS text fields are shorter than iOS, so a smaller offset
+    /// prevents the label from overlapping the field chrome.
+    private var floatingLabelOffset: CGFloat {
+        switch platformContext.platform {
+        case .macOS:
+            -32
+        case .watchOS:
+            -28
+        default:
+            -40
+        }
+    }
+
     public var body: some View {
         PrismVStack(alignment: .leading, spacing: .small) {
             contentTextField
@@ -149,6 +165,11 @@ public struct PrismTextField: PrismView {
             .keyboardType(configuration.contentType.rawValue)
             .textInputAutocapitalization(configuration.autocapitalizationType.rawValue)
         #endif
+        #if os(macOS)
+            // macOS adds its own bezel by default; `.plain` removes it so
+            // `.prismBackgroundSecondary()` is the sole background provider.
+            .textFieldStyle(.plain)
+        #endif
         .submitLabel(configuration.submitLabel)
         .prism(alignment: .leading)
         .prismPadding(.horizontal, .extraLarge)
@@ -182,10 +203,13 @@ public struct PrismTextField: PrismView {
             )
             .prism(font: .body)
             .prism(color: .textSecondary)
-            .offset(x: needFocus && !text.isEmpty ? .zero : 50)
-            .opacity(0.5)
-            .scaleEffect(0.8)
+            // Opacity + scale replaces the hardcoded 50pt offset so the
+            // transition works identically across macOS and iOS.
+            .opacity(needFocus && !text.isEmpty ? 0.5 : 0)
+            .scaleEffect(needFocus && !text.isEmpty ? 0.8 : 0.4)
         }
+        .disabled(text.isEmpty)
+        .accessibilityHidden(text.isEmpty)
     }
 
     @ViewBuilder
@@ -195,7 +219,10 @@ public struct PrismTextField: PrismView {
                 .prism(font: .footnote)
                 .prism(color: stateColor)
                 .prismGlow(for: error == nil ? nil : theme.color.error)
-                .offset(x: needFocus ? .zero : -50)
+                // Opacity + scale replaces the hardcoded -50pt offset for
+                // reliable cross-platform icon reveal.
+                .opacity(needFocus ? 1 : 0)
+                .scaleEffect(needFocus ? 1 : 0.4)
         }
     }
 
@@ -206,7 +233,7 @@ public struct PrismTextField: PrismView {
             .prism(color: .disabled)
             .lineLimit(1)
             .prismPadding()
-            .offset(y: needFocus ? -40 : .zero)
+            .offset(y: needFocus ? floatingLabelOffset : .zero)
     }
 
     @ViewBuilder

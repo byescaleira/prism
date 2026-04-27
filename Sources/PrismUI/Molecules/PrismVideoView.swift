@@ -74,17 +74,31 @@ public struct PrismVideoView: View {
     struct PrismVideoPlayer: NSViewRepresentable {
         let player: AVPlayer
 
-        func updateNSView(
-            _ NSView: NSView,
-            context: NSViewRepresentableContext<PrismVideoPlayer>
-        ) {
-            guard let view = NSView as? AVPlayerView else { return }
+        func makeNSView(context: Context) -> AVPlayerView {
+            let view = AVPlayerView()
             view.player = player
+            view.controlsStyle = .floating
             view.allowsPictureInPicturePlayback = true
+            return view
         }
 
-        func makeNSView(context: Context) -> NSView {
-            return AVPlayerView(frame: .zero)
+        func updateNSView(
+            _ nsView: AVPlayerView,
+            context: Context
+        ) {
+            nsView.player = player
+            nsView.allowsPictureInPicturePlayback = true
+        }
+
+        func sizeThatFits(
+            _ proposal: ProposedViewSize,
+            nsView: AVPlayerView,
+            context: Context
+        ) -> CGSize? {
+            guard let width = proposal.width, let height = proposal.height else {
+                return nil
+            }
+            return CGSize(width: width, height: height)
         }
     }
 
@@ -96,6 +110,7 @@ public struct PrismVideoView: View {
             let vc = AVPlayerViewController()
             vc.player = player
             #if os(tvOS)
+                vc.allowsPictureInPicturePlayback = true
             #else
                 vc.canStartPictureInPictureAutomaticallyFromInline = true
             #endif
@@ -103,6 +118,7 @@ public struct PrismVideoView: View {
         }
 
         func updateUIViewController(_ uiViewController: AVPlayerViewController, context: Context) {
+            guard uiViewController.player !== player else { return }
             uiViewController.player = player
         }
     }

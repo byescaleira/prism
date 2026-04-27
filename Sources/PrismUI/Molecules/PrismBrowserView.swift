@@ -7,8 +7,8 @@
 
 import SwiftUI
 
-#if canImport(AppKit)
-    import AppKit
+#if canImport(WebKit)
+    import WebKit
 #endif
 #if canImport(SafariServices)
     import SafariServices
@@ -18,7 +18,7 @@ import SwiftUI
 ///
 /// `PrismBrowserView` is a component for displaying web content via:
 /// - Modal sheet with `SFSafariViewController` (iOS)
-/// - Native browser (macOS)
+/// - Embedded `WKWebView` (macOS)
 /// - Optional URL binding for presentation control
 ///
 /// ## Basic Usage
@@ -45,7 +45,7 @@ import SwiftUI
 ///
 /// ## Platform Behavior
 /// - **iOS**: Opens in `SFSafariViewController` within a sheet
-/// - **macOS**: Opens in the system default browser
+/// - **macOS**: Opens in an embedded `WKWebView` within a sheet
 ///
 /// - Note: The sheet automatically dismisses when `url` is set to `nil`.
 public struct PrismBrowserView<Content: View>: View {
@@ -96,20 +96,30 @@ public struct PrismBrowserView<Content: View>: View {
         }
     }
 
-#elseif canImport(AppKit)
+#elseif canImport(AppKit) && canImport(WebKit)
+    /// macOS browser view backed by `WKWebView`.
+    ///
+    /// Renders web content inline instead of opening the system browser,
+    /// so the sheet displays the page directly within the app.
     struct PrismBrowser: NSViewRepresentable {
         let url: URL
 
-        func updateNSView(
-            _ nsView: NSView,
-            context: NSViewRepresentableContext<PrismBrowser>
-        ) {
-            _ = nsView
-            NSWorkspace.shared.open(url)
+        func makeNSView(context: Context) -> WKWebView {
+            let webView = WKWebView()
+            webView.allowsBackForwardNavigationGestures = true
+            webView.load(URLRequest(url: url))
+            return webView
         }
 
-        func makeNSView(context: Context) -> NSView {
-            return .init()
+        func updateNSView(
+            _ webView: WKWebView,
+            context: Context
+        ) {
+            // Reload only when the URL actually changes to avoid
+            // unnecessary network requests on unrelated state updates.
+            if webView.url != url {
+                webView.load(URLRequest(url: url))
+            }
         }
     }
 
