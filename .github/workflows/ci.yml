@@ -17,7 +17,7 @@ jobs:
   quality:
     name: Lint → Build → Test
     if: github.actor != 'github-actions[bot]'
-    runs-on: macos-latest
+    runs-on: macos-26
     timeout-minutes: 45
 
     steps:

@@ -1,7 +1,7 @@
 <p align="center">
   <img src="https://img.shields.io/github/v/release/rafaelesantos/prism?style=flat-square&color=blue" alt="Release">
   <img src="https://github.com/rafaelesantos/prism/actions/workflows/ci.yml/badge.svg" alt="CI">
-  <img src="https://img.shields.io/badge/Swift-6.2-F05138?style=flat-square&logo=swift&logoColor=white" alt="Swift 6.3">
+  <img src="https://img.shields.io/badge/Swift-6.3-F05138?style=flat-square&logo=swift&logoColor=white" alt="Swift 6.3">
   <img src="https://img.shields.io/badge/Platforms-iOS_|_macOS_|_tvOS_|_watchOS_|_visionOS-blue?style=flat-square" alt="Platforms">
   <img src="https://img.shields.io/badge/Architecture-Clean_+_UDF-purple?style=flat-square" alt="Architecture">
   <img src="https://img.shields.io/badge/Concurrency-Strict-orange?style=flat-square" alt="Concurrency">
