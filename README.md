@@ -5,7 +5,7 @@
   <img src="https://img.shields.io/badge/Platforms-iOS_|_macOS_|_tvOS_|_watchOS_|_visionOS-blue?style=flat-square" alt="Platforms">
   <img src="https://img.shields.io/badge/Architecture-Clean_+_UDF-purple?style=flat-square" alt="Architecture">
   <img src="https://img.shields.io/badge/Concurrency-Strict-orange?style=flat-square" alt="Concurrency">
-  <img src="https://img.shields.io/badge/coverage-0%25-red?style=flat-square" alt="Coverage">
+  <img src="https://img.shields.io/badge/coverage--%25-red?style=flat-square
   <img src="https://img.shields.io/badge/License-MIT-green?style=flat-square" alt="License">
 </p>
 
