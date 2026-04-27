@@ -16,6 +16,7 @@ permissions:
 jobs:
   quality:
     name: Lint → Build → Test
+    if: github.actor != 'github-actions[bot]'
     runs-on: macos-latest
     timeout-minutes: 30
 

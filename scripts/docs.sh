@@ -39,31 +39,7 @@ for target in "${TARGETS[@]}"; do
     cp -R "$BUILD_DIR/$target.doccarchive" "$OUTPUT_DIR/$target"
 done
 
-cat > "$OUTPUT_DIR/index.html" << 'HTML'
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="utf-8">
-    <title>Prism Documentation</title>
-    <style>
-        body { font-family: -apple-system, system-ui, sans-serif; max-width: 640px; margin: 4rem auto; padding: 0 1rem; }
-        h1 { font-size: 1.5rem; }
-        a { display: block; padding: 0.5rem 0; color: #0066cc; text-decoration: none; }
-        a:hover { text-decoration: underline; }
-    </style>
-</head>
-<body>
-    <h1>Prism Documentation</h1>
-    <a href="Prism/documentation/prism/">Prism (umbrella)</a>
-    <a href="PrismFoundation/documentation/prismfoundation/">PrismFoundation</a>
-    <a href="PrismNetwork/documentation/prismnetwork/">PrismNetwork</a>
-    <a href="PrismArchitecture/documentation/prismarchitecture/">PrismArchitecture</a>
-    <a href="PrismUI/documentation/prismui/">PrismUI</a>
-    <a href="PrismVideo/documentation/prismvideo/">PrismVideo</a>
-    <a href="PrismIntelligence/documentation/prismintelligence/">PrismIntelligence</a>
-</body>
-</html>
-HTML
+cp "$ROOT_DIR/scripts/docs-index.html" "$OUTPUT_DIR/index.html"
 
 echo ""
 echo "Documentation built at $OUTPUT_DIR/"
