@@ -42,7 +42,8 @@ jobs:
               swift package generate-documentation \
                   --target "$target" \
                   --disable-indexing \
-                  --transform-for-static-hosting
+                  --transform-for-static-hosting \
+                  --hosting-base-path "prism/$target"
           done
 
       - name: Assemble output

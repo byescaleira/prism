@@ -90,6 +90,9 @@
     "Delete" : {
 
     },
+    "Edit" : {
+
+    },
     "Expand" : {
 
     },
@@ -231,6 +234,9 @@
           }
         }
       }
+    },
+    "Menu" : {
+
     },
     "mergeConflictDescription" : {
       "extractionState" : "manual",
