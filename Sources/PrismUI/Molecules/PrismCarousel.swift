@@ -5,6 +5,7 @@
 //  Created by Rafael Escaleira on 14/02/26.
 //
 
+import PrismFoundation
 import SwiftUI
 
 /// Horizontal scrolling item carousel for the PrismUI Design System.
@@ -69,6 +70,7 @@ import SwiftUI
 public struct PrismCarousel<Item: Identifiable & Equatable, Content: View>: PrismView {
     @Environment(\.theme) var theme
     @Environment(\.platformContext) private var platformContext
+    @Environment(\.analyticsProvider) private var analyticsProvider
 
     let items: [Item]
     let itemWidth: CGFloat
@@ -201,6 +203,15 @@ public struct PrismCarousel<Item: Identifiable & Equatable, Content: View>: Pris
             .prism(if: resolvedAutoScrolling) { $0.onReceive(timer) { _ in autoScroll() } }
         }
         .prism(accessibility)
+        .onChange(of: selection) { _, newIndex in
+            trackScroll(to: newIndex)
+        }
+    }
+
+    private func trackScroll(to index: Int?) {
+        guard let analyticsProvider, let index else { return }
+        let testID = (accessibility ?? PrismAccessibility.custom(label: "Carousel", testID: "")).testID
+        analyticsProvider.track(.carouselScroll(testID: testID, index: index))
     }
 
     func autoScroll() {

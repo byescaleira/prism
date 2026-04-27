@@ -5,6 +5,7 @@
 //  Created by Rafael Escaleira on 18/06/25.
 //
 
+import PrismFoundation
 import SwiftUI
 
 /// A styled button for the PrismUI Design System.
@@ -35,6 +36,8 @@ import SwiftUI
 /// - Important: For UI testing, always provide a unique and stable `testID`.
 /// - Note: The button provides haptic feedback on iOS.
 public struct PrismButton: PrismView {
+    @Environment(\.analyticsProvider) private var analyticsProvider
+
     let role: ButtonRole?
     let action: () async -> Void
     let label: any View
@@ -123,11 +126,23 @@ public struct PrismButton: PrismView {
             #if os(iOS)
                 UIImpactFeedbackGenerator(style: .medium).impactOccurred()
             #endif
+            trackTap()
             Task { await action() }
         } label: {
             AnyView(label)
         }
         .prism(accessibility: accessibility ?? defaultAccessibility)
+    }
+
+    private func trackTap() {
+        guard let analyticsProvider else { return }
+        let props = accessibility ?? defaultAccessibility
+        analyticsProvider.track(
+            .buttonTap(
+                label: props.testID,
+                testID: props.testID
+            )
+        )
     }
 
     // MARK: - Default Accessibility

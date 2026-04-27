@@ -61,6 +61,7 @@ import SwiftUI
 public struct PrismTextField: PrismView {
     @Environment(\.theme) var theme
     @Environment(\.platformContext) private var platformContext
+    @Environment(\.analyticsProvider) private var analyticsProvider
     @FocusState var isFocused: Bool
     @Binding var text: String
     @State var error: PrismError?
@@ -142,6 +143,9 @@ public struct PrismTextField: PrismView {
         .animation(theme.animation, value: text.isEmpty)
         .animation(theme.animation, value: error?.localizedDescription)
         .onChange(of: text) { validate() }
+        .onChange(of: isFocused) { _, focused in
+            trackFieldInteraction(focused ? "focus" : "blur")
+        }
     }
 
     // MARK: - Default Accessibility
@@ -284,6 +288,12 @@ public struct PrismTextField: PrismView {
                     .prism(alignment: .leading)
             }
         }
+    }
+
+    private func trackFieldInteraction(_ action: String) {
+        guard let analyticsProvider else { return }
+        let testID = (accessibility ?? defaultAccessibility).testID
+        analyticsProvider.track(.fieldInteraction(testID: testID, action: action))
     }
 
     public static func mocked() -> some View {

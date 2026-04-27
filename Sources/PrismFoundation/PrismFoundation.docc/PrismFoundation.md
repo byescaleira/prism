@@ -1,6 +1,6 @@
 # ``PrismFoundation``
 
-Camada base do Prism: entidades, erros, logging, recursos, defaults, formatação, locale, arquivos e extensões Foundation.
+Camada base do Prism: entidades, erros, logging, analytics, recursos, defaults, formatação, locale, arquivos e extensões Foundation.
 
 ## Visão Geral
 
@@ -43,11 +43,22 @@ Os protocolos ``PrismEntity`` e ``PrismError`` definem contratos para entidades 
 - ``PrismResourceString``
 - ``PrismResourceImage``
 
+### Analytics
+
+- ``PrismAnalyticsProvider``
+- ``PrismAnalyticsEvent``
+- <doc:AnalyticsGuide>
+
+### Locale
+
+- ``PrismLocale``
+- ``PrismLocaleManager``
+- <doc:LocaleGuide>
+
 ### Armazenamento e Formatação
 
 - ``PrismDefaults``
 - ``PrismDateFormatter``
-- ``PrismLocale``
 
 ### Arquivos
 

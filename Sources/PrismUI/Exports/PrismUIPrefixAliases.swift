@@ -67,6 +67,15 @@ public typealias NovaAccessibilityAction = PrismAccessibilityAction
 public typealias NovaAccessibilityBuilder = PrismAccessibilityBuilder
 public typealias NovaAccessibilityHint = PrismAccessibilityHint
 
+// MARK: - Analytics
+
+public typealias NovaAnalyticsProvider = PrismAnalyticsProvider
+public typealias NovaAnalyticsEvent = PrismAnalyticsEvent
+
+// MARK: - Locale
+
+public typealias NovaLocaleManager = PrismLocaleManager
+
 // MARK: - Styles & Tokens
 
 public typealias NovaColor = PrismColor
@@ -125,6 +134,25 @@ extension View {
     /// Applies accessibility properties using builder pattern with custom prefix.
     public func nova(accessibility builder: (PrismAccessibilityConfig) -> PrismAccessibilityConfig) -> some View {
         prism(accessibility: builder)
+    }
+
+    // MARK: - Analytics
+
+    /// Injects analytics provider with custom prefix.
+    public func nova(analytics: any PrismAnalyticsProvider) -> some View {
+        prism(analytics: analytics)
+    }
+
+    /// Tracks custom event with custom prefix.
+    public func novaTrack(_ event: PrismAnalyticsEvent) -> some View {
+        prismTrack(event)
+    }
+
+    // MARK: - Locale Manager
+
+    /// Injects locale manager with custom prefix.
+    public func nova(localeManager: PrismLocaleManager) -> some View {
+        prism(localeManager: localeManager)
     }
 
     // MARK: - Style Modifiers

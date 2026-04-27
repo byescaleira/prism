@@ -56,6 +56,7 @@ import SwiftUI
 /// - Important: Requires routes to conform to `PrismRoutable`.
 public struct PrismNavigationView<Content: View, Route: PrismRoutable, Destination: View>: View {
     @Environment(\.platformContext) private var platformContext
+    @Environment(\.analyticsProvider) private var analyticsProvider
     @Namespace private var transitionNamespace
 
     @Bindable private var router: PrismRouter<Route>
@@ -192,9 +193,21 @@ public struct PrismNavigationView<Content: View, Route: PrismRoutable, Destinati
         #if os(iOS)
             destination(route)
                 .navigationTransition(.zoom(sourceID: route.id, in: transitionNamespace))
+                .onAppear { trackScreenView(route) }
         #else
             destination(route)
+                .onAppear { trackScreenView(route) }
         #endif
+    }
+
+    private func trackScreenView(_ route: Route) {
+        guard let analyticsProvider else { return }
+        analyticsProvider.track(
+            .screenView(
+                name: String(describing: type(of: route)),
+                route: String(describing: route)
+            )
+        )
     }
 
     @ViewBuilder

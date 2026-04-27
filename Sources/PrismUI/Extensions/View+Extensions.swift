@@ -160,6 +160,30 @@ extension View {
         self.environment(\.locale, locale.rawValue)
     }
 
+    /// Injects a ``PrismLocaleManager`` and applies its current locale.
+    ///
+    /// The view hierarchy will update automatically when the manager's
+    /// ``PrismLocaleManager/current`` property changes.
+    ///
+    /// - Parameter localeManager: The locale manager to inject.
+    /// - Returns: A view with the locale manager and its locale applied.
+    public func prism(localeManager: PrismLocaleManager) -> some View {
+        self
+            .environment(\.localeManager, localeManager)
+            .environment(\.locale, localeManager.current.rawValue)
+    }
+
+    /// Injects an analytics provider for automatic component tracking.
+    ///
+    /// Once set, PrismUI components (buttons, text fields, carousels, etc.)
+    /// will automatically emit events to this provider.
+    ///
+    /// - Parameter analytics: The analytics provider to use.
+    /// - Returns: A view with the analytics provider in its environment.
+    public func prism(analytics: any PrismAnalyticsProvider) -> some View {
+        self.environment(\.analyticsProvider, analytics)
+    }
+
     /// Forces a preferred color scheme (light or dark) on the view.
     ///
     /// - Parameter colorScheme: The color scheme to apply, or `nil` to follow the system setting.
@@ -487,6 +511,14 @@ extension View {
                 isActive: isActive
             )
         )
+    }
+
+    /// Tracks a custom analytics event when the view appears.
+    ///
+    /// - Parameter event: The event to track on appearance.
+    /// - Returns: A view that emits the analytics event on appear.
+    public func prismTrack(_ event: PrismAnalyticsEvent) -> some View {
+        self.modifier(PrismAnalyticsTrackModifier(event: event))
     }
 
     /// Presents an in-app browser sheet when the bound URL is non-nil.

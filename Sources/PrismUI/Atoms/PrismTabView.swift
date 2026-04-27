@@ -71,6 +71,7 @@ import SwiftUI
 /// - Note: Maintains the same API across platforms and adapts the chrome based on `PrismPlatformContext`.
 public struct PrismTabView<SelectionValue: Hashable>: PrismView {
     @Environment(\.platformContext) private var platformContext
+    @Environment(\.analyticsProvider) private var analyticsProvider
 
     @Binding var selection: SelectionValue
     var searchText: Binding<String>?
@@ -114,6 +115,17 @@ public struct PrismTabView<SelectionValue: Hashable>: PrismView {
     public var body: some View {
         tabView
             .prism(accessibility)
+            .onChange(of: selection) { _, newValue in
+                trackTabSelect(newValue)
+            }
+    }
+
+    private func trackTabSelect(_ value: SelectionValue) {
+        guard let analyticsProvider else { return }
+        let testID = (accessibility ?? PrismAccessibility.custom(label: "", testID: "")).testID
+        analyticsProvider.track(
+            .tabSelect(testID: testID, tab: String(describing: value))
+        )
     }
 
     internal static func showsBottomAccessory(
