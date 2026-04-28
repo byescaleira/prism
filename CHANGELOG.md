@@ -10,6 +10,75 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 
 ### Added
 
+- feat(ui): add theme editor, auto theme generation, Figma sync, interactive storybook
+- feat(ui): add accessibility v2, localization, performance, style protocols, environment setup, preview blocks, navigation path, observable, watchOS complications, visionOS volumes, macOS menu bar
+- feat(ui): add context menu, gauge, group box, label styles, content transitions, sensory feedback, image resource, table, paste button, refreshable, TipKit, timeline, settings
+- feat(ui): add map, photos, document, headers, gradients, toolbar, validation, previews, onboarding, redacted styles, notification banner
+- feat(ui): align with Apple reference projects — glass, mesh gradient, transitions, split view, responsive layout
+- feat(ui): add haptics, drag/drop, keyboard shortcuts, focus, undo, theme persistence, component browser
+- feat(ui): add widgets, live activities, charts, animations, token export, SwiftData integration
+- feat(ui): infrastructure polish — localization, visionOS, accessibility, performance
+- feat(ui): add theme variants, snapshot testing, DocC guides, README/CHANGELOG update
+- feat(ui): add 16 new components — primitives, composites, forms, modifiers
+- feat(ui): add Phases 7-10 — Composites, Forms, Lists, Polish
+- feat(ui): add Phase 5 navigation + Phase 6 testing infrastructure
+- feat(ui): add Phase 4 accessibility tools + update DocC
+- feat(ui): add Phase 3 layout system — Stack, Grid, Section, Scaffold, Spacer
+- feat(ui): add Phase 2 primitives — Button, Icon, Image, TextField, Card, Tag, Divider, LoadingState
+- feat(ui): rewrite PrismUI design system from scratch — Phase 1
+
+### Changed
+
+- Merge pull request #3 from rafaelesantos/dependabot/github_actions/actions/upload-artifact-7
+- Merge pull request #2 from rafaelesantos/dependabot/github_actions/actions/checkout-6
+- Merge pull request #15 from rafaelesantos/feature/advanced-features
+- chore(release): update changelog for v0.10.0
+- Merge pull request #14 from rafaelesantos/feature/quality-dx-platform
+- chore(release): update changelog for v0.9.0
+- Merge pull request #13 from rafaelesantos/feature/final-gaps-polish
+- chore(release): update changelog for v0.8.0
+- Merge pull request #12 from rafaelesantos/feature/comprehensive-expansion
+- chore(release): update changelog for v0.7.0
+- Merge pull request #11 from rafaelesantos/feature/apple-reference-upgrades
+- chore(release): update changelog for v0.6.0
+- Merge pull request #10 from rafaelesantos/feature/platform-interactions
+- chore(release): update changelog for v0.5.0
+- Merge pull request #9 from rafaelesantos/feature/advanced-integrations
+- chore: resolve merge conflict in CHANGELOG.md
+- chore(release): update changelog for v0.4.0
+- Merge pull request #8 from rafaelesantos/feature/infra-polish
+- chore(release): update changelog for v0.3.0
+- Merge pull request #7 from rafaelesantos/feature/polish-and-docs
+- chore: resolve merge conflict in CHANGELOG.md
+- chore(release): update changelog for v0.2.0
+- Merge pull request #6 from rafaelesantos/feature/new-components
+- chore(release): update changelog for v0.1.0
+- Merge pull request #5 from rafaelesantos/feature/design-system-v2
+- docs(ui): update DocC with composites, forms, and lists sections
+- docs(ui): update DocC catalog with navigation and testing sections
+- chore(docs): remove debug step from docs workflow
+- debug(docs): add archive structure inspection step
+- ci: update coverage badge to -%
+- Bump actions/checkout from 4 to 6
+- Bump actions/upload-artifact from 4 to 7
+
+### Fixed
+
+- fix(docs): add hosting-base-path for DocC static hosting
+- fix(test): increase settleTasks delay for CI reliability
+- fix(ci): use macos-26 runner for Swift 6.3 and platform v26
+- fix(ci): lower swift-tools-version to 6.2 for CI compatibility
+- fix(ci): auto-detect Xcode with Swift 6.3 on runner
+- fix(ci): use swift-actions/setup-swift with Swift 6.3
+- fix(ci): use Xcode 26.3 for Swift 6.3 toolchain
+- fix(ci): pin Xcode 26.4 for Swift 6.3 toolchain
+- fix(ci): pin Xcode 26.0 for Swift 6.3 compatibility
+- fix(ci): use setup-xcode action to install latest Xcode
+- fix(ci): allow dependabot PRs to merge into main
+## [0.11.0] - 2026-04-28
+
+### Added
+
 - **Theme Editor**: `PrismThemeEditor` — live runtime theme builder with color pickers, spacing/radius/elevation/motion previews, dark mode toggle, and JSON export
 - **Auto Theme Generation**: `PrismAutoTheme` — generate `BrandTheme` from a single color using 4 color harmony strategies (complementary, analogous, triadic, split-complementary) with HSL color math
 - **Figma Sync**: `PrismFigmaSync` — bidirectional token sync: export to Figma Variables format, import from Figma JSON to `BrandTheme`, plus W3C DTCG format for cross-tool compatibility
