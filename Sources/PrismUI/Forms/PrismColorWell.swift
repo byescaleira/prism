@@ -39,7 +39,7 @@ public struct PrismColorWell: View {
                     ColorPicker("", selection: $selection, supportsOpacity: false)
                         .labelsHidden()
                         .frame(width: 32, height: 32)
-                        .accessibilityLabel("Custom color")
+                        .accessibilityLabel(PrismStrings.customColor)
                 }
             }
         }
@@ -76,7 +76,7 @@ public struct PrismColorWell: View {
                 }
         }
         .buttonStyle(.plain)
-        .accessibilityLabel("Color swatch")
+        .accessibilityLabel(PrismStrings.colorSwatch)
         .accessibilityAddTraits(isSelected(color) ? .isSelected : [])
     }
 

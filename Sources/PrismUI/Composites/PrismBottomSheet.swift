@@ -48,7 +48,7 @@ public struct PrismBottomSheet<Content: View>: View {
             .onTapGesture { isPresented = false }
             .transition(.opacity)
             .accessibilityAddTraits(.isButton)
-            .accessibilityLabel("Dismiss")
+            .accessibilityLabel(PrismStrings.dismiss)
     }
 
     private func sheetView(maxHeight: CGFloat) -> some View {

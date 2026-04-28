@@ -12,11 +12,17 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 - **Theme variants**: DarkTheme (always-dark), HighContrastTheme (WCAG AAA), BrandTheme (configurable primary/secondary/accent)
 - **Snapshot testing**: PrismSnapshotTest with render, renderAll, and pixel-by-pixel compare — light, dark, large text, high contrast configurations
 - **DocC guides**: Getting Started, Using Tokens, Component Guide, Theming Guide — all with code examples
+- **Localization**: All hardcoded UI strings extracted to PrismStrings with Bundle.module support
+- **visionOS polish**: PrismDepthStack, prismDepth(), prismOrnament(), prismHover() with spatial layout support
+- **Accessibility audit**: Systematic WCAG contrast, tap target, and theme completeness tests
+- **Performance tooling**: prismLazy() for deferred rendering, prismBodyCount() for DEBUG profiling
+- **Package.swift**: StrictConcurrency experimental feature enabled across all targets
 
 ### Changed
 
-- README rewritten with updated test counts (273/43), component list, theme table, and usage examples
+- README rewritten with updated test counts (290/44), component list, theme table, and usage examples
 - DocC catalog updated with all new components, theme variants, guides section, and PrismSnapshotTest
+- HighContrastTheme success/warning colors darkened to pass WCAG large text on white
 
 ## [0.2.0] - 2026-04-28
 

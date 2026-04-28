@@ -12,7 +12,7 @@
 
 A modular Swift package for building Apple-platform apps — shared foundation, networking, architecture, adaptive UI, media, and on-device intelligence.
 
-> **273 tests** · **43 suites** · **7 modules** · **Swift 6.3 strict concurrency** · **DocC on every public API**
+> **290 tests** · **44 suites** · **7 modules** · **Swift 6.3 strict concurrency** · **DocC on every public API**
 
 ---
 
@@ -202,7 +202,7 @@ make docs-serve      # DocC + local server at :8000
 
 | Check | Status |
 |-------|--------|
-| Tests | 275+ across 43 suites |
+| Tests | 275+ across 44 suites |
 | Concurrency | Strict — `Sendable`, `@MainActor`, actor isolation |
 | Formatting | `swift-format` enforced in CI |
 | Docs | DocC with guides: Getting Started, Tokens, Components, Theming |

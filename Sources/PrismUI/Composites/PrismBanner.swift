@@ -45,7 +45,7 @@ public struct PrismBanner: View {
                             .foregroundStyle(theme.color(.onBackgroundSecondary))
                     }
                     .buttonStyle(.plain)
-                    .accessibilityLabel("Dismiss")
+                    .accessibilityLabel(PrismStrings.dismiss)
                 }
             }
             .padding(SpacingToken.lg.rawValue)

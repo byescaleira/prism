@@ -44,7 +44,7 @@ public struct PrismChip: View {
                             .font(.system(size: 10, weight: .bold))
                     }
                     .buttonStyle(.plain)
-                    .accessibilityLabel("Remove")
+                    .accessibilityLabel(PrismStrings.remove)
                 }
             }
             .foregroundStyle(isSelected ? theme.color(.onBrand) : theme.color(.onSurface))

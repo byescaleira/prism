@@ -92,7 +92,7 @@ private struct ErrorStateView: View {
 
             if let retry {
                 Button(action: retry) {
-                    Text("Retry")
+                    Text(PrismStrings.retry)
                         .font(TypographyToken.headline.font)
                         .foregroundStyle(theme.color(.interactive))
                 }

@@ -12,7 +12,7 @@ private struct SkeletonModifier: ViewModifier {
             content
                 .redacted(reason: .placeholder)
                 .overlay(shimmer)
-                .accessibilityLabel("Loading")
+                .accessibilityLabel(PrismStrings.loading)
         } else {
             content
         }

@@ -42,8 +42,8 @@ public struct HighContrastTheme: PrismTheme, Sendable {
         case .interactivePressed: .accentColor.opacity(0.65)
         case .interactiveDisabled: platformForeground.opacity(0.35)
 
-        case .success: Color(red: 0.0, green: 0.7, blue: 0.15)
-        case .warning: Color(red: 0.85, green: 0.55, blue: 0.0)
+        case .success: Color(red: 0.0, green: 0.55, blue: 0.1)
+        case .warning: Color(red: 0.7, green: 0.4, blue: 0.0)
         case .error: Color(red: 0.9, green: 0.1, blue: 0.1)
         case .info: Color(red: 0.0, green: 0.4, blue: 0.9)
 

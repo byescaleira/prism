@@ -52,7 +52,7 @@ public struct PrismCountdownTimer: View {
             .frame(width: 120, height: 120)
 
             if showLabel {
-                Text(isRunning ? "Running" : (remaining <= 0 ? "Complete" : "Paused"))
+                Text(verbatim: isRunning ? .prismRunning : (remaining <= 0 ? .prismComplete : .prismPaused))
                     .font(TypographyToken.caption.font(weight: .medium))
                     .foregroundStyle(theme.color(.onBackgroundSecondary))
             }

@@ -58,19 +58,19 @@ public struct PrismSwipeAction: @unchecked Sendable {
     }
 
     public static func delete(handler: @escaping () -> Void) -> PrismSwipeAction {
-        PrismSwipeAction("Delete", icon: "trash", tint: .red, role: .destructive, handler: handler)
+        PrismSwipeAction(PrismStrings.delete, icon: "trash", tint: .red, role: .destructive, handler: handler)
     }
 
     public static func archive(handler: @escaping () -> Void) -> PrismSwipeAction {
-        PrismSwipeAction("Archive", icon: "archivebox", tint: .orange, handler: handler)
+        PrismSwipeAction(PrismStrings.archive, icon: "archivebox", tint: .orange, handler: handler)
     }
 
     public static func pin(handler: @escaping () -> Void) -> PrismSwipeAction {
-        PrismSwipeAction("Pin", icon: "pin", tint: .yellow, handler: handler)
+        PrismSwipeAction(PrismStrings.pin, icon: "pin", tint: .yellow, handler: handler)
     }
 
     public static func flag(handler: @escaping () -> Void) -> PrismSwipeAction {
-        PrismSwipeAction("Flag", icon: "flag", tint: .orange, handler: handler)
+        PrismSwipeAction(PrismStrings.flag, icon: "flag", tint: .orange, handler: handler)
     }
 }
 

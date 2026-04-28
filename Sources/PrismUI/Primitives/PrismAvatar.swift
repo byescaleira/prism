@@ -105,7 +105,7 @@ public struct PrismAvatar: View {
     }
 
     private var accessibilityText: String {
-        var label = "Avatar"
+        var label = String.prismAvatar
         if case .initials(let text) = content { label = text }
         if let status { label += ", \(status.accessibilityLabel)" }
         return label
@@ -168,10 +168,10 @@ extension PrismAvatar {
 
         var accessibilityLabel: String {
             switch self {
-            case .online: "Online"
-            case .offline: "Offline"
-            case .busy: "Busy"
-            case .away: "Away"
+            case .online: .prismOnline
+            case .offline: .prismOffline
+            case .busy: .prismBusy
+            case .away: .prismAway
             }
         }
     }

@@ -58,8 +58,12 @@ let package = Package(
                 "PrismVideo",
                 "PrismIntelligence",
             ],
+            swiftSettings: swiftSettings
         ),
-        .target(name: "PrismFoundation"),
+        .target(
+            name: "PrismFoundation",
+            swiftSettings: swiftSettings
+        ),
         .target(
             name: "PrismNetwork",
             dependencies: ["PrismFoundation"],
@@ -67,10 +71,12 @@ let package = Package(
                 .process("Resource/PrismNetworkString.xcstrings"),
                 .process("Resource/PrismNetworkLogMessage.xcstrings"),
             ],
+            swiftSettings: swiftSettings
         ),
         .target(
             name: "PrismArchitecture",
             dependencies: ["PrismFoundation"],
+            swiftSettings: swiftSettings
         ),
         .target(
             name: "PrismUI",
@@ -83,18 +89,22 @@ let package = Package(
                 .process("Resources/Media.xcassets"),
                 .copy("Resources/Symbols.json"),
             ],
+            swiftSettings: swiftSettings
         ),
         .target(
             name: "PrismVideo",
             dependencies: ["PrismFoundation"],
+            swiftSettings: swiftSettings
         ),
         .target(
             name: "PrismIntelligence",
             dependencies: ["PrismFoundation"],
+            swiftSettings: swiftSettings
         ),
         .target(
             name: "PrismPreview",
             dependencies: ["Prism"],
+            swiftSettings: swiftSettings
         ),
         .testTarget(
             name: "PrismFoundationTests",
@@ -135,3 +145,9 @@ let package = Package(
     ],
     swiftLanguageModes: [.v6],
 )
+
+// MARK: - Swift Settings
+
+private let swiftSettings: [SwiftSetting] = [
+    .enableExperimentalFeature("StrictConcurrency"),
+]

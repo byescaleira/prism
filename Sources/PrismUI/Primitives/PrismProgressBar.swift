@@ -102,7 +102,7 @@ public struct PrismProgressBar: View {
         if let value {
             "\(Int(min(max(value / total, 0), 1) * 100)) percent"
         } else {
-            "In progress"
+            String.prismInProgress
         }
     }
 }

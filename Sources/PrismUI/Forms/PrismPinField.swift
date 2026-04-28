@@ -25,8 +25,8 @@ public struct PrismPinField: View {
             cellRow
         }
         .accessibilityElement()
-        .accessibilityLabel("PIN entry, \(length) digits")
-        .accessibilityValue(code.isEmpty ? "Empty" : "\(code.count) of \(length) entered")
+        .accessibilityLabel(Text(verbatim: "\(String.prismPinEntry), \(length) digits"))
+        .accessibilityValue(code.isEmpty ? String.prismEmpty : "\(code.count) of \(length) entered")
     }
 
     private var hiddenTextField: some View {
