@@ -6,6 +6,18 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+
+## [1.6.0] - 2026-04-28
+
+### Added
+
+- **Color Blindness Simulation**: `PrismColorBlindnessSimulator` — 7 vision type simulations with view modifier
+- **Focus Order Validation**: `PrismFocusOrderValidator` — priority-based focus order checking
+- **Voice Control Labels**: `PrismVoiceControlGroup` + modifiers for voice control accessibility
+- **WCAG Contrast Checker V2**: `PrismContrastChecker` — contrast ratio, level compliance, auto color suggestion
+- **Accessibility Announcements**: `PrismAccessibilityAnnouncer` — priority-based screen reader announcements
+- 20+ new tests
+
 ## [1.5.0] - 2026-04-28
 
 ### Added

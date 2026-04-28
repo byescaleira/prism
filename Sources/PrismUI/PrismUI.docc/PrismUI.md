@@ -124,6 +124,18 @@ earn their wrapper by adding behavior beyond what raw SwiftUI provides.
 - ``PrismReduceMotion``
 - ``PrismDynamicTypePreview``
 
+### Accessibility V3
+
+- ``PrismColorBlindnessSimulator``
+- ``PrismColorBlindnessType``
+- ``PrismFocusOrderValidator``
+- ``PrismFocusOrderItem``
+- ``PrismVoiceControlGroup``
+- ``PrismContrastChecker``
+- ``PrismContrastLevel``
+- ``PrismAccessibilityAnnouncer``
+- ``PrismAnnouncementPriority``
+
 ### Widgets
 
 - ``PrismWidgetView``
