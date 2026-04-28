@@ -149,9 +149,39 @@ earn their wrapper by adding behavior beyond what raw SwiftUI provides.
 
 - ``PrismTokenExport``
 
+### Haptics
+
+- ``PrismHaptics``
+- ``PrismHapticType``
+- ``PrismImpactWeight``
+- ``PrismNotificationStyle``
+
+### Drag & Drop
+
+- ``PrismReorderableList``
+
+### Keyboard Shortcuts
+
+- ``PrismShortcut``
+- ``PrismShortcutGroup``
+
+### Focus
+
+- ``PrismFocusStyle``
+- ``PrismFocusSection``
+
+### Undo/Redo
+
+- ``PrismUndoButtons``
+
+### Theme Persistence
+
+- ``PrismThemeStore``
+
 ### Testing
 
 - ``PrismPreviewCatalog``
 - ``PrismThemeTest``
 - ``PrismAccessibilityTest``
 - ``PrismSnapshotTest``
+- ``PrismComponentBrowser``
