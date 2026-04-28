@@ -6,6 +6,24 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+
+## [0.6.0] - 2026-04-28
+
+### Added
+
+- **Haptics**: `PrismHaptics` engine with platform-adaptive feedback (UIKit/AppKit/WatchKit), `.prismHaptic()` modifier
+- **Drag & Drop**: `prismDraggable()` / `prismDropTarget()` with themed indicators, `PrismReorderableList` with `onMove`
+- **Keyboard Shortcuts**: `PrismShortcut` with 8 presets (save/undo/redo/delete/search/new/refresh/close), `PrismShortcutGroup`
+- **Focus Management**: `PrismFocusStyle` (ring/highlight/scale/subtle), `PrismFocusSection` for tvOS/macOS, `.prismFocusable()`
+- **Undo/Redo**: `.prismUndoable()` modifier with `UndoManager` integration, `PrismUndoButtons` toolbar component
+- **Theme Persistence**: `PrismThemeStore` with `@AppStorage` persistence, runtime registration, animated switching
+- **Component Browser**: `PrismComponentBrowser` dev tool — searchable catalog of all components with live toggles
+- 35 new tests (367 total, 60 suites)
+
+### Changed
+
+- DocC catalog updated with Haptics, Drag & Drop, Keyboard Shortcuts, Focus, Undo/Redo, Theme Persistence, Component Browser sections
+
 ## [0.5.0] - 2026-04-28
 
 ### Added
