@@ -6,6 +6,38 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+
+## [0.7.0] - 2026-04-28
+
+### Added
+
+- **Liquid Glass**: `PrismGlassContainer` (coordinated glass layout), `prismGlassID()` (glass animation identity), `prismBackgroundExtension()`, `prismGlass(cornerRadius:)`
+- **Glass buttons**: `.glass` and `.glassProminent` variants use native `buttonStyle(.glass)` / `.glassProminent`
+- **MeshGradient**: `PrismMeshGradient` with 4 presets (aurora, sunset, ocean, subtle) + custom points
+- **Navigation transitions**: `prismZoomTransition()`, `prismTransitionSource()` for hero animations
+- **Scroll transitions**: `prismScrollTransition()` (scale), `prismScrollTransitionFade()`, `prismScrollEdge()` soft edge
+- **NavigationSplitView**: `PrismSplitView` (2-column), `PrismThreeColumnView` (3-column) wrappers
+- **Typography width**: `prismFontWidth()`, `.font(weight:width:)` for expanded/condensed text
+- **Spring motion tokens**: `.snappy`, `.bouncy`, `.smooth` using SwiftUI's built-in spring animations
+- **Responsive layout**: `prismContainerFrame()`, `PrismScaledView`, `prismGeometry()`, `prismContentMargins()`
+- **Sheet upgrades**: item-based presentation, `interactiveDismiss`, `PrismSheetBackground` (material/clear)
+- **Confirmation dialog**: `prismConfirmationDialog()` with actions and message
+- **Inspector**: `prismInspector()` for iPad/macOS sidebar
+- **ContentUnavailableView**: `PrismContentUnavailable`, `PrismSearchUnavailable` wrapping native iOS 17+ views
+- **ShareLink**: `PrismShareButton` for text, URL, and Transferable sharing
+- **Searchable**: `prismSearchable()` with keyboard dismiss
+- **Scroll control**: `prismScrollTarget()` (viewAligned/paging), `prismScrollIndicators()`, `prismScrollClipDisabled()`
+- **Symbol transitions**: `prismSymbolTransition()` for animated SF Symbol content
+- **Toolbar**: `prismToolbarBackground()` visibility control
+- 54 new tests (421 total, 73 suites)
+
+### Changed
+
+- `PrismButton` glass variant now uses native `buttonStyle(.glass)` instead of custom style
+- `MotionToken` now has 8 cases (added snappy, bouncy, smooth)
+- Existing motion duration test updated from "strictly increasing" to "positive" to accommodate spring tokens
+- DocC catalog updated with Glass Effects, Mesh Gradients, Split View, Responsive, Sharing, Empty States sections
+
 ## [0.6.0] - 2026-04-28
 
 ### Added

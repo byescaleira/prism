@@ -44,7 +44,7 @@ public struct PrismButton<Label: View>: View {
     }
 
     public var body: some View {
-        Button(role: role) {
+        let button = Button(role: role) {
             guard !isLoading else { return }
             triggerHaptic()
             isLoading = true
@@ -55,13 +55,21 @@ public struct PrismButton<Label: View>: View {
         } label: {
             buttonContent
         }
-        .buttonStyle(PrismButtonStyle(
-            variant: variant,
-            theme: theme,
-            isLoading: isLoading,
-            reduceMotion: reduceMotion
-        ))
         .disabled(!isEnabled || isLoading)
+
+        switch variant {
+        case .glass:
+            button.buttonStyle(.glass)
+        case .glassProminent:
+            button.buttonStyle(.glassProminent)
+        default:
+            button.buttonStyle(PrismButtonStyle(
+                variant: variant,
+                theme: theme,
+                isLoading: isLoading,
+                reduceMotion: reduceMotion
+            ))
+        }
     }
 
     @ViewBuilder
@@ -77,7 +85,8 @@ public struct PrismButton<Label: View>: View {
 
     private var labelColor: Color {
         switch variant {
-        case .filled, .glass: theme.color(.onBrand)
+        case .filled: theme.color(.onBrand)
+        case .glass, .glassProminent: theme.color(.onBackground)
         case .tinted: theme.color(.interactive)
         case .bordered, .plain: theme.color(.interactive)
         }
@@ -106,6 +115,7 @@ public enum PrismButtonVariant: Sendable {
     case bordered
     case plain
     case glass
+    case glassProminent
 }
 
 public enum PrismButtonHaptic: Sendable {
@@ -145,12 +155,14 @@ private struct PrismButtonStyle: SwiftUI.ButtonStyle {
 
     private func foregroundColor(pressed: Bool) -> Color {
         switch variant {
-        case .filled, .glass:
+        case .filled:
             theme.color(.onBrand)
         case .tinted:
             theme.color(.interactive)
         case .bordered, .plain:
             pressed ? theme.color(.interactivePressed) : theme.color(.interactive)
+        case .glass, .glassProminent:
+            theme.color(.onBackground)
         }
     }
 
@@ -163,8 +175,8 @@ private struct PrismButtonStyle: SwiftUI.ButtonStyle {
             theme.color(.interactive).opacity(pressed ? 0.2 : 0.12)
         case .bordered, .plain:
             Color.clear
-        case .glass:
-            theme.color(.interactive)
+        case .glass, .glassProminent:
+            Color.clear
         }
     }
 

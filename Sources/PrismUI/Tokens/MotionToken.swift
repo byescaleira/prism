@@ -11,6 +11,9 @@ public enum MotionToken: Sendable, CaseIterable {
     case normal
     case slow
     case expressive
+    case snappy
+    case bouncy
+    case smooth
 
     public var duration: Double {
         switch self {
@@ -19,6 +22,9 @@ public enum MotionToken: Sendable, CaseIterable {
         case .normal: 0.25
         case .slow: 0.35
         case .expressive: 0.5
+        case .snappy: 0.25
+        case .bouncy: 0.35
+        case .smooth: 0.3
         }
     }
 
@@ -34,6 +40,12 @@ public enum MotionToken: Sendable, CaseIterable {
             .easeInOut(duration: duration)
         case .expressive:
             .spring(duration: duration, bounce: 0.2)
+        case .snappy:
+            .snappy
+        case .bouncy:
+            .bouncy
+        case .smooth:
+            .smooth
         }
     }
 }

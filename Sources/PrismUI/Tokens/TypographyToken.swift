@@ -60,4 +60,12 @@ public enum TypographyToken: Sendable, CaseIterable {
     public func font(weight: Font.Weight, design: Font.Design) -> Font {
         .system(textStyle, design: design, weight: weight)
     }
+
+    public func font(weight: Font.Weight, width: Font.Width) -> Font {
+        .system(textStyle, weight: weight).width(width)
+    }
+
+    public func font(weight: Font.Weight, design: Font.Design, width: Font.Width) -> Font {
+        .system(textStyle, design: design, weight: weight).width(width)
+    }
 }

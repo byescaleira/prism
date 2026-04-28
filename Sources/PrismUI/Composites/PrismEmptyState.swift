@@ -64,3 +64,85 @@ extension PrismEmptyState where Action == EmptyView {
         self.action = EmptyView()
     }
 }
+
+/// System-styled empty state wrapping `ContentUnavailableView`.
+///
+/// Uses Apple's native `ContentUnavailableView` for system-consistent appearance.
+///
+/// ```swift
+/// PrismContentUnavailable(
+///     "No Results",
+///     systemImage: "magnifyingglass",
+///     description: "Try a different search term"
+/// )
+/// ```
+@available(iOS 17.0, macOS 14.0, tvOS 17.0, watchOS 10.0, *)
+public struct PrismContentUnavailable<Actions: View>: View {
+    private let title: LocalizedStringKey
+    private let systemImage: String
+    private let description: LocalizedStringKey?
+    private let actions: Actions
+
+    public init(
+        _ title: LocalizedStringKey,
+        systemImage: String,
+        description: LocalizedStringKey? = nil,
+        @ViewBuilder actions: () -> Actions
+    ) {
+        self.title = title
+        self.systemImage = systemImage
+        self.description = description
+        self.actions = actions()
+    }
+
+    public var body: some View {
+        if let description {
+            ContentUnavailableView {
+                Label(title, systemImage: systemImage)
+            } description: {
+                Text(description)
+            } actions: {
+                actions
+            }
+        } else {
+            ContentUnavailableView {
+                Label(title, systemImage: systemImage)
+            } actions: {
+                actions
+            }
+        }
+    }
+}
+
+@available(iOS 17.0, macOS 14.0, tvOS 17.0, watchOS 10.0, *)
+extension PrismContentUnavailable where Actions == EmptyView {
+
+    public init(
+        _ title: LocalizedStringKey,
+        systemImage: String,
+        description: LocalizedStringKey? = nil
+    ) {
+        self.title = title
+        self.systemImage = systemImage
+        self.description = description
+        self.actions = EmptyView()
+    }
+}
+
+/// Search-specific empty state using system `ContentUnavailableView.search`.
+@available(iOS 17.0, macOS 14.0, tvOS 17.0, watchOS 10.0, *)
+public struct PrismSearchUnavailable: View {
+    private let query: String
+
+    public init(query: String = "") {
+        self.query = query
+    }
+
+    public var body: some View {
+        if query.isEmpty {
+            ContentUnavailableView.search
+        } else {
+            ContentUnavailableView.search(text: query)
+        }
+    }
+}

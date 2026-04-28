@@ -178,6 +178,33 @@ earn their wrapper by adding behavior beyond what raw SwiftUI provides.
 
 - ``PrismThemeStore``
 
+### Glass Effects
+
+- ``PrismGlassContainer``
+
+### Mesh Gradients
+
+- ``PrismMeshGradient``
+
+### Navigation Split View
+
+- ``PrismSplitView``
+- ``PrismThreeColumnView``
+
+### Responsive Layout
+
+- ``PrismResponsiveSize``
+- ``PrismScaledView``
+
+### Sharing
+
+- ``PrismShareButton``
+
+### Empty States
+
+- ``PrismContentUnavailable``
+- ``PrismSearchUnavailable``
+
 ### Testing
 
 - ``PrismPreviewCatalog``

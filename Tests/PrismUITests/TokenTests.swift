@@ -62,10 +62,9 @@ struct TokenTests {
     // MARK: - MotionToken
 
     @Test
-    func motionDurationsAreStrictlyIncreasing() {
-        let durations = MotionToken.allCases.map(\.duration)
-        for i in 1..<durations.count {
-            #expect(durations[i] > durations[i - 1])
+    func motionDurationsArePositive() {
+        for token in MotionToken.allCases {
+            #expect(token.duration > 0)
         }
     }
 
