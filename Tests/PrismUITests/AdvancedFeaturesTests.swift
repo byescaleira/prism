@@ -26,29 +26,29 @@ struct AdvancedFeaturesTests {
         @Test("generate complementary from blue")
         @MainActor func complementary() {
             let theme = PrismAutoTheme.generate(from: .blue)
-            let brand = theme.color(.brand)
-            #expect(brand != nil)
+            let resolved = theme.color(.brand).resolve(in: .init())
+            #expect(resolved.blue > 0.5)
         }
 
         @Test("generate analogous from red")
         @MainActor func analogous() {
             let theme = PrismAutoTheme.analogous(from: .red)
-            let brand = theme.color(.brand)
-            #expect(brand != nil)
+            let resolved = theme.color(.brand).resolve(in: .init())
+            #expect(resolved.red > 0.5)
         }
 
         @Test("generate triadic from green")
         @MainActor func triadic() {
             let theme = PrismAutoTheme.triadic(from: .green)
-            let brand = theme.color(.brand)
-            #expect(brand != nil)
+            let resolved = theme.color(.brand).resolve(in: .init())
+            #expect(resolved.green > 0.5)
         }
 
         @Test("generate split-complementary from purple")
         @MainActor func splitComplementary() {
             let theme = PrismAutoTheme.splitComplementary(from: .purple)
-            let brand = theme.color(.brand)
-            #expect(brand != nil)
+            _ = theme.color(.brand).resolve(in: .init())
+            _ = theme.color(.brandVariant).resolve(in: .init())
         }
 
         @Test("Harmony cases")
@@ -61,7 +61,7 @@ struct AdvancedFeaturesTests {
         @MainActor func generateWithHarmony() {
             for harmony in PrismAutoTheme.Harmony.allCases {
                 let theme = PrismAutoTheme.generate(from: .orange, harmony: harmony)
-                #expect(theme.color(.brand) != nil)
+                _ = theme.color(.brand).resolve(in: .init())
             }
         }
 
@@ -177,7 +177,7 @@ struct AdvancedFeaturesTests {
         @MainActor func themeChoiceProducesTheme() {
             for choice in PrismStorybook.ThemeChoice.allCases {
                 let theme = choice.theme
-                #expect(theme.color(.brand) != nil)
+                _ = theme.color(.brand).resolve(in: .init())
             }
         }
     }
