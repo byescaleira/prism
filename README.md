@@ -12,7 +12,7 @@
 
 A modular Swift package for building Apple-platform apps — shared foundation, networking, architecture, adaptive UI, media, and on-device intelligence.
 
-> **463 tests** · **85 suites** · **7 modules** · **Swift 6.3 strict concurrency** · **DocC on every public API**
+> **493 tests** · **98 suites** · **7 modules** · **Swift 6.3 strict concurrency** · **DocC on every public API**
 
 ---
 

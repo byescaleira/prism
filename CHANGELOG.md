@@ -6,6 +6,29 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+## [0.9.0] - 2026-04-28
+
+### Added
+
+- **Context Menu**: `prismContextMenu()` with optional preview support
+- **Gauge**: `PrismGauge` with semantic color tinting (error/warning/success by value range)
+- **GroupBox**: `PrismGroupBox` with themed background and optional label/title
+- **Label Style**: `PrismLabelStyle` (automatic/iconOnly/titleOnly/titleAndIcon) with `prismLabelStyle()` modifier
+- **Content Transition**: `PrismContentTransition` (numericText/countdown/interpolate/opacity/identity) with `prismContentTransition()` modifier
+- **Sensory Feedback**: `PrismSensoryFeedback` (11 types) with `prismSensoryFeedback()` modifier (iOS 17+)
+- **Image Resource**: `PrismImageResource` for system/catalog images with token-based tinting
+- **Table**: `PrismTable` themed wrapper for macOS Table views
+- **Paste Button**: `PrismPasteButton` with platform-adaptive implementation (PasteButton on iOS/macOS, fallback on others)
+- **Refreshable**: `prismRefreshable()` modifier for pull-to-refresh
+- **TipKit Integration**: `PrismTipView` and `prismPopoverTip()` with themed tip background and tint (iOS 17+)
+- **Timeline View**: `PrismTimelineView` with `PrismTimelineSchedule` (animation/everySecond/custom/explicit)
+- **Settings**: `PrismSettingsView` and `PrismSettingsSection` for themed preferences forms
+- 30 new tests (493 total, 98 suites)
+
+### Changed
+
+- DocC catalog updated with Context Menu, Gauge, GroupBox, Label Style, Content Transition, Sensory Feedback, Image Resource, Table, Paste, Timeline, TipKit, Settings sections
+
 ## [0.8.0] - 2026-04-28
 
 ### Added

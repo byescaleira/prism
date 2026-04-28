@@ -260,6 +260,54 @@ earn their wrapper by adding behavior beyond what raw SwiftUI provides.
 
 - ``PrismNotificationBanner``
 
+### Context Menu
+
+### Content Transition
+
+- ``PrismContentTransition``
+
+### Sensory Feedback
+
+- ``PrismSensoryFeedback``
+
+### Gauge
+
+- ``PrismGauge``
+
+### GroupBox
+
+- ``PrismGroupBox``
+
+### Label Style
+
+- ``PrismLabelStyle``
+
+### Image Resource
+
+- ``PrismImageResource``
+
+### Table (macOS)
+
+- ``PrismTable``
+
+### Paste Button
+
+- ``PrismPasteButton``
+
+### Timeline View
+
+- ``PrismTimelineSchedule``
+- ``PrismTimelineView``
+
+### TipKit Integration
+
+- ``PrismTipView``
+
+### Settings
+
+- ``PrismSettingsView``
+- ``PrismSettingsSection``
+
 ### Testing
 
 - ``PrismPreviewCatalog``
