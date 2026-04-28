@@ -269,6 +269,7 @@ earn their wrapper by adding behavior beyond what raw SwiftUI provides.
 
 - ``PrismDevicePreview``
 - ``PrismLocalePreview``
+- ``PrismPreviews``
 
 ### Onboarding
 
