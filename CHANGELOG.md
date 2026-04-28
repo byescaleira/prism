@@ -6,6 +6,25 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+
+## [3.1.0] - 2026-04-28
+
+### Added
+
+- **New Module**: `PrismCapabilities` — Apple Developer Program capability wrappers
+- **StoreKit 2**: `PrismStoreKitClient` — products, purchases, subscriptions, transaction listener
+- **MetricKit**: `PrismMetricKitClient` — app metrics and crash diagnostics via MXMetricManager
+- **Device Activity**: `PrismDeviceActivityClient` — Screen Time monitoring schedules and events
+- **Background Tasks**: `PrismBackgroundTaskClient` — BGTaskScheduler registration and scheduling
+- **Apple Pay**: `PrismApplePayClient` — payment requests with PKPaymentAuthorizationController
+- **App Clips**: `PrismAppClipClient` — invocation handling, location verification, full app install
+- **Sign in with Apple**: `PrismSignInWithAppleClient` — authentication with credential state checking
+- **Push Notifications**: `PrismPushNotificationClient` — permissions, local/remote, rich notifications
+- **CloudKit**: `PrismCloudKitClient` — record CRUD, queries, subscriptions, account status
+- **HealthKit**: `PrismHealthKitClient` — authorization, samples, statistics, background delivery
+- **WidgetKit**: `PrismWidgetCenter` — timeline reloading and configuration queries
+- 40+ new tests
+
 ## [0.16.0] - 2026-04-28
 
 ### Added

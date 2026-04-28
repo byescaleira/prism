@@ -43,6 +43,10 @@ let package = Package(
             name: "PrismIntelligence",
             targets: ["PrismIntelligence"],
         ),
+        .library(
+            name: "PrismCapabilities",
+            targets: ["PrismCapabilities"],
+        ),
     ],
     dependencies: [
         .package(url: "https://github.com/swiftlang/swift-docc-plugin", from: "1.4.3")
@@ -57,6 +61,7 @@ let package = Package(
                 "PrismUI",
                 "PrismVideo",
                 "PrismIntelligence",
+                "PrismCapabilities",
             ],
             swiftSettings: swiftSettings
         ),
@@ -102,6 +107,12 @@ let package = Package(
             swiftSettings: swiftSettings
         ),
         .target(
+            name: "PrismCapabilities",
+            dependencies: ["PrismFoundation"],
+            path: "Sources/PrismCapabilities",
+            swiftSettings: swiftSettings
+        ),
+        .target(
             name: "PrismPreview",
             dependencies: ["Prism"],
             swiftSettings: swiftSettings
@@ -141,6 +152,11 @@ let package = Package(
                 "PrismVideo",
                 "PrismFoundation",
             ],
+        ),
+        .testTarget(
+            name: "PrismCapabilitiesTests",
+            dependencies: ["PrismCapabilities"],
+            path: "Tests/PrismCapabilitiesTests",
         ),
     ],
     swiftLanguageModes: [.v6],
