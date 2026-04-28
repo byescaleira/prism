@@ -7,6 +7,30 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 
 ## [Unreleased]
 
+## [2.7.0] - 2026-04-28
+
+### Added
+
+- **Embedding Store**: `PrismEmbedding`, `PrismEmbeddingStore` actor — vector storage with cosine similarity search
+- **RAG Pipeline**: `PrismRAGConfig`, `PrismTextChunker`, `PrismRAGPipeline` — chunk, embed, store, retrieve, generate workflow
+- **Vision Classifier**: `PrismVisionClassifier` — image classification via Vision framework (`VNClassifyImageRequest`)
+- **NLP Actions**: `PrismNLPActions` — sentiment analysis, entity extraction, language detection, tokenization via NaturalLanguage
+- **Structured Output**: `PrismStructuredParser`, `PrismOutputValidator` — JSON extraction, key-value parsing, schema validation
+- **Model Manager**: `PrismModelManager` actor — model lifecycle management with register, unload, and hot-swap
+- 22+ new tests (Swift Testing)
+
+## [2.5.0] - 2026-04-28
+
+### Added
+
+- **Retry Policies**: `PrismRetryPolicy` protocol, `PrismExponentialBackoff` (exponential backoff with jitter), `PrismLinearRetry` (fixed delay), `PrismRetryableRequest` wrapper
+- **Request Deduplication**: `PrismRequestDeduplicator` actor — coalesces identical in-flight requests by key (URL + method + body hash)
+- **Offline Queue**: `PrismQueuedRequest` struct, `PrismOfflineQueue` actor with priority-based dequeue and auto-flush via `PrismConnectivityMonitor` (NWPathMonitor)
+- **Response Caching**: `PrismCachePolicy` enum (4 strategies), `PrismCacheEntry` with TTL, `PrismResponseCache` actor with LRU eviction
+- **GraphQL Support**: `PrismGraphQLQuery`, `PrismGraphQLResponse<T>`, `PrismGraphQLError`, `PrismGraphQLClient` actor for typed query/mutation execution
+- **Multipart Upload**: `PrismMultipartFormData` builder, `PrismUploadProgress` tracker, `PrismUploadTask` actor with AsyncStream progress
+- 27 new tests
+
 ## [1.10.0] - 2026-04-28
 
 ### Added
