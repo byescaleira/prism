@@ -24,6 +24,18 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 - chore: ignore worktree dirs
 - Merge feature/performance-toolkit into main
 
+## [2.1.0] - 2026-04-28
+
+### Added
+
+- **Heatmap**: `PrismHeatmapCell`, `PrismHeatmap` — colored grid from 2D numeric data with color interpolation and optional row/column labels
+- **Treemap**: `PrismTreemapItem`, `PrismTreemap` — squarified treemap layout with drill-down navigation and breadcrumb trail
+- **Radar Chart**: `PrismRadarAxis`, `PrismRadarDataSet`, `PrismRadarChart` — polygon overlay with multiple data sets, axis labels, and grid lines
+- **Sparkline**: `PrismSparklineStyle`, `PrismSparkline` — inline mini chart with line, area, and bar styles plus min/max markers and trend coloring
+- **Funnel Chart**: `PrismFunnelStage`, `PrismFunnelChart` — tapered trapezoid stages with conversion rate labels
+- **Candlestick Chart**: `PrismCandlestick`, `PrismCandlestickChart` — standard OHLC candles with green/red bullish/bearish coloring
+- 28 new tests
+
 ## [1.10.0] - 2026-04-28
 
 ### Added

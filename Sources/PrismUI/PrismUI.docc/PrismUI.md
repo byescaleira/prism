@@ -160,6 +160,22 @@ earn their wrapper by adding behavior beyond what raw SwiftUI provides.
 - ``PrismLineChart``
 - ``PrismDonutChart``
 
+### Charts V2
+
+- ``PrismHeatmapCell``
+- ``PrismHeatmap``
+- ``PrismTreemapItem``
+- ``PrismTreemap``
+- ``PrismRadarAxis``
+- ``PrismRadarDataSet``
+- ``PrismRadarChart``
+- ``PrismSparklineStyle``
+- ``PrismSparkline``
+- ``PrismFunnelStage``
+- ``PrismFunnelChart``
+- ``PrismCandlestick``
+- ``PrismCandlestickChart``
+
 ### Animations
 
 - ``PrismAnimationPreset``
