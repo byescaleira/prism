@@ -6,6 +6,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+## [0.11.1] - 2026-04-28
+
+### Changed
+
+- Merge pull request #16 from rafaelesantos/feature/production-ship
+
+### Fixed
+
+- fix: stabilize flaky async tests, eliminate all compiler warnings
 ## [0.11.0] - 2026-04-28
 
 ### Added
