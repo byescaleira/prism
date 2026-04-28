@@ -478,3 +478,16 @@ earn their wrapper by adding behavior beyond what raw SwiftUI provides.
 - ``PrismPrototypeFlow``
 - ``PrismEnvironmentDebugger``
 - ``PrismEnvironmentSnapshot``
+
+### Rich Text
+
+- ``PrismMarkdownView``
+- ``PrismMarkdownStyle``
+- ``PrismRichTextEditor``
+- ``PrismTextFormatting``
+- ``PrismFormattingToolbar``
+- ``PrismAttributedStringBuilder``
+- ``PrismTextBuilder``
+- ``PrismSyntaxLanguage``
+- ``PrismSyntaxHighlighter``
+- ``PrismCodeBlock``

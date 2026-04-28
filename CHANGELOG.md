@@ -7,6 +7,19 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 
 ## [Unreleased]
 
+## [2.2.0] - 2026-04-28
+
+### Added
+
+- **Markdown Renderer**: `PrismMarkdownView` — renders Markdown strings as styled SwiftUI with headings, bold, italic, code blocks, inline code, links, lists, blockquotes, images, and horizontal rules
+- **Markdown Styles**: `PrismMarkdownStyle` — default, compact, and documentation rendering modes
+- **Rich Text Editor**: `PrismRichTextEditor` — attributed string editor with `PrismFormattingToolbar` for bold, italic, underline, strikethrough, code, headings, links, and lists
+- **Attributed String Builder**: `PrismAttributedStringBuilder` — chainable API for composing styled text with `.text()`, `.bold()`, `.italic()`, `.code()`, `.link()`, `.colored()`, `.newline()`
+- **Result Builder**: `@PrismTextBuilder` — declarative attributed string composition using Swift result builder syntax
+- **Syntax Highlighter**: `PrismSyntaxHighlighter` — token-based syntax coloring for Swift, JSON, HTML, CSS, JavaScript, and Python
+- **Code Block View**: `PrismCodeBlock` — themed code display with line numbers, syntax highlighting, and copy-to-clipboard button
+- 22 new tests
+
 ## [1.10.0] - 2026-04-28
 
 ### Added
