@@ -7,6 +7,17 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 
 ## [Unreleased]
 
+## [1.9.0] - 2026-04-28
+
+### Added
+
+- **Model View**: `PrismModelView` — generic SwiftData CRUD list with detail view
+- **Model Form Builder**: `PrismModelFormBuilder` — declarative form generation from field definitions
+- **Migration Helper**: `PrismMigrationHelper` — ordered migration stage management
+- **CloudKit Sync**: `PrismCloudSyncMonitor` — sync state monitoring with status indicator view
+- **Predicate Builder**: `PrismPredicateBuilder` — chainable filter API with `PrismFilterBar` UI
+- 28 new tests
+
 ## [1.8.0] - 2026-04-28
 
 ### Added
