@@ -350,6 +350,22 @@ earn their wrapper by adding behavior beyond what raw SwiftUI provides.
 - ``PrismMenuBarContent``
 - ``PrismMenuBarButton``
 
+### Theme Editor
+
+- ``PrismThemeEditor``
+
+### Auto Theme Generation
+
+- ``PrismAutoTheme``
+
+### Figma Sync
+
+- ``PrismFigmaSync``
+
+### Storybook
+
+- ``PrismStorybook``
+
 ### Testing
 
 - ``PrismPreviewCatalog``
