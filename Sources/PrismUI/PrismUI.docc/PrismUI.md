@@ -478,3 +478,22 @@ earn their wrapper by adding behavior beyond what raw SwiftUI provides.
 - ``PrismPrototypeFlow``
 - ``PrismEnvironmentDebugger``
 - ``PrismEnvironmentSnapshot``
+
+### Communication
+
+- ``PrismChatBubble``
+- ``PrismBubbleStyle``
+- ``PrismMessage``
+- ``PrismMessageStatus``
+- ``PrismMessageList``
+- ``PrismMessageGroup``
+- ``PrismTypingIndicator``
+- ``PrismTypingBubble``
+- ``PrismReaction``
+- ``PrismReactionPicker``
+- ``PrismReactionBar``
+- ``PrismThread``
+- ``PrismThreadView``
+- ``PrismReadReceipt``
+- ``PrismReadReceiptIndicator``
+- ``PrismReadReceiptList``

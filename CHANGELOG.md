@@ -7,6 +7,27 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 
 ## [Unreleased]
 
+## [2.3.0] - 2026-04-28
+
+### Added
+
+- **Chat Bubble**: `PrismChatBubble` — message bubble with sender alignment, timestamp, and delivery status
+- **Bubble Styles**: `PrismBubbleStyle` — filled, outlined, and glass visual variants
+- **Message List**: `PrismMessageList` — scrollable conversation view with date separators and auto-scroll
+- **Message Model**: `PrismMessage` and `PrismMessageStatus` — chat message data with 5-state delivery tracking
+- **Message Grouping**: `PrismMessageGroup` — groups consecutive messages from the same sender
+- **Typing Indicator**: `PrismTypingIndicator` — animated bouncing dots with staggered animation
+- **Typing Bubble**: `PrismTypingBubble` — typing indicator inside a chat bubble
+- **Reaction Picker**: `PrismReactionPicker` — horizontal emoji strip with pop-in animation
+- **Reaction Bar**: `PrismReactionBar` — displays emoji reactions with counts below a message
+- **Reaction Model**: `PrismReaction` — emoji, count, and selection state
+- **Thread View**: `PrismThreadView` — root message with indented, collapsible replies
+- **Thread Model**: `PrismThread` — root message, replies, and reply count
+- **Read Receipts**: `PrismReadReceiptIndicator` — checkmark icons for sent, delivered, and read status
+- **Read Receipt List**: `PrismReadReceiptList` — expandable list of who read a message
+- **Read Receipt Model**: `PrismReadReceipt` — userId, name, and readAt timestamp
+- 35 new tests
+
 ## [1.10.0] - 2026-04-28
 
 ### Added
