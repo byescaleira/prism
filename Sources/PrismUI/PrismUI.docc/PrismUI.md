@@ -112,6 +112,43 @@ earn their wrapper by adding behavior beyond what raw SwiftUI provides.
 - ``PrismReduceMotion``
 - ``PrismDynamicTypePreview``
 
+### Widgets
+
+- ``PrismWidgetView``
+- ``PrismWidgetGauge``
+- ``PrismWidgetStat``
+
+### Live Activities
+
+- ``PrismLiveActivityCompact``
+- ``PrismLiveActivityExpanded``
+- ``PrismLiveActivityMinimal``
+
+### App Intents
+
+- ``PrismIntentResult``
+- ``PrismIntentSnippet``
+- ``PrismIntentConfirmation``
+
+### Charts
+
+- ``PrismBarChart``
+- ``PrismLineChart``
+- ``PrismDonutChart``
+
+### Animations
+
+- ``PrismAnimationPreset``
+
+### SwiftData Integration
+
+- ``PrismModelList``
+- ``PrismModelForm``
+
+### Design Token Export
+
+- ``PrismTokenExport``
+
 ### Testing
 
 - ``PrismPreviewCatalog``
