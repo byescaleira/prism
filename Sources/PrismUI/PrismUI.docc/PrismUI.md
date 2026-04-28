@@ -41,14 +41,23 @@ earn their wrapper by adding behavior beyond what raw SwiftUI provides.
 - ``PrismTextField``
 - ``PrismCard``
 - ``PrismTag``
+- ``PrismChip``
 - ``PrismDivider``
 - ``PrismLoadingState``
+- ``PrismProgressBar``
+- ``PrismAvatar``
 
 ### Composites
 
 - ``PrismBanner``
 - ``PrismCarousel``
 - ``PrismSearchBar``
+- ``PrismToast``
+- ``PrismMenu``
+- ``PrismBottomSheet``
+- ``PrismTooltip``
+- ``PrismEmptyState``
+- ``PrismCountdownTimer``
 
 ### Forms
 
@@ -57,12 +66,20 @@ earn their wrapper by adding behavior beyond what raw SwiftUI provides.
 - ``PrismSlider``
 - ``PrismSecureField``
 - ``PrismDatePicker``
+- ``PrismSegmentedControl``
+- ``PrismStepper``
+- ``PrismTextArea``
+- ``PrismRating``
+- ``PrismPinField``
+- ``PrismColorWell``
 
 ### Lists
 
 - ``PrismRow``
 - ``PrismDisclosureRow``
 - ``PrismList``
+- ``PrismBadge``
+- ``PrismSwipeAction``
 
 ### Layout
 
