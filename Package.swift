@@ -78,9 +78,6 @@ let package = Package(
                 "PrismFoundation",
                 "PrismArchitecture",
             ],
-            exclude: [
-                "Exports/README.md"
-            ],
             resources: [
                 .process("Resources/Localizable.xcstrings"),
                 .process("Resources/Media.xcassets"),
