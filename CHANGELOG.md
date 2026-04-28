@@ -7,6 +7,19 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 
 ## [Unreleased]
 
+## [2.6.0] - 2026-04-28
+
+### Added
+
+- **Time-Travel Debugging**: `PrismStateSnapshot`, `PrismTimeTravelDebugger` — record, navigate, and jump through state history with configurable snapshot limits
+- **State Persistence**: `PrismPersistenceStrategy` protocol with `PrismDiskPersistence`, `PrismKeychainPersistence`, `PrismUserDefaultsPersistence` — pluggable state saving strategies
+- **Persist Middleware**: `PrismPersistMiddleware` — auto-saves state changes via any persistence strategy
+- **Derived Stores**: `PrismDerivedStore` — read-only projected view of parent store with Equatable-based change detection
+- **Store Scope**: `PrismStoreScope` — scoped store for child features with action mapping
+- **Middleware Chaining DSL**: `PrismChainableMiddleware` protocol, `PrismLoggingMiddleware`, `PrismThrottleMiddleware`, `PrismMiddlewareChain` builder
+- **Undo/Redo Stack**: `PrismUndoRedoStack` — configurable undo/redo state management with stack size limits
+- 30 new tests
+
 ## [1.10.0] - 2026-04-28
 
 ### Added
