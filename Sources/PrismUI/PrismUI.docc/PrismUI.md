@@ -170,6 +170,22 @@ earn their wrapper by adding behavior beyond what raw SwiftUI provides.
 - ``PrismModelList``
 - ``PrismModelForm``
 
+### SwiftData V2
+
+- ``PrismModelView``
+- ``PrismModelDetailView``
+- ``PrismModelFormBuilder``
+- ``PrismFormField``
+- ``PrismMigrationHelper``
+- ``PrismMigrationStage``
+- ``PrismCloudSyncMonitor``
+- ``PrismSyncState``
+- ``PrismSyncStatusView``
+- ``PrismPredicateBuilder``
+- ``PrismFilterOperator``
+- ``PrismFilterField``
+- ``PrismFilterBar``
+
 ### Design Token Export
 
 - ``PrismTokenExport``

@@ -6,6 +6,18 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+
+## [1.9.0] - 2026-04-28
+
+### Added
+
+- **Model View**: `PrismModelView` — generic SwiftData CRUD list with detail view
+- **Model Form Builder**: `PrismModelFormBuilder` — declarative form generation from field definitions
+- **Migration Helper**: `PrismMigrationHelper` — ordered migration stage management
+- **CloudKit Sync**: `PrismCloudSyncMonitor` — sync state monitoring with status indicator view
+- **Predicate Builder**: `PrismPredicateBuilder` — chainable filter API with `PrismFilterBar` UI
+- 28 new tests (654 total, 140 suites)
+
 ## [1.5.0] - 2026-04-28
 
 ### Added
