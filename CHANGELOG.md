@@ -6,6 +6,17 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+## [1.3.0] - 2026-04-28
+
+### Added
+
+- **Preview Catalog**: `PrismPreviews` — 13 ready-to-use preview providers covering buttons, text fields, cards, tags, avatars, loading states, banners, search, forms, layout, elevation, motion, and multi-theme comparison
+- 15 new tests (610 total, 128 suites)
+
+### Changed
+
+- DocC catalog updated with PrismPreviews in Preview Tools section
+
 ## [0.13.0] - 2026-04-28
 
 ### Added
@@ -25,7 +36,6 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 - **Search Suggestions**: `PrismSearchSuggestions` — autocomplete search with dropdown suggestion list, max items control
 - **Button Group**: `PrismButtonGroup` — horizontal button container with alignment and spacing control
 - **Segmented Buttons**: `PrismSegmentedButtons` — mutually exclusive option strip with animated selection
-- 20 new tests (595 total, 127 suites)
 
 ### Changed
 
@@ -50,7 +60,6 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 - **Shared Transitions**: `PrismSharedElement`, `PrismHeroTransition` — matchedGeometryEffect wrappers with hero transition container
 - **Physics Animations**: `PrismGravityDrop`, `PrismMomentumScroll`, `PrismFloat`, `PrismParticleEffect` — gravity, momentum, bobbing, particle celebration effects
 - **Staggered Animations**: `PrismStaggeredList`, `prismStagger` modifier — 5 stagger styles (slideUp, slideLeft, fadeIn, scaleIn, slideRight)
-- 33 new tests (575 total, 120 suites)
 
 ### Changed
 
