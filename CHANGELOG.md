@@ -6,6 +6,20 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+## [0.11.0] - 2026-04-28
+
+### Added
+
+- **Theme Editor**: `PrismThemeEditor` — live runtime theme builder with color pickers, spacing/radius/elevation/motion previews, dark mode toggle, and JSON export
+- **Auto Theme Generation**: `PrismAutoTheme` — generate `BrandTheme` from a single color using 4 color harmony strategies (complementary, analogous, triadic, split-complementary) with HSL color math
+- **Figma Sync**: `PrismFigmaSync` — bidirectional token sync: export to Figma Variables format, import from Figma JSON to `BrandTheme`, plus W3C DTCG format for cross-tool compatibility
+- **Storybook**: `PrismStorybook` — interactive Storybook-style component explorer with NavigationSplitView sidebar, theme switching, dark mode/large text toggles, and live component stories across 5 categories
+- 20 new tests (542 total, 113 suites)
+
+### Changed
+
+- DocC catalog updated with Theme Editor, Auto Theme, Figma Sync, Storybook sections
+
 ## [0.10.0] - 2026-04-28
 
 ### Added
