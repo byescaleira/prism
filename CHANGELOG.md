@@ -5,6 +5,23 @@ All notable changes to Prism will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.0] - 2026-04-28
+
+### Added
+
+- feat(ui): add Phases 7-10 — Composites, Forms, Lists, Polish
+- feat(ui): add Phase 5 navigation + Phase 6 testing infrastructure
+- feat(ui): add Phase 4 accessibility tools + update DocC
+- feat(ui): add Phase 3 layout system — Stack, Grid, Section, Scaffold, Spacer
+- feat(ui): add Phase 2 primitives — Button, Icon, Image, TextField, Card, Tag, Divider, LoadingState
+- feat(ui): rewrite PrismUI design system from scratch — Phase 1
+
+### Changed
+
+- Merge pull request #5 from rafaelesantos/feature/design-system-v2
+- docs(ui): update DocC with composites, forms, and lists sections
+- docs(ui): update DocC catalog with navigation and testing sections
+
 ## [1.0.0] - 2026-04-27
 
 ### Added
