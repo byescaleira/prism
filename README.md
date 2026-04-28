@@ -5,7 +5,6 @@
   <img src="https://img.shields.io/badge/Platforms-iOS_|_macOS_|_tvOS_|_watchOS_|_visionOS-blue?style=flat-square" alt="Platforms">
   <img src="https://img.shields.io/badge/Architecture-Clean_+_UDF-purple?style=flat-square" alt="Architecture">
   <img src="https://img.shields.io/badge/Concurrency-Strict-orange?style=flat-square" alt="Concurrency">
-  <img src="https://img.shields.io/badge/coverage--%25-red?style=flat-square
   <img src="https://img.shields.io/badge/License-MIT-green?style=flat-square" alt="License">
 </p>
 
@@ -13,7 +12,7 @@
 
 A modular Swift package for building Apple-platform apps — shared foundation, networking, architecture, adaptive UI, media, and on-device intelligence.
 
-> **154 tests** · **31 suites** · **7 modules** · **Swift 6.3 strict concurrency** · **DocC on every public API**
+> **273 tests** · **43 suites** · **7 modules** · **Swift 6.3 strict concurrency** · **DocC on every public API**
 
 ---
 
@@ -36,7 +35,7 @@ A modular Swift package for building Apple-platform apps — shared foundation, 
 | `PrismFoundation` | Entities, logging, analytics, locale, resources, defaults, formatting |
 | `PrismNetwork` | HTTP client, socket transport, endpoints, caching, FIX protocol |
 | `PrismArchitecture` | Router, store, reducer, middleware — unidirectional data flow |
-| `PrismUI` | Design tokens, atoms, molecules, modifiers, accessibility, theming |
+| `PrismUI` | Token-driven design system — 60+ components, 4 themes, Apple HIG |
 | `PrismVideo` | Video download helpers and media entities |
 | `PrismIntelligence` | CreateML training, CoreML inference, Apple Intelligence, remote LLM |
 | `Prism` | Umbrella — `import Prism` gives you everything |
@@ -62,18 +61,84 @@ import PrismNetwork   // just networking
 
 ---
 
-## Usage
+## PrismUI Design System
 
-### UI Components
+### Tokens
+
+Six semantic token types drive every visual decision:
+
+| Token | Purpose | Values |
+|-------|---------|--------|
+| `ColorToken` | 28 semantic color roles | brand, surfaces, content, feedback |
+| `TypographyToken` | Text styles with weights | largeTitle → caption2 |
+| `SpacingToken` | 4pt grid system | 0–64pt |
+| `RadiusToken` | Continuous corners | sm(8) → full(1000) |
+| `ElevationToken` | Shadow hierarchy | flat → overlay |
+| `MotionToken` | Reduce-motion-aware | instant → expressive |
+
+### Themes
+
+| Theme | Description |
+|-------|-------------|
+| `DefaultTheme` | Apple HIG system colors, auto light/dark |
+| `DarkTheme` | Always-dark, ignores system appearance |
+| `HighContrastTheme` | Maximum contrast for accessibility |
+| `BrandTheme` | Configurable primary/secondary/accent |
 
 ```swift
-PrismButton("Sign In", variant: .primary) {
-    await viewModel.signIn()
-}
-.prism(testID: "sign_in_button")
+// Apply theme
+ContentView()
+    .prismTheme(DefaultTheme())
+
+// Custom brand
+let theme = BrandTheme(primary: .indigo, secondary: .mint, accent: .orange)
 ```
 
-### State Management
+### Components (60+)
+
+**Primitives:** Button, Icon, AsyncImage, TextField, Card, Tag, Chip, Divider, LoadingState, ProgressBar, Avatar
+
+**Composites:** Alert, Banner, Carousel, SearchBar, Toolbar, Toast, Menu, BottomSheet, Tooltip, EmptyState, CountdownTimer
+
+**Forms:** Toggle, Picker, Slider, SecureField, DatePicker, SegmentedControl, Stepper, TextArea, Rating, PinField, ColorWell
+
+**Lists:** Row, DisclosureRow, List, Badge, SwipeActions
+
+**Layout:** AdaptiveStack, Grid, Section, Scaffold, Spacer
+
+**Navigation:** NavigationView, TabView, Sheet
+
+### Usage
+
+```swift
+// Themed button with async action
+PrismButton("Sign In", variant: .filled) {
+    await viewModel.signIn()
+}
+
+// Validated text field
+PrismTextField("Email", text: $email, validation: .pattern(
+    "[A-Z0-9a-z._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}",
+    "Enter a valid email"
+))
+
+// Semantic modifiers
+Text("Welcome")
+    .prismFont(.title)
+    .prismColor(.onBackground)
+    .prismPadding(.lg)
+    .prismSurface(.surfaceSecondary, radius: .lg)
+
+// Auto-dismissing toast
+.prismToast(isPresented: $showToast, "Saved!", icon: "checkmark", style: .success)
+
+// Avatar with status
+PrismAvatar(initials: "JD", size: .large, status: .online)
+```
+
+---
+
+## State Management
 
 ```swift
 let store = PrismStore(
@@ -84,15 +149,18 @@ let store = PrismStore(
 store.send(.loadData)
 ```
 
-### Analytics
+## Analytics
 
 ```swift
 ContentView()
-    .prism(analytics: FirebaseAnalytics())
-// button_tap, screen_view, field_interaction — automatic
+    .prismAnalytics(FirebaseAnalytics())
+
+// Track screen views
+ContentView()
+    .prismTrackScreen("Home")
 ```
 
-### Intelligence
+## Intelligence
 
 ```swift
 // Train from any Codable
@@ -114,21 +182,6 @@ let remote = PrismIntelligenceClient.remote(
 let answer = try await remote.generate("Summarize this document.")
 ```
 
-### Locale
-
-```swift
-@main struct MyApp: App {
-    @State private var localeManager = PrismLocaleManager(initial: .englishUS)
-
-    var body: some Scene {
-        WindowGroup {
-            ContentView()
-                .prism(localeManager: localeManager)
-        }
-    }
-}
-```
-
 ---
 
 ## Development
@@ -143,60 +196,20 @@ make docs            # generate DocC
 make docs-serve      # DocC + local server at :8000
 ```
 
-### Prefix Customization
-
-```swift
-public typealias AppButton = PrismButton
-public typealias AppText   = PrismText
-// PrismUIPrefixAliases.swift — copy and rename
-```
-
----
-
-## GitFlow
-
-```
-feature/xyz ──→ develop ──→ release/1.2.0 ──→ main ──→ tag + release
-                   ↑                              │
-                   └──────── back-merge ──────────┘
-                                                  │
-hotfix/1.2.1 ─────────────────────────────────────→ main + develop
-```
-
-| Branch | Purpose | Target |
-|--------|---------|--------|
-| `main` | Production | protected |
-| `develop` | Integration | `main` via `release/*` |
-| `feature/*` | New work | `develop` |
-| `release/*` | Release prep | `main` + `develop` |
-| `hotfix/*` | Urgent fixes | `main` + `develop` |
-
-```bash
-make feature name=my-feature
-make release version=1.2.0
-make hotfix  version=1.2.1
-make finish-release
-make finish-hotfix
-```
-
-**On merge to `main`:** version bump → CHANGELOG → tag → GitHub Release → DocC deploy → back-merge `develop`
-
-**Commits:** [Conventional Commits](https://www.conventionalcommits.org/) — `feat:` minor · `fix:` patch · `!:` major
-
 ---
 
 ## Quality
 
 | Check | Status |
 |-------|--------|
-| Tests | 154 across 31 suites |
+| Tests | 275+ across 43 suites |
 | Concurrency | Strict — `Sendable`, `@MainActor`, actor isolation |
 | Formatting | `swift-format` enforced in CI |
-| Imports | Explicit target dependency checks |
-| Docs | DocC on all public APIs |
-| Branch guard | GitFlow + Conventional Commits enforced |
-| Accessibility | VoiceOver, Dynamic Type, contrast ratios |
-| Localization | Runtime switching, locale-aware formatting |
+| Docs | DocC with guides: Getting Started, Tokens, Components, Theming |
+| Themes | 4 built-in + custom theme protocol |
+| Accessibility | VoiceOver, Dynamic Type, contrast ratios, reduce motion |
+| Snapshot Testing | Built-in `PrismSnapshotTest` for visual regression |
+| WCAG | Contrast ratio validation (AA/AAA) via `PrismAccessibilityTest` |
 
 ---
 
@@ -207,5 +220,5 @@ make finish-hotfix
 ---
 
 <p align="center">
-  <sub>swift · swiftui · ios · macos · swift-package-manager · clean-architecture · design-system · coreml · accessibility · localization · analytics · gitflow</sub>
+  <sub>swift · swiftui · ios · macos · swift-package-manager · clean-architecture · design-system · coreml · accessibility · localization · analytics</sub>
 </p>

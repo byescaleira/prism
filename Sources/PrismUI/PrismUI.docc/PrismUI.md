@@ -19,6 +19,13 @@ earn their wrapper by adding behavior beyond what raw SwiftUI provides.
 
 ## Topics
 
+### Guides
+
+- <doc:GettingStarted>
+- <doc:UsingTokens>
+- <doc:ComponentGuide>
+- <doc:ThemingGuide>
+
 ### Tokens
 
 - ``ColorToken``
@@ -32,6 +39,9 @@ earn their wrapper by adding behavior beyond what raw SwiftUI provides.
 
 - ``PrismTheme``
 - ``DefaultTheme``
+- ``DarkTheme``
+- ``HighContrastTheme``
+- ``BrandTheme``
 
 ### Primitives
 
@@ -49,9 +59,11 @@ earn their wrapper by adding behavior beyond what raw SwiftUI provides.
 
 ### Composites
 
+- ``PrismAlert``
 - ``PrismBanner``
 - ``PrismCarousel``
 - ``PrismSearchBar``
+- ``PrismToolbar``
 - ``PrismToast``
 - ``PrismMenu``
 - ``PrismBottomSheet``
@@ -105,3 +117,4 @@ earn their wrapper by adding behavior beyond what raw SwiftUI provides.
 - ``PrismPreviewCatalog``
 - ``PrismThemeTest``
 - ``PrismAccessibilityTest``
+- ``PrismSnapshotTest``
