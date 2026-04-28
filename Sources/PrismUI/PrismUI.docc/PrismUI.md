@@ -44,6 +44,26 @@ earn their wrapper by adding behavior beyond what raw SwiftUI provides.
 - ``PrismDivider``
 - ``PrismLoadingState``
 
+### Composites
+
+- ``PrismBanner``
+- ``PrismCarousel``
+- ``PrismSearchBar``
+
+### Forms
+
+- ``PrismToggle``
+- ``PrismPicker``
+- ``PrismSlider``
+- ``PrismSecureField``
+- ``PrismDatePicker``
+
+### Lists
+
+- ``PrismRow``
+- ``PrismDisclosureRow``
+- ``PrismList``
+
 ### Layout
 
 - ``PrismAdaptiveStack``
