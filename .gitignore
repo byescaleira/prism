@@ -58,3 +58,4 @@ secrets/
 
 # === Claude Code ===
 .claude/settings.local.json
+.claude/worktrees/
