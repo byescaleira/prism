@@ -1,0 +1,126 @@
+---
+title: "Cron Jobs"
+description: "Schedule recurring tasks with standard cron expressions."
+icon: "clock"
+---
+
+# Cron Jobs
+
+`PrismCronScheduler` runs tasks on a schedule using standard 5-field cron expressions. Clean up old data every night, send reports every Monday, refresh caches every 5 minutes — all from within your Swift server.
+
+## Quick Start
+
+```swift title="Schedule a Job"
+let cron = PrismCronScheduler()
+
+try await cron.schedule("cleanup", expression: "0 3 * * *") {
+    // Runs at 3:00 AM every day
+    try await db.execute("DELETE FROM sessions WHERE expires_at < datetime('now')")
+    print("Expired sessions cleaned up")
+}
+
+await cron.start()
+```
+
+## Cron Expression Format
+
+```
+┌───────────── minute (0–59)
+│ ┌───────────── hour (0–23)
+│ │ ┌───────────── day of month (1–31)
+│ │ │ ┌───────────── month (1–12)
+│ │ │ │ ┌───────────── day of week (0–6, Sunday = 0)
+│ │ │ │ │
+* * * * *
+```
+
+### Supported Syntax
+
+| Syntax | Meaning | Example |
+|--------|---------|---------|
+| `*` | Every value | `* * * * *` = every minute |
+| `*/N` | Every N values | `*/5 * * * *` = every 5 minutes |
+| `N` | Specific value | `0 9 * * *` = 9:00 AM |
+| `N-M` | Range | `0 9-17 * * *` = every hour 9 AM to 5 PM |
+| `N,M,O` | List | `0 9,12,18 * * *` = 9 AM, noon, 6 PM |
+
+### Common Schedules
+
+```swift title="Schedule Examples"
+// Every 5 minutes
+try await cron.schedule("ping", expression: "*/5 * * * *") { ... }
+
+// Every hour at :00
+try await cron.schedule("hourly", expression: "0 * * * *") { ... }
+
+// Every day at midnight
+try await cron.schedule("daily", expression: "0 0 * * *") { ... }
+
+// Every Monday at 9 AM
+try await cron.schedule("weekly", expression: "0 9 * * 1") { ... }
+
+// First day of every month at noon
+try await cron.schedule("monthly", expression: "0 12 1 * *") { ... }
+
+// Weekdays at 8:30 AM
+try await cron.schedule("workday", expression: "30 8 * * 1-5") { ... }
+```
+
+## Managing Jobs
+
+```swift title="Manage Scheduled Jobs"
+// List all scheduled jobs
+let jobNames = await cron.jobs  // ["cleanup", "ping", "hourly"]
+
+// Remove a job
+await cron.unschedule("ping")
+
+// Check if scheduler is running
+let running = await cron.isRunning
+
+// Stop all jobs
+await cron.stop()
+```
+
+## Practical Example: Report Generator
+
+```swift title="Weekly Report"
+try await cron.schedule("weekly-report", expression: "0 9 * * 1") {
+    let stats = await metrics.snapshot()
+    let report = """
+    Weekly Report:
+    - Total requests: \(stats.requestCount)
+    - Error rate: \(Double(stats.errorCount) / max(Double(stats.requestCount), 1) * 100)%
+    - Avg latency: \(Double(stats.averageLatencyNanos) / 1_000_000)ms
+    """
+    try await sendSlackMessage(channel: "#ops", text: report)
+    await metrics.reset()
+}
+```
+
+## Using Cron Expressions Directly
+
+Parse and inspect cron expressions without the scheduler:
+
+```swift title="Parse Cron Expression"
+let expr = try PrismCronExpression("30 9 * * 1-5")
+
+// Check if a date matches
+let now = Date()
+if expr.matches(now) {
+    print("It's a weekday at 9:30 AM!")
+}
+
+// Find next fire time
+if let next = expr.nextFire(after: Date()) {
+    print("Next run: \(next)")
+}
+```
+
+<Note>
+  The scheduler checks every 60 seconds. Jobs won't fire more precisely than once per minute. If a job takes longer than a minute, the next check might fire it again — keep handlers idempotent or add a lock.
+</Note>
+
+<Tip>
+  Start the scheduler after your server is fully configured. Stop it during graceful shutdown to prevent jobs from running while the server is draining connections.
+</Tip>

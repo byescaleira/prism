@@ -1,0 +1,159 @@
+---
+title: "Relationships"
+description: "Define hasMany, belongsTo, and hasOne relationships between your models."
+icon: "link"
+---
+
+# Relationships
+
+Prism supports three relationship types between database models: **hasMany**, **belongsTo**, and **hasOne**. Define them on your models, then load related data with simple queries.
+
+## Relationship Types
+
+<CardGroup cols={3}>
+  <Card title="hasMany" icon="arrow-right">
+    A user **has many** posts. The foreign key lives on the related table.
+  </Card>
+  <Card title="belongsTo" icon="arrow-left">
+    A post **belongs to** a user. The foreign key lives on this table.
+  </Card>
+  <Card title="hasOne" icon="arrows-left-right">
+    A user **has one** profile. Like hasMany but returns a single row.
+  </Card>
+</CardGroup>
+
+## Defining Relationships
+
+```swift title="Schema"
+// users table
+// id | name | email
+
+// posts table
+// id | user_id | title | body
+
+// profiles table
+// id | user_id | bio | avatar_url
+```
+
+```swift title="User Model with Relationships"
+struct User: PrismRelatable {
+    static var tableName: String { "users" }
+
+    static var relations: [String: PrismRelation] {
+        [
+            "posts": .hasMany("posts", foreignKey: "user_id"),
+            "profile": .hasOne("profiles", foreignKey: "user_id")
+        ]
+    }
+
+    let id: Int
+    let name: String
+    let email: String
+
+    init(row: PrismRow) {
+        self.id = row["id"]?.intValue ?? 0
+        self.name = row["name"]?.textValue ?? ""
+        self.email = row["email"]?.textValue ?? ""
+    }
+
+    func toValues() -> [String: PrismDatabaseValue] {
+        ["name": .text(name), "email": .text(email)]
+    }
+}
+```
+
+```swift title="Post Model"
+struct Post: PrismRelatable {
+    static var tableName: String { "posts" }
+
+    static var relations: [String: PrismRelation] {
+        [
+            "author": .belongsTo("users", foreignKey: "user_id")
+        ]
+    }
+
+    let id: Int
+    let userId: Int
+    let title: String
+
+    init(row: PrismRow) {
+        self.id = row["id"]?.intValue ?? 0
+        self.userId = row["user_id"]?.intValue ?? 0
+        self.title = row["title"]?.textValue ?? ""
+    }
+
+    func toValues() -> [String: PrismDatabaseValue] {
+        ["user_id": .integer(userId), "title": .text(title)]
+    }
+}
+```
+
+## Loading Related Data
+
+### Has Many
+
+```swift title="Load User's Posts"
+let user = try await db.find(User.self, id: 1)!
+let posts = try await db.loadHasMany("posts", foreignKey: "user_id", localValue: "\(user.id)")
+
+for post in posts {
+    print(post["title"]?.textValue ?? "")
+}
+```
+
+### Belongs To
+
+```swift title="Load Post's Author"
+let post = try await db.find(Post.self, id: 1)!
+let author = try await db.loadBelongsTo("users", primaryKey: "id", foreignValue: "\(post.userId)")
+
+if let author {
+    print("Author: \(author["name"]?.textValue ?? "")")
+}
+```
+
+### Has One
+
+```swift title="Load User's Profile"
+let profile = try await db.loadHasOne("profiles", foreignKey: "user_id", localValue: "\(user.id)")
+
+if let profile {
+    print("Bio: \(profile["bio"]?.textValue ?? "")")
+}
+```
+
+## API Example
+
+Build an endpoint that returns users with their posts:
+
+```swift title="Users with Posts API"
+await server.get("/users/:id") { request in
+    guard let id = Int(request.parameters["id"] ?? "") else {
+        return .json(["error": "Invalid ID"], status: .badRequest)
+    }
+
+    guard let user = try await db.find(User.self, id: id) else {
+        return .json(["error": "Not found"], status: .notFound)
+    }
+
+    let posts = try await db.loadHasMany("posts", foreignKey: "user_id", localValue: "\(user.id)")
+    let profile = try await db.loadHasOne("profiles", foreignKey: "user_id", localValue: "\(user.id)")
+
+    return .json([
+        "id": user.id,
+        "name": user.name,
+        "email": user.email,
+        "bio": profile?["bio"]?.textValue ?? "",
+        "posts": posts.map { row in
+            [
+                "id": row["id"]?.intValue ?? 0,
+                "title": row["title"]?.textValue ?? ""
+            ] as [String: Any]
+        }
+    ] as [String: Any])
+}
+```
+
+<Tip>
+  For performance-sensitive endpoints, consider using a single JOIN query instead of multiple relationship loads. Relationships are convenient for simple cases; raw SQL with JOINs is better when you need to minimize round trips.
+</Tip>

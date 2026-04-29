@@ -1,0 +1,122 @@
+---
+title: "Request Tracing"
+description: "Track requests across services with correlation IDs and structured logging."
+icon: "route"
+---
+
+# Request Tracing
+
+In a production system, you need to trace a request from entry to response — especially when debugging errors or diagnosing latency. `PrismTracingMiddleware` assigns unique IDs to every request and propagates correlation IDs across service boundaries.
+
+## Quick Setup
+
+```swift title="Enable Tracing"
+await server.use(PrismTracingMiddleware())
+```
+
+Every response now includes `X-Request-ID`. If the client sends one, it's preserved; otherwise, a new UUID is generated.
+
+## How It Works
+
+1. Incoming request checked for `X-Request-ID` header
+2. If missing and `generateIfMissing` is true, a UUID is generated
+3. `X-Correlation-ID` and `X-Parent-ID` headers are captured if present
+4. All IDs stored in `request.userInfo` for downstream handlers
+5. Response includes `X-Request-ID` and `X-Correlation-ID` headers
+
+## Configuration
+
+```swift title="Custom Headers"
+await server.use(PrismTracingMiddleware(
+    headerName: "X-Request-ID",
+    correlationHeader: "X-Correlation-ID",
+    generateIfMissing: true
+))
+```
+
+## Accessing Trace Context
+
+```swift title="Use in Handlers"
+await server.get("/orders/:id") { request in
+    if let trace = request.traceContext {
+        print("Request ID: \(trace.requestID)")
+        print("Correlation: \(trace.correlationID ?? "none")")
+        print("Elapsed: \(trace.elapsed)")
+    }
+
+    let order = try await fetchOrder(request.parameters["id"]!)
+    return .json(order)
+}
+```
+
+The `PrismTraceContext` provides:
+- `requestID` — unique ID for this request
+- `correlationID` — groups related requests across services
+- `parentID` — the upstream request that triggered this one
+- `startTime` — when the trace was created
+- `elapsed` — time since the trace started
+
+## Structured Logging
+
+`PrismTracingLogger` formats log messages with trace context:
+
+```swift title="Traced Logging"
+await server.post("/payments") { request in
+    guard let trace = request.traceContext else {
+        return .json(["error": "Missing trace"], status: .internalServerError)
+    }
+
+    let logger = PrismTracingLogger(context: trace)
+
+    print(logger.log("Processing payment"))
+    // [a1b2c3d4-...] Processing payment
+
+    print(logger.log("Calling payment gateway"))
+    // [a1b2c3d4-...] [corr-id-xyz] Calling payment gateway
+
+    return .json(["status": "processed"])
+}
+```
+
+## Cross-Service Tracing
+
+When calling other services, forward the trace headers:
+
+```swift title="Propagate to Downstream"
+await server.post("/orders") { request in
+    let trace = request.traceContext
+    let client = PrismHTTPClient()
+
+    // Forward trace headers to downstream service
+    var headers: [String: String] = [:]
+    if let rid = trace?.requestID {
+        headers["X-Request-ID"] = UUID().uuidString
+        headers["X-Correlation-ID"] = trace?.correlationID ?? rid
+        headers["X-Parent-ID"] = rid
+    }
+
+    let paymentResult = try await client.post(
+        "http://payment-service/charge",
+        body: chargeData,
+        headers: headers
+    )
+
+    return .json(["status": "created"], status: .created)
+}
+```
+
+## Custom Logger
+
+```swift title="Logger without Context"
+let logger = PrismTracingLogger(requestID: "manual-123", correlationID: "batch-456")
+print(logger.log("Starting batch job"))
+// [manual-123] [batch-456] Starting batch job
+```
+
+<Tip>
+  Always forward correlation IDs to downstream services. When debugging a production issue, you can search logs across all services using the correlation ID to see the complete request flow.
+</Tip>
+
+<Note>
+  The request ID is stored in `request.userInfo["traceContext.requestID"]`. If you're accessing it from raw userInfo, remember that the key includes the `traceContext.` prefix.
+</Note>

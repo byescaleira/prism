@@ -1,0 +1,202 @@
+---
+title: "Middleware"
+description: "Intercept, transform, and compose request/response processing with the middleware pipeline."
+icon: "layer-group"
+---
+
+# Middleware
+
+Middleware sits between the incoming request and your route handler. It can inspect requests, modify responses, short-circuit the chain, or add cross-cutting behavior like logging, auth, and caching.
+
+## How Middleware Works
+
+```
+Request → Middleware 1 → Middleware 2 → Route Handler
+                                              ↓
+Response ← Middleware 1 ← Middleware 2 ← Response
+```
+
+Each middleware calls `next(request)` to pass control to the next middleware (or the handler). It can act before and/or after the call.
+
+## The Protocol
+
+```swift title="PrismMiddleware"
+public protocol PrismMiddleware: Sendable {
+    func handle(
+        _ request: PrismHTTPRequest,
+        next: @escaping PrismRouteHandler
+    ) async throws -> PrismHTTPResponse
+}
+```
+
+## Writing Custom Middleware
+
+### Before-only (modify request)
+
+```swift title="Request Timer"
+struct RequestTimerMiddleware: PrismMiddleware, Sendable {
+    func handle(_ request: PrismHTTPRequest, next: @escaping PrismRouteHandler) async throws -> PrismHTTPResponse {
+        var req = request
+        req.userInfo["startTime"] = "\(ContinuousClock.now)"
+        return try await next(req)
+    }
+}
+```
+
+### After-only (modify response)
+
+```swift title="Security Headers"
+struct SecurityHeadersMiddleware: PrismMiddleware, Sendable {
+    func handle(_ request: PrismHTTPRequest, next: @escaping PrismRouteHandler) async throws -> PrismHTTPResponse {
+        var response = try await next(request)
+        response.headers.set(name: "X-Content-Type-Options", value: "nosniff")
+        response.headers.set(name: "X-Frame-Options", value: "DENY")
+        return response
+    }
+}
+```
+
+### Before and after (wrap)
+
+```swift title="Timing Middleware"
+struct TimingMiddleware: PrismMiddleware, Sendable {
+    func handle(_ request: PrismHTTPRequest, next: @escaping PrismRouteHandler) async throws -> PrismHTTPResponse {
+        let clock = ContinuousClock()
+        let start = clock.now
+
+        var response = try await next(request)
+
+        let elapsed = clock.now - start
+        response.headers.set(name: "X-Response-Time", value: "\(elapsed)")
+        return response
+    }
+}
+```
+
+### Short-circuit (block request)
+
+```swift title="Maintenance Mode"
+struct MaintenanceMiddleware: PrismMiddleware, Sendable {
+    let enabled: Bool
+
+    func handle(_ request: PrismHTTPRequest, next: @escaping PrismRouteHandler) async throws -> PrismHTTPResponse {
+        if enabled {
+            return .json(
+                ["error": "Server is under maintenance"],
+                status: .serviceUnavailable
+            )
+        }
+        return try await next(request)
+    }
+}
+```
+
+## Registering Middleware
+
+### Global Middleware
+
+Applied to every request:
+
+```swift title="Global"
+await server.use(PrismLoggingMiddleware())
+await server.use(PrismCORSMiddleware(allowedOrigins: ["*"]))
+await server.use(PrismErrorMiddleware())
+```
+
+### Group Middleware
+
+Applied only to routes in the group:
+
+```swift title="Group-specific"
+await server.group("/api", middlewares: [
+    PrismAuthMiddleware(validator: tokenValidator),
+    PrismRateLimitMiddleware(maxRequestsPerMinute: 60)
+]) { api in
+    api.get("/data") { _ in .json(["protected": true]) }
+}
+```
+
+## Execution Order
+
+Middleware runs in the order you register it:
+
+```swift title="Order Matters"
+await server.use(LoggingMiddleware())  // 1st: logs request
+await server.use(AuthMiddleware())     // 2nd: checks auth
+await server.use(CacheMiddleware())    // 3rd: checks cache
+// Route handler runs last
+```
+
+<Tip>
+Put error-handling middleware first so it catches errors from all other middleware and handlers. Put auth middleware before business logic middleware.
+</Tip>
+
+## Composing Middleware
+
+Build powerful processing pipelines by stacking middleware:
+
+```swift title="Production Stack"
+// 1. Error handling (outermost — catches everything)
+await server.use(PrismErrorMiddleware(includeStackTrace: false))
+
+// 2. Request tracing
+await server.use(PrismTracingMiddleware())
+
+// 3. Logging (includes trace IDs)
+await server.use(PrismLoggingMiddleware())
+
+// 4. Security
+await server.use(PrismCORSMiddleware(allowedOrigins: ["https://myapp.com"]))
+await server.use(PrismSecurityHeadersMiddleware())
+
+// 5. Performance
+await server.use(PrismCompressionMiddleware())
+await server.use(PrismResponseCacheMiddleware(ttl: 300))
+
+// 6. Rate limiting
+await server.use(PrismSlidingWindowMiddleware(
+    config: .perIP(max: 100, window: .seconds(60)),
+    store: PrismMemoryRateLimitStore()
+))
+
+// 7. Health & metrics
+await server.use(PrismHealthMiddleware(monitor: healthMonitor))
+await server.use(PrismMetricsMiddleware(metrics: metrics))
+```
+
+## Real-World Example: API Key Auth
+
+```swift title="API Key Middleware"
+struct APIKeyMiddleware: PrismMiddleware, Sendable {
+    let validKeys: Set<String>
+
+    func handle(_ request: PrismHTTPRequest, next: @escaping PrismRouteHandler) async throws -> PrismHTTPResponse {
+        guard let apiKey = request.headers.value(for: "X-API-Key"),
+              validKeys.contains(apiKey) else {
+            throw PrismAppError.unauthorized("Invalid or missing API key")
+        }
+
+        var req = request
+        req.userInfo["apiKey"] = apiKey
+        return try await next(req)
+    }
+}
+
+// Usage
+let apiKeys: Set<String> = ["key-abc-123", "key-def-456"]
+await server.group("/api", middlewares: [APIKeyMiddleware(validKeys: apiKeys)]) { api in
+    api.get("/data") { request in
+        let key = request.userInfo["apiKey"]!
+        return .json(["authenticatedWith": key])
+    }
+}
+```
+
+<CardGroup cols={2}>
+  <Card title="Built-in Middleware" icon="shield" href="/middleware/cors">
+    Explore CORS, auth, rate limiting, and more.
+  </Card>
+  <Card title="Lifecycle Hooks" icon="webhook" href="/middleware/hooks">
+    Fine-grained request/response/error hooks.
+  </Card>
+</CardGroup>

@@ -1,0 +1,116 @@
+---
+title: "HTML Responses"
+description: "Generate HTML responses with Swift string interpolation and response helpers."
+icon: "code"
+---
+
+# HTML Responses
+
+Prism includes a `.html()` response helper for serving HTML content. Combined with Swift's multi-line strings and string interpolation, you can generate dynamic HTML pages directly from your route handlers.
+
+## Basic HTML Response
+
+```swift title="Simple HTML Page"
+await server.get("/") { _ in
+    .html("""
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>Welcome</title>
+    </head>
+    <body>
+        <h1>Welcome to Prism</h1>
+        <p>A native Swift server framework.</p>
+    </body>
+    </html>
+    """)
+}
+```
+
+## Dynamic Content
+
+Swift's string interpolation makes it natural to inject data:
+
+```swift title="Dynamic HTML"
+await server.get("/users/:id") { request in
+    let id = request.parameters["id"] ?? "?"
+    let user = try await fetchUser(id: id)
+
+    return .html("""
+    <!DOCTYPE html>
+    <html>
+    <head><title>\(user.name)</title></head>
+    <body>
+        <h1>\(user.name)</h1>
+        <p>Email: \(user.email)</p>
+        <p>Member since: \(user.createdAt)</p>
+    </body>
+    </html>
+    """)
+}
+```
+
+## Reusable Layout Functions
+
+Keep your HTML DRY with layout functions:
+
+```swift title="Layout Helper"
+func layout(title: String, body: String) -> String {
+    """
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>\(title) — MyApp</title>
+        <style>
+            body { font-family: system-ui; max-width: 800px; margin: 0 auto; padding: 2rem; }
+            nav a { margin-right: 1rem; }
+        </style>
+    </head>
+    <body>
+        <nav><a href="/">Home</a><a href="/about">About</a></nav>
+        <main>\(body)</main>
+        <footer><p>&copy; 2025 MyApp</p></footer>
+    </body>
+    </html>
+    """
+}
+
+await server.get("/") { _ in
+    .html(layout(title: "Home", body: "<h1>Welcome</h1><p>Hello, world!</p>"))
+}
+
+await server.get("/about") { _ in
+    .html(layout(title: "About", body: "<h1>About</h1><p>Built with Prism.</p>"))
+}
+```
+
+## Rendering Lists
+
+```swift title="HTML Table from Data"
+await server.get("/dashboard") { _ in
+    let items = try await fetchRecentOrders()
+
+    let rows = items.map { order in
+        "<tr><td>\(order.id)</td><td>\(order.customer)</td><td>$\(order.total)</td></tr>"
+    }.joined(separator: "\n")
+
+    return .html(layout(title: "Dashboard", body: """
+        <h1>Recent Orders</h1>
+        <table>
+            <thead><tr><th>ID</th><th>Customer</th><th>Total</th></tr></thead>
+            <tbody>\(rows)</tbody>
+        </table>
+    """))
+}
+```
+
+<Warning>
+  Always escape user-provided content before inserting it into HTML to prevent XSS attacks. Swift's string interpolation does **not** auto-escape HTML entities. Replace `<`, `>`, `&`, and `"` with their HTML entity equivalents.
+</Warning>
+
+<Tip>
+  For API-first applications, use `.html()` primarily for admin dashboards, error pages, and occasional server-rendered pages. Pair it with [Content Negotiation](/content/content-negotiation) to serve HTML to browsers and JSON to API clients from the same endpoint.
+</Tip>

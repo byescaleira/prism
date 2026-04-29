@@ -1,0 +1,225 @@
+---
+title: "Request"
+description: "Access headers, body, parameters, and parsed data from incoming HTTP requests."
+icon: "arrow-right-to-bracket"
+---
+
+# Request
+
+Every route handler receives a `PrismHTTPRequest` — a struct containing everything about the incoming HTTP request.
+
+## Anatomy of a Request
+
+```swift
+public struct PrismHTTPRequest: Sendable {
+    public let method: PrismHTTPMethod       // .GET, .POST, .PUT, etc.
+    public let uri: String                   // "/users/42?active=true"
+    public let path: String                  // "/users/42"
+    public let version: String               // "HTTP/1.1"
+    public var headers: PrismHTTPHeaders     // Request headers
+    public var body: Data?                   // Raw body data
+    public var parameters: [String: String]  // Route params (:id -> "42")
+    public let queryParameters: [String: String] // ?active=true
+    public var userInfo: [String: String]    // Custom middleware data
+}
+```
+
+## Reading Headers
+
+```swift title="Headers"
+await server.get("/check") { request in
+    let contentType = request.headers.value(for: "Content-Type")
+    let auth = request.headers.value(for: "Authorization")
+    let userAgent = request.headers.value(for: "User-Agent")
+
+    return .json([
+        "contentType": contentType ?? "none",
+        "hasAuth": auth != nil ? "yes" : "no"
+    ])
+}
+```
+
+<Tip>
+Header lookups are case-insensitive. `"content-type"` and `"Content-Type"` both work.
+</Tip>
+
+## JSON Body
+
+Parse JSON from the request body:
+
+```swift title="JSON Parsing"
+await server.post("/users") { request in
+    // Option 1: Decode to a Codable struct
+    struct CreateUser: Codable {
+        let name: String
+        let email: String
+    }
+
+    let user: CreateUser = try request.decodeJSON()
+    return .json(["created": user.name])
+}
+```
+
+Or work with raw JSON:
+
+```swift title="Raw JSON"
+await server.post("/data") { request in
+    guard let body = request.body,
+          let json = try? JSONSerialization.jsonObject(with: body) as? [String: Any] else {
+        throw PrismAppError.badRequest("Invalid JSON")
+    }
+
+    let name = json["name"] as? String ?? "unknown"
+    return .json(["received": name])
+}
+```
+
+## Form Data
+
+URL-encoded form data is parsed automatically:
+
+```swift title="Form Data"
+// POST /login with body: username=alice&password=secret
+await server.post("/login") { request in
+    let username = request.formData["username"] ?? ""
+    let password = request.formData["password"] ?? ""
+
+    guard username == "alice" && password == "secret" else {
+        throw PrismAppError.unauthorized("Invalid credentials")
+    }
+
+    return .json(["token": "abc123"])
+}
+```
+
+## Nested Form Data
+
+For complex forms with nested fields:
+
+```swift title="Nested Forms"
+// POST with body: user[name]=Alice&user[age]=30&tags[0]=swift&tags[1]=server
+await server.post("/register") { request in
+    let nested = request.nestedFormData
+    // nested = ["user": ["name": "Alice", "age": "30"], "tags": ["swift", "server"]]
+
+    if let user = nested["user"] as? [String: String] {
+        return .json(["name": user["name"] ?? ""])
+    }
+    return .json(["error": "missing user"])
+}
+```
+
+## Multipart File Uploads
+
+Handle file uploads from HTML forms:
+
+```swift title="File Upload"
+await server.post("/upload") { request in
+    let parts = try request.multipartParts()
+
+    for part in parts {
+        if let filename = part.filename {
+            // File part
+            print("File: \(filename), size: \(part.data.count)")
+        } else {
+            // Form field
+            print("Field \(part.name): \(part.stringValue ?? "")")
+        }
+    }
+
+    return .json(["uploaded": parts.count])
+}
+```
+
+## XML Body
+
+Parse XML from the request body:
+
+```swift title="XML Parsing"
+await server.post("/webhook") { request in
+    guard let xml = request.xmlBody else {
+        throw PrismAppError.badRequest("Invalid XML")
+    }
+
+    let eventType = xml.child(named: "event")?.text ?? "unknown"
+    return .json(["event": eventType])
+}
+```
+
+## Query Parameters
+
+```swift title="Query Parameters"
+// GET /products?category=electronics&sort=price&order=desc
+await server.get("/products") { request in
+    let category = request.queryParameters["category"] ?? "all"
+    let sort = request.queryParameters["sort"] ?? "name"
+    let order = request.queryParameters["order"] ?? "asc"
+
+    return .json(["category": category, "sort": sort, "order": order])
+}
+```
+
+## Route Parameters
+
+Captured from the URL pattern:
+
+```swift title="Route Parameters"
+// GET /users/42/posts/7
+await server.get("/users/:userId/posts/:postId") { request in
+    let userId = request.parameters["userId"]!   // "42"
+    let postId = request.parameters["postId"]!   // "7"
+    return .json(["userId": userId, "postId": postId])
+}
+```
+
+## Request Validation
+
+Validate incoming data declaratively:
+
+```swift title="Validation"
+await server.post("/register") { request in
+    let result = request.validate { v in
+        v.field("email", .required, .email)
+        v.field("password", .required, .minLength(8))
+        v.field("age", .required, .integer, .min(18))
+    }
+
+    if let errorResponse = result.errorResponse() {
+        return errorResponse // 422 with validation errors
+    }
+
+    // Data is valid, proceed
+    let email = request.formData["email"]!
+    return .json(["registered": email])
+}
+```
+
+## Custom Data via UserInfo
+
+Middleware can store data for downstream handlers:
+
+```swift title="UserInfo"
+// Middleware sets user info
+struct AuthMiddleware: PrismMiddleware {
+    func handle(_ request: PrismHTTPRequest, next: @escaping PrismRouteHandler) async throws -> PrismHTTPResponse {
+        var req = request
+        req.userInfo["userId"] = "42"
+        return try await next(req)
+    }
+}
+
+// Handler reads it
+await server.get("/me") { request in
+    let userId = request.userInfo["userId"] ?? "anonymous"
+    return .json(["userId": userId])
+}
+```
+
+<CardGroup cols={2}>
+  <Card title="Response" icon="arrow-right-from-bracket" href="/core/response">
+    Learn how to build and send responses.
+  </Card>
+  <Card title="Validation" icon="check" href="/security/validation">
+    Deep dive into request validation rules.
+  </Card>
+</CardGroup>

@@ -1,0 +1,111 @@
+---
+title: "Lifecycle Hooks"
+description: "Fine-grained request, response, and error hooks for cross-cutting concerns."
+icon: "webhook"
+---
+
+# Lifecycle Hooks
+
+While middleware wraps the entire request/response cycle, hooks let you tap into specific moments: before the request is handled, after the response is built, or when an error occurs.
+
+## The Three Hook Types
+
+| Hook | When it runs | What it can do |
+|------|-------------|----------------|
+| `onRequest` | Before routing | Modify the request, add headers, reject early |
+| `onResponse` | After handler | Modify the response, add headers, log |
+| `onError` | When an error is thrown | Return a custom response, log errors |
+
+## Setup
+
+```swift title="Register Hooks"
+let hooks = PrismHookRegistry()
+
+// Add a request ID to every request
+await hooks.onRequest { request in
+    var req = request
+    req.userInfo["requestId"] = UUID().uuidString
+    return req
+}
+
+// Add timing header to every response
+await hooks.onResponse { request, response in
+    var res = response
+    res.headers.set(name: "X-Request-ID", value: request.userInfo["requestId"] ?? "")
+    return res
+}
+
+// Log all errors
+await hooks.onError { error, request in
+    print("Error on \(request.path): \(error)")
+    return nil // Let default error handling take over
+}
+
+await server.use(PrismHooksMiddleware(registry: hooks))
+```
+
+## Real-World: Error Monitoring
+
+Send errors to an external service:
+
+```swift title="Error Tracking"
+await hooks.onError { error, request in
+    // Send to monitoring (Sentry, Datadog, etc.)
+    let errorInfo: [String: Any] = [
+        "error": "\(error)",
+        "path": request.path,
+        "method": request.method.rawValue
+    ]
+    await errorTracker.report(errorInfo)
+
+    return nil // Don't override the response
+}
+```
+
+## Real-World: Request Sanitization
+
+Clean up incoming data before it reaches handlers:
+
+```swift title="Sanitize Input"
+await hooks.onRequest { request in
+    var req = request
+    // Strip trailing slashes
+    if req.path != "/" && req.path.hasSuffix("/") {
+        // Store cleaned path for logging
+        req.userInfo["originalPath"] = req.path
+    }
+    return req
+}
+```
+
+## Multiple Hooks
+
+Register multiple hooks of the same type — they run in order:
+
+```swift title="Hook Chain"
+await hooks.onResponse { req, res in
+    var r = res
+    r.headers.set(name: "X-Powered-By", value: "Prism")
+    return r
+}
+
+await hooks.onResponse { req, res in
+    var r = res
+    r.headers.set(name: "X-Version", value: "4.4.0")
+    return r
+}
+// Both headers are added to every response
+```
+
+<Tip>
+Hooks are lighter than middleware when you only need to act at one specific point in the lifecycle. Use middleware when you need to wrap the entire request/response flow (e.g., timing, caching).
+</Tip>
+
+<CardGroup cols={2}>
+  <Card title="Middleware" icon="layer-group" href="/core/middleware">
+    Full middleware pipeline for wrapping requests.
+  </Card>
+  <Card title="Tracing" icon="route" href="/advanced/tracing">
+    Request tracing with correlation IDs.
+  </Card>
+</CardGroup>

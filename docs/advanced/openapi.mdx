@@ -1,0 +1,154 @@
+---
+title: "OpenAPI"
+description: "Auto-generate OpenAPI 3.0 specs and serve Swagger UI documentation."
+icon: "book"
+---
+
+# OpenAPI
+
+`PrismOpenAPIGenerator` produces OpenAPI 3.0 specifications from endpoint definitions, and `PrismOpenAPIMiddleware` serves them as JSON alongside a Swagger UI playground. Document your API once, get interactive docs and client generation for free.
+
+## Quick Setup
+
+```swift title="Serve API Docs"
+let endpoints = [
+    PrismAPIEndpoint(
+        method: .GET, path: "/users",
+        summary: "List all users",
+        tags: ["Users"],
+        responses: [PrismAPIResponse(statusCode: 200, description: "User list", contentType: "application/json")]
+    ),
+    PrismAPIEndpoint(
+        method: .POST, path: "/users",
+        summary: "Create a user",
+        tags: ["Users"],
+        requestBody: PrismAPIBody(description: "User data", schemaRef: "CreateUser"),
+        responses: [PrismAPIResponse(statusCode: 201, description: "Created")]
+    )
+]
+
+let generator = PrismOpenAPIGenerator(
+    title: "My API",
+    version: "1.0.0",
+    description: "A sample API built with Prism",
+    serverURL: "http://localhost:8080",
+    endpoints: endpoints
+)
+
+await server.use(PrismOpenAPIMiddleware(generator: generator))
+// GET /openapi.json → OpenAPI spec
+// GET /docs → Swagger UI
+```
+
+## Defining Endpoints
+
+```swift title="Endpoint with Parameters"
+PrismAPIEndpoint(
+    method: .GET,
+    path: "/users/:id",
+    summary: "Get user by ID",
+    description: "Returns a single user object.",
+    tags: ["Users"],
+    parameters: [
+        PrismAPIParameter(name: "id", location: .path, required: true, type: "integer", description: "User ID")
+    ],
+    responses: [
+        PrismAPIResponse(statusCode: 200, description: "Success", contentType: "application/json", schemaRef: "User"),
+        PrismAPIResponse(statusCode: 404, description: "User not found")
+    ]
+)
+```
+
+## Parameters
+
+```swift title="Parameter Locations"
+// Path parameter: /users/{id}
+PrismAPIParameter(name: "id", location: .path, required: true, type: "integer")
+
+// Query parameter: /users?page=1&limit=20
+PrismAPIParameter(name: "page", location: .query, type: "integer", description: "Page number")
+PrismAPIParameter(name: "limit", location: .query, type: "integer", description: "Items per page")
+
+// Header parameter
+PrismAPIParameter(name: "X-API-Key", location: .header, required: true, type: "string")
+```
+
+## Request Bodies
+
+```swift title="Request Body"
+PrismAPIBody(
+    contentType: "application/json",
+    description: "User registration data",
+    schemaRef: "CreateUser"  // References #/components/schemas/CreateUser
+)
+```
+
+## Complete API Documentation
+
+```swift title="Full API Example"
+let endpoints = [
+    // List todos
+    PrismAPIEndpoint(
+        method: .GET, path: "/todos",
+        summary: "List todos",
+        tags: ["Todos"],
+        parameters: [
+            PrismAPIParameter(name: "completed", location: .query, type: "boolean", description: "Filter by completion status")
+        ],
+        responses: [PrismAPIResponse(statusCode: 200, description: "Todo list", contentType: "application/json")]
+    ),
+    // Create todo
+    PrismAPIEndpoint(
+        method: .POST, path: "/todos",
+        summary: "Create a todo",
+        tags: ["Todos"],
+        requestBody: PrismAPIBody(description: "Todo data"),
+        responses: [
+            PrismAPIResponse(statusCode: 201, description: "Created"),
+            PrismAPIResponse(statusCode: 422, description: "Validation error")
+        ]
+    ),
+    // Update todo
+    PrismAPIEndpoint(
+        method: .PATCH, path: "/todos/:id",
+        summary: "Update a todo",
+        tags: ["Todos"],
+        parameters: [PrismAPIParameter(name: "id", location: .path, required: true, type: "integer")],
+        requestBody: PrismAPIBody(description: "Fields to update"),
+        responses: [PrismAPIResponse(statusCode: 200, description: "Updated")]
+    ),
+    // Delete todo
+    PrismAPIEndpoint(
+        method: .DELETE, path: "/todos/:id",
+        summary: "Delete a todo",
+        tags: ["Todos"],
+        parameters: [PrismAPIParameter(name: "id", location: .path, required: true, type: "integer")],
+        responses: [PrismAPIResponse(statusCode: 204, description: "Deleted")]
+    )
+]
+```
+
+## Custom Paths
+
+```swift title="Custom Spec and Docs Paths"
+await server.use(PrismOpenAPIMiddleware(
+    generator: generator,
+    specPath: "/api/openapi.json",
+    docsPath: "/api/docs"
+))
+```
+
+## Generate JSON Programmatically
+
+```swift title="Generate Spec"
+let specData = try generator.generateJSON(prettyPrinted: true)
+let specDict = generator.generate()  // [String: Any]
+```
+
+<Tip>
+  Keep your endpoint definitions close to your route definitions. Consider creating a function that registers both the route and its OpenAPI documentation at the same time to keep them in sync.
+</Tip>
+
+<Note>
+  The Swagger UI is loaded from a CDN. Your server must have internet access for the docs page to render. The OpenAPI JSON spec at `/openapi.json` works offline.
+</Note>

@@ -1,0 +1,190 @@
+---
+title: "Response"
+description: "Build HTTP responses with JSON, HTML, redirects, streaming, and custom headers."
+icon: "arrow-right-from-bracket"
+---
+
+# Response
+
+`PrismHTTPResponse` represents what your server sends back to the client. Prism provides convenient factory methods for common response types, plus full control when you need it.
+
+## Quick Response Factories
+
+<Tabs>
+  <Tab title="JSON">
+    ```swift
+    // Encode any Codable value
+    struct User: Codable { let name: String; let age: Int }
+    let user = User(name: "Alice", age: 30)
+
+    return .json(user)
+    return .json(user, status: .created)
+    return .json(["key": "value"]) // Dictionary
+    ```
+  </Tab>
+  <Tab title="Text">
+    ```swift
+    return .text("Hello, World!")
+    return .text("Not Found", status: .notFound)
+    ```
+  </Tab>
+  <Tab title="HTML">
+    ```swift
+    return .html("<h1>Welcome</h1><p>Hello from Prism</p>")
+    return .html(renderedTemplate, status: .ok)
+    ```
+  </Tab>
+  <Tab title="Redirect">
+    ```swift
+    return .redirect(to: "/dashboard")
+    return .redirect(to: "/login", permanent: true) // 301
+    ```
+  </Tab>
+</Tabs>
+
+## Status Codes
+
+Prism includes all standard HTTP status codes:
+
+```swift title="Common Status Codes"
+.ok                  // 200
+.created             // 201
+.noContent           // 204
+.movedPermanently    // 301
+.found               // 302
+.badRequest          // 400
+.unauthorized        // 401
+.forbidden           // 403
+.notFound            // 404
+.conflict            // 409
+.unprocessableEntity // 422
+.tooManyRequests     // 429
+.internalServerError // 500
+.serviceUnavailable  // 503
+```
+
+Custom status codes:
+
+```swift
+let status = PrismHTTPStatus(code: 418, reason: "I'm a teapot")
+return PrismHTTPResponse(status: status, body: .text("I'm a teapot"))
+```
+
+## Custom Headers
+
+```swift title="Custom Headers"
+var response = PrismHTTPResponse.json(["data": "value"])
+response.headers.set(name: "X-Custom-Header", value: "my-value")
+response.headers.set(name: "Cache-Control", value: "max-age=3600")
+return response
+```
+
+## Building Responses Manually
+
+For full control, construct a response from scratch:
+
+```swift title="Manual Response"
+let body = Data("Custom body".utf8)
+var headers = PrismHTTPHeaders()
+headers.set(name: "Content-Type", value: "text/plain; charset=utf-8")
+headers.set(name: "Content-Length", value: "\(body.count)")
+headers.set(name: "X-Powered-By", value: "Prism")
+
+return PrismHTTPResponse(
+    status: .ok,
+    headers: headers,
+    body: .data(body)
+)
+```
+
+## Body Types
+
+`PrismHTTPBody` supports several formats:
+
+```swift title="Body Types"
+.empty                    // No body (204 responses)
+.text("Hello")            // UTF-8 string
+.data(someData)           // Raw bytes
+```
+
+## Streaming Responses
+
+For large files or real-time data, use chunked transfer encoding:
+
+```swift title="Chunked Response"
+await server.get("/download") { request in
+    let writer = PrismStreamWriter()
+    await writer.write("chunk 1")
+    await writer.write("chunk 2")
+    await writer.write("chunk 3")
+    await writer.end()
+
+    let data = await writer.serialize()
+    var headers = PrismHTTPHeaders()
+    headers.set(name: "Transfer-Encoding", value: "chunked")
+    headers.set(name: "Content-Type", value: "text/plain")
+    return PrismHTTPResponse(status: .ok, headers: headers, body: .data(data))
+}
+```
+
+## Content Negotiation
+
+Respond with different formats based on the client's `Accept` header:
+
+```swift title="Content Negotiation"
+await server.get("/data") { request in
+    let data: [String: Any] = ["name": "Prism", "version": "4.4"]
+
+    return PrismNegotiatedResponse.respond(
+        to: request,
+        data: data,
+        available: [.json, .xml, .csv, .html]
+    )
+}
+```
+
+Clients requesting `Accept: application/xml` get XML. Those requesting `Accept: text/csv` get CSV. JSON is the default fallback.
+
+## Practical Patterns
+
+### API Response Envelope
+
+```swift title="Consistent API Responses"
+func apiSuccess(_ data: [String: Any], status: PrismHTTPStatus = .ok) -> PrismHTTPResponse {
+    let envelope: [String: Any] = [
+        "success": true,
+        "data": data
+    ]
+    let body = (try? JSONSerialization.data(withJSONObject: envelope)) ?? Data()
+    var headers = PrismHTTPHeaders()
+    headers.set(name: "Content-Type", value: "application/json; charset=utf-8")
+    return PrismHTTPResponse(status: status, headers: headers, body: .data(body))
+}
+
+await server.get("/users") { _ in
+    apiSuccess(["users": [["id": 1, "name": "Alice"]]])
+}
+```
+
+### File Downloads
+
+```swift title="File Download"
+await server.get("/export") { _ in
+    let csv = "name,email\nAlice,alice@example.com\nBob,bob@example.com"
+    let data = Data(csv.utf8)
+    var headers = PrismHTTPHeaders()
+    headers.set(name: "Content-Type", value: "text/csv")
+    headers.set(name: "Content-Disposition", value: "attachment; filename=\"export.csv\"")
+    headers.set(name: "Content-Length", value: "\(data.count)")
+    return PrismHTTPResponse(status: .ok, headers: headers, body: .data(data))
+}
+```
+
+<CardGroup cols={2}>
+  <Card title="Streaming" icon="water" href="/content/streaming">
+    Stream large responses with chunked encoding.
+  </Card>
+  <Card title="Content Negotiation" icon="arrows-split-up-and-left" href="/content/content-negotiation">
+    Serve multiple formats from a single endpoint.
+  </Card>
+</CardGroup>

@@ -1,0 +1,171 @@
+---
+title: "Models"
+description: "Map database rows to Swift structs with the PrismModel protocol."
+icon: "cube"
+---
+
+# Models
+
+`PrismModel` bridges the gap between your database rows and Swift structs. Define a model, and you get `find`, `all`, `insert`, and `delete` for free.
+
+## Defining a Model
+
+```swift title="User Model"
+struct User: PrismModel {
+    static var tableName: String { "users" }
+
+    let id: Int
+    let name: String
+    let email: String
+    let role: String
+
+    init(row: PrismRow) {
+        self.id = row["id"]?.intValue ?? 0
+        self.name = row["name"]?.textValue ?? ""
+        self.email = row["email"]?.textValue ?? ""
+        self.role = row["role"]?.textValue ?? "user"
+    }
+
+    func toValues() -> [String: PrismDatabaseValue] {
+        [
+            "name": .text(name),
+            "email": .text(email),
+            "role": .text(role)
+        ]
+    }
+}
+```
+
+<Note>
+  The `primaryKey` defaults to `"id"`. Override it if your table uses a different column name.
+</Note>
+
+## CRUD Operations
+
+### Find by ID
+
+```swift title="Find a User"
+if let user = try await db.find(User.self, id: 1) {
+    print("Found: \(user.name)")
+} else {
+    print("User not found")
+}
+```
+
+### Fetch All
+
+```swift title="Fetch All Users"
+let users = try await db.all(User.self)
+for user in users {
+    print("\(user.name) — \(user.email)")
+}
+```
+
+### Insert
+
+```swift title="Create a User"
+let user = User(row: PrismRow(columns: [
+    "name": .text("Bob"),
+    "email": .text("bob@example.com"),
+    "role": .text("admin")
+]))
+
+try await db.insert(user)
+let id = await db.lastInsertID
+```
+
+### Delete
+
+```swift title="Delete a User"
+if let user = try await db.find(User.self, id: 5) {
+    try await db.delete(user)
+}
+```
+
+## REST API with Models
+
+Here's a complete CRUD API using models:
+
+```swift title="Users API"
+let db = try PrismDatabase(path: "app.db")
+
+// Setup table
+try await db.execute("""
+    CREATE TABLE IF NOT EXISTS users (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        name TEXT NOT NULL,
+        email TEXT UNIQUE NOT NULL,
+        role TEXT DEFAULT 'user'
+    )
+""")
+
+let server = PrismHTTPServer(port: 8080)
+
+// List users
+await server.get("/users") { _ in
+    let users = try await db.all(User.self)
+    return .json(users.map { ["id": $0.id, "name": $0.name, "email": $0.email] as [String: Any] })
+}
+
+// Get single user
+await server.get("/users/:id") { request in
+    guard let id = Int(request.parameters["id"] ?? "") else {
+        return .json(["error": "Invalid ID"], status: .badRequest)
+    }
+    guard let user = try await db.find(User.self, id: id) else {
+        return .json(["error": "Not found"], status: .notFound)
+    }
+    return .json(["id": user.id, "name": user.name, "email": user.email] as [String: Any])
+}
+
+// Create user
+await server.post("/users") { request in
+    struct CreateUser: Decodable { let name: String; let email: String }
+    let input: CreateUser = try request.decodeJSON()
+    try await db.execute(
+        "INSERT INTO users (name, email) VALUES (?, ?)",
+        parameters: [.text(input.name), .text(input.email)]
+    )
+    return .json(["id": await db.lastInsertID], status: .created)
+}
+
+// Delete user
+await server.delete("/users/:id") { request in
+    guard let id = Int(request.parameters["id"] ?? "") else {
+        return .json(["error": "Invalid ID"], status: .badRequest)
+    }
+    try await db.execute("DELETE FROM users WHERE id = ?", parameters: [.integer(id)])
+    return PrismHTTPResponse(status: .noContent)
+}
+```
+
+<Tip>
+  Models are lightweight Swift structs — no magic, no reflection, no runtime overhead. The `PrismRow` initializer gives you full control over how database values map to your properties.
+</Tip>
+
+## Custom Primary Keys
+
+```swift title="Custom Primary Key"
+struct APIKey: PrismModel {
+    static var tableName: String { "api_keys" }
+    static var primaryKey: String { "key" }
+
+    let key: String
+    let userId: Int
+    let createdAt: String
+
+    init(row: PrismRow) {
+        self.key = row["key"]?.textValue ?? ""
+        self.userId = row["user_id"]?.intValue ?? 0
+        self.createdAt = row["created_at"]?.textValue ?? ""
+    }
+
+    func toValues() -> [String: PrismDatabaseValue] {
+        [
+            "key": .text(key),
+            "user_id": .integer(userId),
+            "created_at": .text(createdAt)
+        ]
+    }
+}
+```

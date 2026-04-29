@@ -1,0 +1,149 @@
+---
+title: "Sessions & Cookies"
+description: "Manage user sessions with signed cookies and pluggable storage backends."
+icon: "key"
+---
+
+# Sessions & Cookies
+
+Sessions let your server remember users across requests. Prism's session system uses HMAC-signed cookies for tamper-proof session IDs, with pluggable storage backends for session data.
+
+## Quick Start
+
+```swift title="Enable Sessions"
+let server = PrismHTTPServer(port: 8080)
+
+await server.use(PrismSessionMiddleware(
+    secret: "your-secret-key-here"
+))
+```
+
+That's it. Every request now has a session. The middleware:
+1. Reads the `prism_session` cookie from the request
+2. Verifies the HMAC-SHA256 signature
+3. Loads session data from the store
+4. Makes the session ID available via `request.userInfo["sessionID"]`
+5. Sets a signed cookie on the response
+
+## Session Configuration
+
+```swift title="Custom Session Config"
+let sessions = PrismSessionMiddleware(
+    store: PrismMemorySessionStore(maxSessions: 50000, ttl: 7200),
+    cookieName: "my_app_session",
+    ttl: 7200,           // 2 hours
+    secret: "change-me"  // Used for HMAC signing
+)
+
+await server.use(sessions)
+```
+
+| Parameter | Default | Purpose |
+|-----------|---------|---------|
+| `store` | In-memory | Where session data lives |
+| `cookieName` | `"prism_session"` | Cookie name sent to browser |
+| `ttl` | 3600 (1 hour) | Session lifetime in seconds |
+| `secret` | Random UUID | HMAC signing key |
+
+## Working with Cookies
+
+### Reading Cookies
+
+```swift title="Parse Cookies"
+await server.get("/preferences") { request in
+    let cookies = request.cookies  // [String: String]
+    let theme = cookies["theme"] ?? "light"
+    let lang = cookies["lang"] ?? "en"
+    return .json(["theme": theme, "lang": lang])
+}
+```
+
+### Setting Cookies
+
+```swift title="Set a Cookie"
+await server.post("/preferences") { request in
+    let theme = request.formData["theme"] ?? "light"
+
+    let cookie = PrismCookie(
+        name: "theme",
+        value: theme,
+        path: "/",
+        maxAge: 86400 * 365,  // 1 year
+        secure: true,
+        httpOnly: false,       // Accessible from JavaScript
+        sameSite: .lax
+    )
+
+    var response = PrismHTTPResponse.json(["theme": theme])
+    response.setCookie(cookie)
+    return response
+}
+```
+
+## Cookie Security Options
+
+```swift title="Cookie Attributes"
+PrismCookie(
+    name: "session",
+    value: "abc123",
+    path: "/",                  // Cookie path scope
+    domain: "example.com",     // Cookie domain scope
+    maxAge: 3600,              // Expires in 1 hour
+    secure: true,              // HTTPS only
+    httpOnly: true,            // No JavaScript access
+    sameSite: .strict          // No cross-site sending
+)
+```
+
+| SameSite | Behavior |
+|----------|----------|
+| `.strict` | Cookie only sent on same-site requests |
+| `.lax` | Sent on top-level navigations (links) but not embeds |
+| `.none` | Sent on all requests (requires `secure: true`) |
+
+## Custom Session Store
+
+Implement `PrismSessionStore` for any backend — Redis, database, file system:
+
+```swift title="Custom Store Protocol"
+public protocol PrismSessionStore: Sendable {
+    func load(id: String) async -> PrismSession?
+    func save(_ session: PrismSession) async
+    func destroy(id: String) async
+}
+```
+
+```swift title="Database Session Store"
+actor DatabaseSessionStore: PrismSessionStore {
+    let db: PrismDatabase
+
+    func load(id: String) async -> PrismSession? {
+        guard let row = try? await db.query(
+            "SELECT data, expires_at FROM sessions WHERE id = ?",
+            parameters: [.text(id)]
+        ).first else { return nil }
+
+        // Reconstruct session from row...
+        return session
+    }
+
+    func save(_ session: PrismSession) async {
+        try? await db.execute(
+            "INSERT OR REPLACE INTO sessions (id, data, expires_at) VALUES (?, ?, ?)",
+            parameters: [.text(session.id), .text(encoded), .text(expiry)]
+        )
+    }
+
+    func destroy(id: String) async {
+        try? await db.execute("DELETE FROM sessions WHERE id = ?", parameters: [.text(id)])
+    }
+}
+```
+
+<Warning>
+  Always set a strong `secret` in production. The default (random UUID) changes on every restart, invalidating all existing sessions. Use an environment variable: `secret: ProcessInfo.processInfo.environment["SESSION_SECRET"]!`
+</Warning>
+
+<Tip>
+  The built-in `PrismMemorySessionStore` uses `PrismCache` with LRU eviction — it automatically removes the oldest sessions when the limit is reached. For multi-instance deployments, use a shared store like a database.
+</Tip>

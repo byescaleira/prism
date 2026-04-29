@@ -1,0 +1,205 @@
+---
+title: "Tools"
+description: "Register tools that AI assistants can call to perform actions — query databases, call APIs, process data."
+icon: "wrench"
+---
+
+# MCP Tools
+
+Tools are the most powerful MCP primitive. They let AI assistants execute code on your server — querying databases, calling APIs, processing files, and performing any action your application supports.
+
+## Registering Tools
+
+```swift title="Basic Tool"
+await mcp.registerTool(
+    "calculate",
+    description: "Perform arithmetic calculations",
+    inputSchema: [
+        "expression": "string"
+    ],
+    handler: { args in
+        let expr = args["expression"] as? String ?? ""
+        // Parse and evaluate (simplified)
+        let result = evaluate(expr)
+        return PrismMCPToolResult(
+            content: [.text("Result: \(result)")],
+            isError: false
+        )
+    }
+)
+```
+
+<Tip>
+Write clear, specific tool descriptions. The AI uses these to decide when and how to call your tools. A good description is the difference between a tool that gets used correctly and one that gets ignored.
+</Tip>
+
+## Tool Input Schema
+
+The `inputSchema` tells the AI what parameters your tool accepts:
+
+```swift title="Rich Input Schema"
+await mcp.registerTool(
+    "search_users",
+    description: "Search for users by name, email, or role. Returns matching user records.",
+    inputSchema: [
+        "query": "string",
+        "field": "string",
+        "limit": "number"
+    ],
+    handler: { args in
+        let query = args["query"] as? String ?? ""
+        let field = args["field"] as? String ?? "name"
+        let limit = args["limit"] as? Int ?? 10
+        
+        let rows = try await db.query(
+            "SELECT * FROM users WHERE \(field) LIKE ? LIMIT ?",
+            parameters: [.text("%\(query)%"), .integer(limit)]
+        )
+        
+        let results = rows.map { "- \($0["name"]): \($0["email"])" }.joined(separator: "\n")
+        return PrismMCPToolResult(
+            content: [.text(results.isEmpty ? "No users found" : results)],
+            isError: false
+        )
+    }
+)
+```
+
+## Error Handling
+
+When a tool encounters an error, return `isError: true`:
+
+```swift title="Error Result"
+await mcp.registerTool(
+    "delete_file",
+    description: "Delete a file at the given path",
+    inputSchema: ["path": "string"],
+    handler: { args in
+        let path = args["path"] as? String ?? ""
+        
+        guard FileManager.default.fileExists(atPath: path) else {
+            return PrismMCPToolResult(
+                content: [.text("File not found: \(path)")],
+                isError: true
+            )
+        }
+        
+        try FileManager.default.removeItem(atPath: path)
+        return PrismMCPToolResult(
+            content: [.text("Deleted: \(path)")],
+            isError: false
+        )
+    }
+)
+```
+
+## Practical Examples
+
+<AccordionGroup>
+  <Accordion title="Database Query Tool">
+    ```swift
+    await mcp.registerTool(
+        "query_db",
+        description: "Run a read-only SQL query against the application database",
+        inputSchema: ["sql": "string"],
+        handler: { args in
+            let sql = args["sql"] as? String ?? ""
+            
+            // Safety: only allow SELECT
+            guard sql.trimmingCharacters(in: .whitespaces)
+                      .uppercased().hasPrefix("SELECT") else {
+                return PrismMCPToolResult(
+                    content: [.text("Only SELECT queries are allowed")],
+                    isError: true
+                )
+            }
+            
+            let rows = try await db.query(sql)
+            let output = rows.map { row in
+                row.columns.map { "\($0.key): \($0.value)" }.joined(separator: ", ")
+            }.joined(separator: "\n")
+            
+            return PrismMCPToolResult(
+                content: [.text(output.isEmpty ? "No results" : output)],
+                isError: false
+            )
+        }
+    )
+    ```
+  </Accordion>
+
+  <Accordion title="HTTP Request Tool">
+    ```swift
+    await mcp.registerTool(
+        "http_get",
+        description: "Make an HTTP GET request to a URL and return the response",
+        inputSchema: ["url": "string"],
+        handler: { args in
+            let url = args["url"] as? String ?? ""
+            let client = PrismHTTPClient()
+            let response = try await client.get(url)
+            let body = response.text ?? "(empty)"
+            return PrismMCPToolResult(
+                content: [.text("Status: \(response.statusCode)\n\n\(body)")],
+                isError: response.statusCode >= 400
+            )
+        }
+    )
+    ```
+  </Accordion>
+
+  <Accordion title="File Search Tool">
+    ```swift
+    await mcp.registerTool(
+        "find_files",
+        description: "Search for files matching a pattern in the project directory",
+        inputSchema: ["pattern": "string", "directory": "string"],
+        handler: { args in
+            let pattern = args["pattern"] as? String ?? "*"
+            let dir = args["directory"] as? String ?? "."
+            
+            let fm = FileManager.default
+            let enumerator = fm.enumerator(atPath: dir)
+            var matches: [String] = []
+            
+            while let file = enumerator?.nextObject() as? String {
+                if file.contains(pattern) {
+                    matches.append(file)
+                }
+            }
+            
+            return PrismMCPToolResult(
+                content: [.text(matches.isEmpty ? "No files found" : matches.joined(separator: "\n"))],
+                isError: false
+            )
+        }
+    )
+    ```
+  </Accordion>
+</AccordionGroup>
+
+## Content Types
+
+Tool results can include different content types:
+
+```swift title="Multiple Content Types"
+// Text content
+.text("Plain text result")
+
+// Image content (base64)
+.image(data: base64String, mimeType: "image/png")
+
+// Resource reference
+.resource(uri: "file:///path/to/file", text: "File contents", mimeType: "text/plain")
+```
+
+## What's Next
+
+<CardGroup cols={2}>
+  <Card title="Resources" icon="folder-open" href="/mcp/resources">
+    Expose data as readable resources
+  </Card>
+  <Card title="Transports" icon="network-wired" href="/mcp/transports">
+    Deploy your MCP server over stdio or HTTP
+  </Card>
+</CardGroup>

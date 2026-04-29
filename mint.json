@@ -1,0 +1,166 @@
+{
+  "$schema": "https://mintlify.com/schema.json",
+  "name": "Prism",
+  "logo": {
+    "dark": "/logo/dark.svg",
+    "light": "/logo/light.svg"
+  },
+  "favicon": "/favicon.svg",
+  "colors": {
+    "primary": "#6366F1",
+    "light": "#818CF8",
+    "dark": "#4F46E5",
+    "anchors": {
+      "from": "#6366F1",
+      "to": "#A78BFA"
+    }
+  },
+  "topbarLinks": [
+    {
+      "name": "GitHub",
+      "url": "https://github.com/byescaleira/prism"
+    }
+  ],
+  "topbarCtaButton": {
+    "name": "Get Started",
+    "url": "/introduction"
+  },
+  "tabs": [],
+  "anchors": [
+    {
+      "name": "GitHub",
+      "icon": "github",
+      "url": "https://github.com/byescaleira/prism"
+    },
+    {
+      "name": "Swift Package",
+      "icon": "swift",
+      "url": "https://github.com/byescaleira/prism"
+    }
+  ],
+  "navigation": [
+    {
+      "group": "Getting Started",
+      "pages": [
+        "introduction",
+        "quickstart",
+        "installation"
+      ]
+    },
+    {
+      "group": "Core",
+      "pages": [
+        "core/server",
+        "core/routing",
+        "core/request",
+        "core/response",
+        "core/middleware",
+        "core/error-handling"
+      ]
+    },
+    {
+      "group": "Middleware",
+      "pages": [
+        "middleware/cors",
+        "middleware/logging",
+        "middleware/auth",
+        "middleware/rate-limiting",
+        "middleware/compression",
+        "middleware/rate-limiting-v2",
+        "middleware/hooks"
+      ]
+    },
+    {
+      "group": "Database",
+      "pages": [
+        "database/overview",
+        "database/queries",
+        "database/models",
+        "database/migrations",
+        "database/connection-pool",
+        "database/relationships"
+      ]
+    },
+    {
+      "group": "Real-Time",
+      "pages": [
+        "realtime/websocket",
+        "realtime/websocket-rooms",
+        "realtime/sse",
+        "realtime/events"
+      ]
+    },
+    {
+      "group": "Content",
+      "pages": [
+        "content/json",
+        "content/multipart",
+        "content/file-upload",
+        "content/body-parser",
+        "content/content-negotiation",
+        "content/streaming",
+        "content/templates"
+      ]
+    },
+    {
+      "group": "Security",
+      "pages": [
+        "security/tls",
+        "security/sessions",
+        "security/validation"
+      ]
+    },
+    {
+      "group": "GraphQL",
+      "pages": [
+        "graphql/schema",
+        "graphql/queries",
+        "graphql/mutations",
+        "graphql/playground"
+      ]
+    },
+    {
+      "group": "MCP",
+      "pages": [
+        "mcp/overview",
+        "mcp/tools",
+        "mcp/resources",
+        "mcp/transports"
+      ]
+    },
+    {
+      "group": "Infrastructure",
+      "pages": [
+        "infrastructure/config",
+        "infrastructure/health",
+        "infrastructure/metrics",
+        "infrastructure/cron",
+        "infrastructure/background-tasks",
+        "infrastructure/graceful-shutdown",
+        "infrastructure/cluster"
+      ]
+    },
+    {
+      "group": "Advanced",
+      "pages": [
+        "advanced/dependency-injection",
+        "advanced/tracing",
+        "advanced/versioning",
+        "advanced/http-client",
+        "advanced/openapi",
+        "advanced/cache"
+      ]
+    },
+    {
+      "group": "Testing",
+      "pages": [
+        "testing/test-client",
+        "testing/request-builder",
+        "testing/assertions"
+      ]
+    }
+  ],
+  "footerSocials": {
+    "github": "https://github.com/byescaleira/prism"
+  }
+}

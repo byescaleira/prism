@@ -1,0 +1,163 @@
+---
+title: "WebSocket"
+description: "Build real-time features with native WebSocket support — RFC 6455 compliant."
+icon: "plug"
+---
+
+# WebSocket
+
+Prism has built-in WebSocket support with no external dependencies. It handles the HTTP upgrade handshake, frame parsing, and provides an actor-based connection model for safe concurrent messaging.
+
+## How It Works
+
+1. Client sends an HTTP request with `Upgrade: websocket`
+2. Prism validates the handshake and sends a `101 Switching Protocols` response
+3. The connection switches to the WebSocket protocol
+4. Your handler receives connect, message, and disconnect events
+
+## Creating a Handler
+
+Implement the `PrismWebSocketHandler` protocol:
+
+```swift title="Echo Handler"
+struct EchoHandler: PrismWebSocketHandler {
+    func onConnect(connection: PrismWebSocketConnection) async {
+        print("Client connected: \(connection.id)")
+        await connection.send("Welcome!")
+    }
+
+    func onMessage(connection: PrismWebSocketConnection, message: PrismWebSocketMessage) async {
+        switch message {
+        case .text(let text):
+            await connection.send("Echo: \(text)")
+        case .binary(let data):
+            await connection.send(data)
+        }
+    }
+
+    func onDisconnect(connection: PrismWebSocketConnection) async {
+        print("Client disconnected: \(connection.id)")
+    }
+}
+```
+
+## Registering WebSocket Routes
+
+```swift title="Register Handler"
+let server = PrismHTTPServer(port: 8080)
+await server.webSocket("/ws", handler: EchoHandler())
+try await server.start()
+```
+
+## Building a Chat Server
+
+```swift title="Simple Chat Server"
+actor ChatServer: PrismWebSocketHandler {
+    private var connections: [String: PrismWebSocketConnection] = [:]
+
+    func onConnect(connection: PrismWebSocketConnection) async {
+        connections[connection.id] = connection
+        await broadcast("User \(connection.id.prefix(8)) joined")
+    }
+
+    func onMessage(connection: PrismWebSocketConnection, message: PrismWebSocketMessage) async {
+        if case .text(let text) = message {
+            await broadcast("[\(connection.id.prefix(8))]: \(text)")
+        }
+    }
+
+    func onDisconnect(connection: PrismWebSocketConnection) async {
+        connections.removeValue(forKey: connection.id)
+        await broadcast("User \(connection.id.prefix(8)) left")
+    }
+
+    private func broadcast(_ message: String) async {
+        for (_, conn) in connections {
+            await conn.send(message)
+        }
+    }
+}
+```
+
+## Client-Side Connection
+
+```javascript title="Browser Client"
+const ws = new WebSocket('ws://localhost:8080/ws');
+
+ws.onopen = () => {
+    console.log('Connected');
+    ws.send('Hello from browser!');
+};
+
+ws.onmessage = (event) => {
+    console.log('Received:', event.data);
+};
+
+ws.onclose = () => {
+    console.log('Disconnected');
+};
+```
+
+## Message Types
+
+<Tabs>
+  <Tab title="Text">
+    ```swift
+    // Send text
+    await connection.send("Hello, World!")
+
+    // Receive text
+    case .text(let text):
+        print(text)
+    ```
+  </Tab>
+  <Tab title="Binary">
+    ```swift
+    // Send binary data
+    let imageData = Data(...)
+    await connection.send(imageData)
+
+    // Receive binary
+    case .binary(let data):
+        processImage(data)
+    ```
+  </Tab>
+</Tabs>
+
+## Real-Time Notifications Example
+
+```swift title="Notification System"
+actor NotificationHandler: PrismWebSocketHandler {
+    private var userConnections: [String: PrismWebSocketConnection] = [:]
+
+    func onConnect(connection: PrismWebSocketConnection) async {
+        // Client sends user ID as first message
+    }
+
+    func onMessage(connection: PrismWebSocketConnection, message: PrismWebSocketMessage) async {
+        if case .text(let text) = message {
+            // Register user connection
+            userConnections[text] = connection
+        }
+    }
+
+    func onDisconnect(connection: PrismWebSocketConnection) async {
+        userConnections = userConnections.filter { $0.value.id != connection.id }
+    }
+
+    // Called from your API routes
+    func notify(userId: String, message: String) async {
+        if let conn = userConnections[userId] {
+            await conn.send(message)
+        }
+    }
+}
+```
+
+<Tip>
+  For multi-room scenarios, check out [WebSocket Rooms](/realtime/websocket-rooms) — it provides room management, broadcasting, and presence tracking out of the box.
+</Tip>
+
+## Ping/Pong
+
+Prism automatically responds to WebSocket ping frames with pong frames. This keeps connections alive through proxies and load balancers that might otherwise time out idle connections.

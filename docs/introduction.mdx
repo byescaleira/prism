@@ -1,0 +1,190 @@
+---
+title: "Introduction"
+description: "Prism is a fully native Swift 6.3 server framework with zero third-party dependencies. Build production-ready APIs, real-time apps, and microservices using only Apple frameworks."
+icon: "book-open"
+---
+
+# What is Prism?
+
+Prism is a server-side Swift framework that does something no other framework does: **it ships with zero third-party dependencies**. Every feature — from HTTP routing to WebSocket support, from SQLite databases to GraphQL engines — is built entirely on Apple's own frameworks: Network.framework, Foundation, SQLite3, CryptoKit, and Compression.
+
+This isn't a toy. Prism includes **36+ production-ready modules** covering everything you need to build modern server applications.
+
+```swift title="Hello World in Prism"
+import PrismServer
+
+let server = PrismHTTPServer(port: 8080)
+
+await server.get("/") { request in
+    .json(["message": "Hello, Prism!"])
+}
+
+await server.get("/users/:id") { request in
+    let id = request.parameters["id"]!
+    .json(["id": id, "name": "Alice"])
+}
+
+try await server.start()
+```
+
+That's a running HTTP server. No configuration files, no boilerplate, no dependency resolution. Just Swift.
+
+## Why Prism?
+
+<CardGroup cols={3}>
+  <Card title="Zero Dependencies" icon="cube">
+    No SwiftNIO, no AsyncHTTPClient, no third-party anything. Your `Package.resolved` stays clean. Your builds stay fast. Your attack surface stays small.
+  </Card>
+  <Card title="Swift 6.3 Native" icon="bolt">
+    Built from the ground up with strict concurrency. Actors, `Sendable`, structured concurrency — not retrofitted, but designed for it.
+  </Card>
+  <Card title="Batteries Included" icon="battery-full">
+    36+ modules out of the box. Database, sessions, GraphQL, MCP, WebSocket rooms, cron jobs, file uploads — all native.
+  </Card>
+</CardGroup>
+
+### How does Prism compare?
+
+| Feature | Prism | Vapor | Hummingbird |
+|---------|-------|-------|-------------|
+| Third-party deps | **0** | 20+ | 10+ |
+| HTTP layer | Network.framework | SwiftNIO | SwiftNIO |
+| Database | Built-in SQLite | Fluent (separate) | Custom |
+| GraphQL | Built-in | Third-party | Third-party |
+| MCP Server | Built-in | None | None |
+| WebSocket Rooms | Built-in | Third-party | Manual |
+| Swift 6 concurrency | Native actors | Partial | Partial |
+
+<Tip>
+  Prism doesn't compete with Vapor on ecosystem size. It competes on **simplicity, control, and zero-dependency builds**. If you want a framework where you understand every line of code running in production, Prism is built for you.
+</Tip>
+
+## Key Features
+
+Prism organizes its features into focused modules that work together seamlessly:
+
+<AccordionGroup>
+  <Accordion title="HTTP & Routing">
+    Full HTTP/1.1 server on Network.framework. Pattern-based routing with `:params` and `*` wildcards. Route groups with shared prefixes and middleware. Support for all HTTP methods.
+  </Accordion>
+  <Accordion title="Middleware Pipeline">
+    CORS, logging, authentication, rate limiting, compression, request tracing, API versioning, lifecycle hooks — all built-in. Stack them declaratively.
+  </Accordion>
+  <Accordion title="Database & ORM">
+    SQLite via the C API. Query builder, model protocol with CRUD, migrations, connection pooling, and relationship queries (hasMany, belongsTo, hasOne).
+  </Accordion>
+  <Accordion title="Real-Time">
+    WebSocket with RFC 6455 compliance. Named rooms with join/leave/broadcast. Server-Sent Events. Actor-based event bus with typed pub/sub.
+  </Accordion>
+  <Accordion title="GraphQL Engine">
+    Schema DSL, recursive descent parser, field-level resolvers, introspection, and an embedded GraphiQL playground. No third-party GraphQL libraries.
+  </Accordion>
+  <Accordion title="MCP Server">
+    Model Context Protocol implementation with JSON-RPC 2.0. Register tools, resources, and prompts. Stdio and HTTP/SSE transports.
+  </Accordion>
+  <Accordion title="Infrastructure">
+    Environment config with `.env` files. Health checks and metrics endpoints. Cron scheduler. Background task manager. Graceful shutdown. Multi-process cluster mode.
+  </Accordion>
+  <Accordion title="Security">
+    TLS via Network.framework. HMAC-SHA256 signed sessions. Input validation with 14 built-in rules. HSTS and security headers. Bearer token authentication.
+  </Accordion>
+</AccordionGroup>
+
+## A Real Example
+
+Here's a more realistic API — a task manager with database, authentication, and validation:
+
+```swift title="Task Manager API"
+import PrismServer
+
+let server = PrismHTTPServer(port: 8080)
+let db = try PrismDatabase(path: "tasks.db")
+
+// Run migrations
+let migrator = PrismMigrator(database: db)
+try await migrator.migrate([
+    PrismMigration(
+        name: "create_tasks",
+        up: "CREATE TABLE tasks (id INTEGER PRIMARY KEY, title TEXT NOT NULL, done INTEGER DEFAULT 0)",
+        down: "DROP TABLE tasks"
+    )
+])
+
+// Global middleware
+await server.use(PrismCORSMiddleware())
+await server.use(PrismLoggingMiddleware())
+await server.use(PrismErrorMiddleware(includeStackTrace: true))
+
+// List tasks
+await server.get("/tasks") { request in
+    let rows = try await db.query("SELECT * FROM tasks")
+    let tasks = rows.map { row in
+        ["id": row["id"], "title": row["title"], "done": row["done"]]
+    }
+    return .json(tasks)
+}
+
+// Create task with validation
+await server.post("/tasks") { request in
+    let result = request.validateJSON { v in
+        v.field("title", .required, .minLength(1), .maxLength(200))
+    }
+    if let error = result.errorResponse() { return error }
+
+    let title = request.formData["title"] ?? ""
+    let changes = try await db.execute(
+        "INSERT INTO tasks (title) VALUES (?)",
+        parameters: [.text(title)]
+    )
+    return .json(["created": true], status: .created)
+}
+
+// Toggle task completion
+await server.patch("/tasks/:id") { request in
+    let id = request.parameters["id"]!
+    try await db.execute(
+        "UPDATE tasks SET done = NOT done WHERE id = ?",
+        parameters: [.text(id)]
+    )
+    return .json(["updated": true])
+}
+
+try await server.start()
+```
+
+## What Can You Build?
+
+<CardGroup cols={2}>
+  <Card title="REST APIs" icon="server">
+    JSON APIs with routing, validation, authentication, rate limiting, and database persistence. Full CRUD in minutes.
+  </Card>
+  <Card title="Real-Time Apps" icon="signal-stream">
+    Chat applications, live dashboards, collaborative tools — using WebSocket rooms, SSE, and the event bus.
+  </Card>
+  <Card title="GraphQL Servers" icon="diagram-project">
+    Define schemas, write resolvers, and serve a GraphQL playground — all without leaving Swift.
+  </Card>
+  <Card title="AI Tool Servers (MCP)" icon="robot">
+    Build MCP-compatible servers that expose tools, resources, and prompts to AI assistants like Claude.
+  </Card>
+  <Card title="Microservices" icon="cubes">
+    Lightweight services with health checks, metrics, tracing, and cluster mode for horizontal scaling.
+  </Card>
+  <Card title="Full-Stack Swift" icon="layer-group">
+    Server-rendered HTML with the template engine, static file serving, and session management.
+  </Card>
+</CardGroup>
+
+## Next Steps
+
+<Steps>
+  <Step title="Install Prism">
+    Add Prism to your Swift package and start building. [Installation guide →](/installation)
+  </Step>
+  <Step title="Build Your First API">
+    Follow the quickstart tutorial to build a REST API from scratch. [Quickstart →](/quickstart)
+  </Step>
+  <Step title="Explore Features">
+    Dive into specific features like [GraphQL](/graphql/schema), [WebSockets](/realtime/websocket), or [Database](/database/overview).
+  </Step>
+</Steps>

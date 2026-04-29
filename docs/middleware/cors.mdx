@@ -1,0 +1,62 @@
+---
+title: "CORS"
+description: "Configure Cross-Origin Resource Sharing for browser-based API consumers."
+icon: "shield"
+---
+
+# CORS Middleware
+
+When your API is consumed by a browser app on a different domain, browsers enforce Cross-Origin Resource Sharing (CORS). Prism's `PrismCORSMiddleware` handles the `OPTIONS` preflight requests and response headers automatically.
+
+## Quick Setup
+
+```swift title="Allow All Origins"
+await server.use(PrismCORSMiddleware(allowedOrigins: ["*"]))
+```
+
+<Warning>
+Using `"*"` allows any website to call your API. Fine for public APIs and development, but restrict origins in production.
+</Warning>
+
+## Production Configuration
+
+```swift title="Specific Origins"
+await server.use(PrismCORSMiddleware(
+    allowedOrigins: [
+        "https://myapp.com",
+        "https://staging.myapp.com"
+    ],
+    allowedMethods: [.GET, .POST, .PUT, .DELETE],
+    allowCredentials: true
+))
+```
+
+## SPA Frontend Pattern
+
+A typical setup when your Swift API serves a React/Vue/Angular frontend:
+
+```swift title="SPA Setup"
+let cors = PrismCORSMiddleware(
+    allowedOrigins: ["https://app.example.com"],
+    allowedMethods: [.GET, .POST, .PUT, .PATCH, .DELETE],
+    allowCredentials: true  // Needed for cookies/auth headers
+)
+
+await server.use(cors)
+
+await server.group("/api") { api in
+    api.get("/me") { request in
+        // Browser can now call this from app.example.com
+        .json(["user": "Alice"])
+    }
+}
+```
+
+## How It Works
+
+1. **Preflight**: Browser sends `OPTIONS` request before the real request. CORS middleware responds with allowed origins/methods/headers.
+2. **Actual request**: Middleware adds `Access-Control-Allow-Origin` and related headers to the response.
+
+<Tip>
+If you're only building a mobile app or server-to-server API, you don't need CORS at all — it's a browser-only security mechanism.
+</Tip>

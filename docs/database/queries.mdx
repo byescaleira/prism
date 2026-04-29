@@ -1,0 +1,163 @@
+---
+title: "Query Builder"
+description: "Build type-safe SQL queries fluently without writing raw strings."
+icon: "magnifying-glass"
+---
+
+# Query Builder
+
+Prism's `PrismQueryBuilder` lets you construct SQL queries with a fluent Swift API. It's not an ORM — it generates SQL strings and parameter arrays, giving you the safety of parameterized queries with the readability of a builder pattern.
+
+## Basic Queries
+
+### Select
+
+```swift title="Select All Columns"
+let users = try await db.select("users").fetch()
+```
+
+```swift title="Select Specific Columns"
+let users = try await db.select("users")
+    .columns(["id", "name", "email"])
+    .fetch()
+```
+
+### Where Clauses
+
+```swift title="Filtering Results"
+let admins = try await db.select("users")
+    .where("role", "=", "admin")
+    .where("active", "=", "1")
+    .fetch()
+```
+
+Multiple `.where()` calls are joined with `AND`:
+
+```swift title="Combined Conditions"
+let results = try await db.select("products")
+    .where("price", ">", "10")
+    .where("category", "=", "electronics")
+    .where("in_stock", "=", "1")
+    .fetch()
+```
+
+### Ordering
+
+```swift title="Sort Results"
+let users = try await db.select("users")
+    .orderBy("created_at", .descending)
+    .fetch()
+```
+
+### Pagination
+
+```swift title="Limit and Offset"
+let page2 = try await db.select("posts")
+    .orderBy("created_at", .descending)
+    .limit(20)
+    .offset(20)
+    .fetch()
+```
+
+## Write Operations
+
+<Tabs>
+  <Tab title="Insert">
+    ```swift title="Insert a Row"
+    try await db.insert("users", values: [
+        "name": "Alice",
+        "email": "alice@example.com",
+        "role": "user"
+    ])
+    ```
+  </Tab>
+  <Tab title="Update">
+    ```swift title="Update Rows"
+    try await db.update("users",
+        values: ["role": "admin"],
+        where: "id = ?",
+        parameters: [.integer(1)]
+    )
+    ```
+  </Tab>
+  <Tab title="Delete">
+    ```swift title="Delete Rows"
+    try await db.delete("users",
+        where: "id = ?",
+        parameters: [.integer(1)]
+    )
+    ```
+  </Tab>
+</Tabs>
+
+## Counting
+
+```swift title="Count Rows"
+let totalUsers = try await db.select("users").count()
+let activeAdmins = try await db.select("users")
+    .where("role", "=", "admin")
+    .where("active", "=", "1")
+    .count()
+```
+
+## Practical Example: Paginated API
+
+Here's how you'd build a paginated endpoint for a blog API:
+
+```swift title="Paginated Posts API"
+await server.get("/posts") { request in
+    let page = Int(request.queryParameters["page"] ?? "1") ?? 1
+    let perPage = Int(request.queryParameters["per_page"] ?? "20") ?? 20
+    let offset = (page - 1) * perPage
+
+    let posts = try await db.select("posts")
+        .columns(["id", "title", "summary", "created_at"])
+        .where("published", "=", "1")
+        .orderBy("created_at", .descending)
+        .limit(perPage)
+        .offset(offset)
+        .fetch()
+
+    let total = try await db.select("posts")
+        .where("published", "=", "1")
+        .count()
+
+    return .json([
+        "data": posts.map { row in
+            [
+                "id": row["id"]?.intValue ?? 0,
+                "title": row["title"]?.textValue ?? "",
+                "summary": row["summary"]?.textValue ?? ""
+            ] as [String: Any]
+        },
+        "meta": [
+            "page": page,
+            "per_page": perPage,
+            "total": total,
+            "total_pages": (total + perPage - 1) / perPage
+        ]
+    ] as [String: Any])
+}
+```
+
+<Tip>
+  The query builder generates parameterized SQL under the hood, so all values are safely bound — no SQL injection risk.
+</Tip>
+
+## When to Use Raw SQL
+
+The query builder handles common cases well. For complex joins, subqueries, or database-specific features, drop down to raw SQL:
+
+```swift title="Complex Raw Query"
+let results = try await db.query("""
+    SELECT u.name, COUNT(p.id) as post_count
+    FROM users u
+    LEFT JOIN posts p ON p.user_id = u.id
+    WHERE u.active = 1
+    GROUP BY u.id
+    HAVING post_count > ?
+    ORDER BY post_count DESC
+""", parameters: [.integer(5)])
+```
+
+Both approaches use the same actor-isolated `PrismDatabase`, so you can mix them freely.

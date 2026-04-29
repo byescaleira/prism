@@ -1,0 +1,215 @@
+---
+title: "Server"
+description: "Configure and run your PrismHTTPServer — the foundation of every Prism application."
+icon: "server"
+---
+
+# The Prism Server
+
+`PrismHTTPServer` is a Swift actor built on Apple's **Network.framework**. It handles TCP connections, HTTP parsing, routing, and middleware — all without a single third-party dependency.
+
+<Note>
+Because `PrismHTTPServer` is an actor, every interaction is concurrency-safe by default. You never need to worry about data races when registering routes or adding middleware.
+</Note>
+
+## Creating a Server
+
+```swift title="main.swift"
+import PrismServer
+
+let server = PrismHTTPServer(host: "0.0.0.0", port: 8080)
+
+await server.get("/") { request in
+    .text("Hello from Prism!")
+}
+
+try await server.start()
+
+// Keep the process alive
+try await Task.sleep(for: .seconds(.max))
+```
+
+That's it. Five lines to a running HTTP server.
+
+## Configuration
+
+<AccordionGroup>
+  <Accordion title="Host and Port">
+    ```swift
+    // Listen on all interfaces, port 3000
+    let server = PrismHTTPServer(host: "0.0.0.0", port: 3000)
+
+    // Localhost only (development)
+    let dev = PrismHTTPServer(host: "127.0.0.1", port: 8080)
+    ```
+  </Accordion>
+
+  <Accordion title="TLS / HTTPS">
+    Prism supports TLS natively via Network.framework — no OpenSSL needed.
+
+    ```swift
+    let tls = PrismTLSConfiguration(
+        identity: try PrismTLSConfiguration.loadIdentity(
+            p12Path: "/path/to/cert.p12",
+            passphrase: "secret"
+        )
+    )
+
+    let server = PrismHTTPServer(
+        host: "0.0.0.0",
+        port: 443,
+        tlsConfig: tls
+    )
+    ```
+  </Accordion>
+
+  <Accordion title="Custom Logger">
+    ```swift
+    let logger = PrismStructuredLogger(destinations: [
+        PrismConsoleLogDestination()
+    ])
+
+    let server = PrismHTTPServer(
+        host: "0.0.0.0",
+        port: 8080,
+        logger: logger
+    )
+    ```
+  </Accordion>
+</AccordionGroup>
+
+## Registering Routes
+
+Register routes using the HTTP method helpers:
+
+```swift title="Route Registration"
+await server.get("/users") { request in
+    .json(["users": []])
+}
+
+await server.post("/users") { request in
+    // Create user from request body
+    .json(["id": 1], status: .created)
+}
+
+await server.put("/users/:id") { request in
+    let id = request.parameters["id"]!
+    .json(["updated": id])
+}
+
+await server.delete("/users/:id") { request in
+    .text("", status: .noContent)
+}
+```
+
+## Adding Middleware
+
+Middleware runs on every request, in the order you add it:
+
+```swift title="Middleware Stack"
+// Runs first — logs every request
+await server.use(PrismLoggingMiddleware())
+
+// Runs second — handles CORS
+await server.use(PrismCORSMiddleware(allowedOrigins: ["*"]))
+
+// Runs third — catches errors globally
+await server.use(PrismErrorMiddleware())
+
+// Routes run last
+await server.get("/api/data") { _ in .json(["ok": true]) }
+```
+
+<Tip>
+Middleware order matters. Put error handling and logging at the top so they wrap everything else.
+</Tip>
+
+## Route Groups
+
+Group related routes under a shared prefix with optional group-specific middleware:
+
+```swift title="Route Groups"
+await server.group("/api/v1", middlewares: [PrismAuthMiddleware(validator: tokenValidator)]) { api in
+    api.get("/profile") { request in
+        .json(["user": "authenticated"])
+    }
+
+    api.group("/admin", middlewares: [adminOnlyMiddleware]) { admin in
+        admin.get("/stats") { _ in
+            .json(["totalUsers": 1000])
+        }
+    }
+}
+```
+
+## Server Lifecycle
+
+```swift title="Start and Stop"
+// Start the server
+try await server.start()
+
+// Later, stop it gracefully
+server.stop()
+```
+
+For production, pair with `PrismGracefulShutdown` to drain connections before stopping:
+
+```swift title="Graceful Shutdown"
+let shutdown = PrismGracefulShutdown()
+await shutdown.installSignalHandlers {
+    server.stop()
+}
+```
+
+## Full Example
+
+Here's a complete server with routing, middleware, database, and error handling:
+
+```swift title="Complete Server"
+import PrismServer
+
+@main
+struct MyApp {
+    static func main() async throws {
+        let server = PrismHTTPServer(port: 8080)
+        let db = try PrismDatabase(path: "app.db")
+
+        // Middleware stack
+        await server.use(PrismLoggingMiddleware())
+        await server.use(PrismCORSMiddleware(allowedOrigins: ["*"]))
+        await server.use(PrismErrorMiddleware(includeStackTrace: true))
+
+        // Public routes
+        await server.get("/health") { _ in .json(["status": "ok"]) }
+
+        // API routes
+        await server.group("/api") { api in
+            api.get("/users") { _ in
+                let rows = try db.query("SELECT * FROM users")
+                return .json(["users": rows.map { $0.columns }])
+            }
+
+            api.post("/users") { request in
+                let name = request.formData["name"] ?? "Unknown"
+                try db.execute(
+                    "INSERT INTO users (name) VALUES (?)",
+                    parameters: [.text(name)]
+                )
+                return .json(["created": name], status: .created)
+            }
+        }
+
+        try await server.start()
+        try await Task.sleep(for: .seconds(.max))
+    }
+}
+```
+
+<CardGroup cols={2}>
+  <Card title="Routing" icon="route" href="/core/routing">
+    Learn about path parameters, wildcards, and route groups.
+  </Card>
+  <Card title="Middleware" icon="layer-group" href="/core/middleware">
+    Build custom middleware and understand the execution chain.
+  </Card>
+</CardGroup>

@@ -1,0 +1,228 @@
+---
+title: "Queries"
+description: "Write resolvers that fetch data, handle arguments, and resolve nested relationships."
+icon: "magnifying-glass"
+---
+
+# Queries
+
+Queries are the read side of your GraphQL API. Each field in your Query type has a resolver — an async function that fetches and returns data.
+
+## Writing Resolvers
+
+A resolver receives a `PrismGraphQLResolveInfo` with everything it needs:
+
+```swift title="Resolver Context"
+let resolver: @Sendable (PrismGraphQLResolveInfo) async throws -> Any? = { info in
+    // info.fieldName    — the field being resolved ("users", "post", etc.)
+    // info.arguments    — arguments passed by the client
+    // info.context      — your app context (database, services, etc.)
+    // info.parentValue  — the parent object (for nested fields)
+    
+    return "Hello, GraphQL!"
+}
+```
+
+<Tip>
+Resolvers are `@Sendable` and `async` — you can safely call databases, APIs, and other async services from within them.
+</Tip>
+
+## Simple Query
+
+```swift title="Hello World Query"
+let queryType = PrismGraphQLObjectType(
+    name: "Query",
+    fields: [
+        "hello": PrismGraphQLField(
+            name: "hello",
+            type: .string,
+            args: [],
+            resolver: { _ in "Hello, World!" }
+        )
+    ]
+)
+
+// Client query: { hello }
+// Response:     { "data": { "hello": "Hello, World!" } }
+```
+
+## Queries with Arguments
+
+Pass arguments to filter, paginate, or customize results:
+
+```swift title="Query with Arguments"
+"user": PrismGraphQLField(
+    name: "user",
+    type: .object("User"),
+    args: [
+        PrismGraphQLArgument(name: "id", type: .nonNull(.id), description: "User ID")
+    ],
+    resolver: { info in
+        guard let id = info.arguments["id"] as? String else { return nil }
+        // Fetch from database
+        let db = info.context as? PrismDatabase
+        let row = try await db?.queryFirst(
+            "SELECT * FROM users WHERE id = ?",
+            parameters: [.text(id)]
+        )
+        return row.map { ["id": $0["id"], "name": $0["name"], "email": $0["email"]] }
+    }
+)
+```
+
+### Multiple Arguments
+
+```swift title="Filtering and Pagination"
+"posts": PrismGraphQLField(
+    name: "posts",
+    type: .list(.object("Post")),
+    args: [
+        PrismGraphQLArgument(name: "limit", type: .int, defaultValue: 10),
+        PrismGraphQLArgument(name: "offset", type: .int, defaultValue: 0),
+        PrismGraphQLArgument(name: "authorId", type: .id)
+    ],
+    resolver: { info in
+        let limit = info.arguments["limit"] as? Int ?? 10
+        let offset = info.arguments["offset"] as? Int ?? 0
+        let authorId = info.arguments["authorId"] as? String
+        
+        var sql = "SELECT * FROM posts"
+        var params: [PrismDatabaseValue] = []
+        
+        if let authorId {
+            sql += " WHERE author_id = ?"
+            params.append(.text(authorId))
+        }
+        sql += " LIMIT ? OFFSET ?"
+        params.append(.integer(limit))
+        params.append(.integer(offset))
+        
+        let db = info.context as? PrismDatabase
+        let rows = try await db?.query(sql, parameters: params) ?? []
+        return rows.map { row in
+            ["id": row["id"], "title": row["title"], "body": row["body"]]
+        }
+    }
+)
+```
+
+The client queries:
+
+```graphql
+{
+  posts(limit: 5, authorId: "42") {
+    id
+    title
+  }
+}
+```
+
+## Nested Object Resolution
+
+When a field returns an object type, the executor resolves its sub-fields using the returned value as `parentValue`:
+
+```swift title="Nested Resolution"
+// Query type with a user field that returns a User object
+"user": PrismGraphQLField(
+    name: "user",
+    type: .object("User"),
+    args: [PrismGraphQLArgument(name: "id", type: .nonNull(.id))],
+    resolver: { info in
+        let id = info.arguments["id"] as? String ?? ""
+        // Return a dictionary — this becomes parentValue for User fields
+        return ["id": id, "name": "Alice", "email": "alice@example.com"]
+    }
+)
+
+// User type fields resolve from parentValue
+let userType = PrismGraphQLObjectType(
+    name: "User",
+    fields: [
+        "id": PrismGraphQLField(name: "id", type: .nonNull(.id), args: [], resolver: { info in
+            (info.parentValue as? [String: Any])?["id"]
+        }),
+        "name": PrismGraphQLField(name: "name", type: .string, args: [], resolver: { info in
+            (info.parentValue as? [String: Any])?["name"]
+        }),
+        "posts": PrismGraphQLField(
+            name: "posts",
+            type: .list(.object("Post")),
+            args: [],
+            resolver: { info in
+                let userId = (info.parentValue as? [String: Any])?["id"] as? String ?? ""
+                // Fetch posts for this user
+                let db = info.context as? PrismDatabase
+                let rows = try await db?.query(
+                    "SELECT * FROM posts WHERE author_id = ?",
+                    parameters: [.text(userId)]
+                ) ?? []
+                return rows.map { ["id": $0["id"], "title": $0["title"]] }
+            }
+        )
+    ]
+)
+```
+
+Now a client can query deeply nested data:
+
+```graphql
+{
+  user(id: "1") {
+    name
+    posts {
+      title
+    }
+  }
+}
+```
+
+## Introspection
+
+Prism's executor handles `__typename`, `__schema`, and `__type` introspection queries automatically. Clients (like GraphiQL) use these to discover your API:
+
+```graphql
+{
+  __schema {
+    queryType { name }
+    types { name fields { name } }
+  }
+}
+```
+
+<Note>
+Introspection is always enabled. In production, you might want to disable it — a future version of Prism will add a config flag for this.
+</Note>
+
+## Error Handling
+
+Resolvers can throw errors. The executor catches them per-field and includes them in the response while still returning data for other fields:
+
+```swift title="Partial Errors"
+"riskyField": PrismGraphQLField(
+    name: "riskyField",
+    type: .string,
+    args: [],
+    resolver: { _ in
+        throw PrismAppError.notFound("Resource not available")
+    }
+)
+```
+
+Response:
+```json
+{
+  "data": { "safeField": "ok", "riskyField": null },
+  "errors": [{ "message": "Resource not available", "path": ["riskyField"] }]
+}
+```
+
+## What's Next
+
+<CardGroup cols={2}>
+  <Card title="Mutations" icon="pen" href="/graphql/mutations">
+    Learn how to modify data through GraphQL
+  </Card>
+  <Card title="Playground" icon="play" href="/graphql/playground">
+    Set up the interactive GraphQL playground
+  </Card>
+</CardGroup>

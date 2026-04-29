@@ -1,0 +1,110 @@
+---
+title: "Advanced Rate Limiting"
+description: "Sliding window rate limiting with per-user limits, custom keys, and standard headers."
+icon: "gauge"
+---
+
+# Advanced Rate Limiting
+
+`PrismSlidingWindowMiddleware` provides production-grade rate limiting with sliding time windows, customizable keys, and standard `X-RateLimit-*` response headers.
+
+## Per-IP Rate Limiting
+
+```swift title="Per-IP"
+let store = PrismMemoryRateLimitStore()
+
+await server.use(PrismSlidingWindowMiddleware(
+    config: .perIP(max: 100, window: .seconds(60)),
+    store: store
+))
+```
+
+Every IP gets 100 requests per 60-second sliding window.
+
+## Per-API-Key Rate Limiting
+
+Different rate limits based on API key tiers:
+
+```swift title="Per-API-Key"
+let premiumLimiter = PrismSlidingWindowMiddleware(
+    config: .perHeader("X-API-Key", max: 1000, window: .seconds(60)),
+    store: PrismMemoryRateLimitStore()
+)
+
+let freeLimiter = PrismSlidingWindowMiddleware(
+    config: .perHeader("X-API-Key", max: 30, window: .seconds(60)),
+    store: PrismMemoryRateLimitStore()
+)
+
+await server.group("/api/premium", middlewares: [premiumLimiter]) { api in
+    api.get("/data") { _ in .json(["tier": "premium"]) }
+}
+
+await server.group("/api/free", middlewares: [freeLimiter]) { api in
+    api.get("/data") { _ in .json(["tier": "free"]) }
+}
+```
+
+## Global Rate Limiting
+
+Single shared limit across all clients:
+
+```swift title="Global"
+await server.use(PrismSlidingWindowMiddleware(
+    config: .global(max: 10000, window: .seconds(60)),
+    store: PrismMemoryRateLimitStore()
+))
+```
+
+## Response Headers
+
+Every response includes standard rate limit headers:
+
+```
+X-RateLimit-Limit: 100
+X-RateLimit-Remaining: 73
+X-RateLimit-Reset: 1714300800
+```
+
+When the limit is exceeded:
+
+```json
+// HTTP 429 Too Many Requests
+{
+    "error": "RATE_LIMIT_EXCEEDED",
+    "message": "Too many requests"
+}
+```
+
+## Custom Key Extraction
+
+Build custom rate limit keys from any request data:
+
+```swift title="Custom Key"
+let config = PrismRateLimitConfig(
+    windowDuration: .seconds(60),
+    maxRequests: 50,
+    keyExtractor: { request in
+        // Rate limit by user ID from auth
+        request.userInfo["userId"] ?? "anonymous"
+    }
+)
+
+await server.use(PrismSlidingWindowMiddleware(
+    config: config,
+    store: PrismMemoryRateLimitStore()
+))
+```
+
+<Tip>
+Use different stores for different middleware instances. Each store tracks its own counters independently.
+</Tip>
+
+<CardGroup cols={2}>
+  <Card title="Authentication" icon="lock" href="/middleware/auth">
+    Combine rate limiting with authentication.
+  </Card>
+  <Card title="Metrics" icon="chart-line" href="/infrastructure/metrics">
+    Monitor rate limit hits in your metrics dashboard.
+  </Card>
+</CardGroup>

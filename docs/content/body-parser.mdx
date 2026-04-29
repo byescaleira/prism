@@ -1,0 +1,127 @@
+---
+title: "Body Parser"
+description: "Automatic body parsing for JSON, URL-encoded forms, XML, and multipart data."
+icon: "file-import"
+---
+
+# Body Parser
+
+Prism can parse request bodies in four formats out of the box: JSON, URL-encoded forms, XML, and multipart. The `PrismBodyParserMiddleware` auto-detects the content type, and request extensions give you direct access to parsed data.
+
+## Auto-Detection Middleware
+
+```swift title="Enable Body Parsing"
+let server = PrismHTTPServer(port: 8080)
+await server.use(PrismBodyParserMiddleware())
+```
+
+The middleware reads `Content-Type` and tags the request in `userInfo["parsedBodyType"]`:
+
+| Content-Type | Tag |
+|-------------|-----|
+| `application/json` | `"json"` |
+| `application/x-www-form-urlencoded` | `"form"` |
+| `multipart/form-data` | `"multipart"` |
+| `application/xml`, `text/xml` | `"xml"` |
+
+## JSON Bodies
+
+The most common format. Use `decodeJSON()` for typed decoding:
+
+```swift title="Parse JSON"
+struct CreateUser: Decodable {
+    let name: String
+    let email: String
+}
+
+await server.post("/users") { request in
+    let input: CreateUser = try request.decodeJSON()
+    return .json(["name": input.name, "email": input.email], status: .created)
+}
+```
+
+## URL-Encoded Forms
+
+Standard HTML form submissions use `application/x-www-form-urlencoded`. Access fields through `formData`:
+
+```swift title="Parse Form Data"
+await server.post("/login") { request in
+    let form = request.formData
+    let username = form["username"] ?? ""
+    let password = form["password"] ?? ""
+
+    // Authenticate...
+    return .json(["user": username])
+}
+```
+
+### Nested Forms
+
+For complex forms with bracket notation like `user[name]=Alice&user[address][city]=Paris`:
+
+```swift title="Nested Form Parsing"
+await server.post("/register") { request in
+    let nested = request.nestedFormData
+
+    if let user = nested["user"] as? [String: Any] {
+        let name = user["name"] as? String ?? ""
+        if let address = user["address"] as? [String: Any] {
+            let city = address["city"] as? String ?? ""
+            return .json(["name": name, "city": city])
+        }
+    }
+
+    return .json(["error": "Invalid form data"], status: .badRequest)
+}
+```
+
+You can also parse nested forms directly:
+
+```swift title="Direct Nested Parsing"
+let data = PrismNestedFormParser.parse("colors[0]=red&colors[1]=blue&user[name]=Alice")
+// {"colors": {"0": "red", "1": "blue"}, "user": {"name": "Alice"}}
+```
+
+## XML Bodies
+
+Parse XML payloads into a traversable tree of `PrismXMLNode`:
+
+```swift title="Parse XML"
+await server.post("/webhook") { request in
+    guard let root = request.xmlBody else {
+        return .json(["error": "Invalid XML"], status: .badRequest)
+    }
+
+    let event = root.child("event")?.text ?? "unknown"
+    let data = root.child("data")
+    let items = data?.childrenNamed("item") ?? []
+
+    return .json(["event": event, "itemCount": items.count])
+}
+```
+
+`PrismXMLNode` provides:
+- `name` — element tag name
+- `attributes` — dictionary of XML attributes
+- `text` — text content of the element
+- `children` — child nodes
+- `child("name")` — first child with given name
+- `childrenNamed("name")` — all children with given name
+
+```swift title="XML with Attributes"
+// Parsing: <order id="123" status="pending"><item sku="ABC">Widget</item></order>
+if let order = request.xmlBody {
+    let orderId = order.attributes["id"]     // "123"
+    let status = order.attributes["status"]  // "pending"
+    let itemName = order.child("item")?.text // "Widget"
+    let sku = order.child("item")?.attributes["sku"] // "ABC"
+}
+```
+
+<Tip>
+  You don't need `PrismBodyParserMiddleware` to use the parsing extensions — `decodeJSON()`, `formData`, `xmlBody`, and `nestedFormData` work on any request with a body. The middleware just adds the content type tag for downstream logic.
+</Tip>
+
+<Note>
+  XML parsing uses Foundation's `XMLParser` under the hood — fully native, no dependencies. For large XML payloads, consider streaming the body in chunks instead.
+</Note>

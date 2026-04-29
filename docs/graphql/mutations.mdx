@@ -1,0 +1,230 @@
+---
+title: "Mutations"
+description: "Create, update, and delete data through GraphQL mutations with input validation and error handling."
+icon: "pen"
+---
+
+# Mutations
+
+Mutations are the write side of your GraphQL API. They follow the same resolver pattern as queries but are conventionally used for operations that modify data.
+
+## Defining Mutations
+
+Create a mutation type the same way you create a query type:
+
+```swift title="Mutation Type"
+let mutationType = PrismGraphQLObjectType(
+    name: "Mutation",
+    fields: [
+        "createUser": PrismGraphQLField(
+            name: "createUser",
+            type: .object("User"),
+            args: [
+                PrismGraphQLArgument(name: "name", type: .nonNull(.string)),
+                PrismGraphQLArgument(name: "email", type: .nonNull(.string))
+            ],
+            resolver: { info in
+                let name = info.arguments["name"] as? String ?? ""
+                let email = info.arguments["email"] as? String ?? ""
+                
+                let db = info.context as? PrismDatabase
+                try await db?.execute(
+                    "INSERT INTO users (name, email) VALUES (?, ?)",
+                    parameters: [.text(name), .text(email)]
+                )
+                let id = await db?.lastInsertID ?? 0
+                return ["id": "\(id)", "name": name, "email": email]
+            }
+        )
+    ]
+)
+
+let schema = PrismGraphQLSchema(query: queryType, mutation: mutationType)
+```
+
+Client mutation:
+
+```graphql
+mutation {
+  createUser(name: "Alice", email: "alice@example.com") {
+    id
+    name
+  }
+}
+```
+
+## CRUD Example
+
+Here's a complete set of mutations for a Post resource:
+
+```swift title="Post CRUD Mutations"
+let mutations = PrismGraphQLObjectType(
+    name: "Mutation",
+    fields: [
+        // CREATE
+        "createPost": PrismGraphQLField(
+            name: "createPost",
+            type: .object("Post"),
+            args: [
+                PrismGraphQLArgument(name: "title", type: .nonNull(.string)),
+                PrismGraphQLArgument(name: "body", type: .string),
+                PrismGraphQLArgument(name: "authorId", type: .nonNull(.id))
+            ],
+            resolver: { info in
+                let title = info.arguments["title"] as? String ?? ""
+                let body = info.arguments["body"] as? String ?? ""
+                let authorId = info.arguments["authorId"] as? String ?? ""
+                
+                let db = info.context as? PrismDatabase
+                try await db?.execute(
+                    "INSERT INTO posts (title, body, author_id) VALUES (?, ?, ?)",
+                    parameters: [.text(title), .text(body), .text(authorId)]
+                )
+                let id = await db?.lastInsertID ?? 0
+                return ["id": "\(id)", "title": title, "body": body, "authorId": authorId]
+            }
+        ),
+        
+        // UPDATE
+        "updatePost": PrismGraphQLField(
+            name: "updatePost",
+            type: .object("Post"),
+            args: [
+                PrismGraphQLArgument(name: "id", type: .nonNull(.id)),
+                PrismGraphQLArgument(name: "title", type: .string),
+                PrismGraphQLArgument(name: "body", type: .string)
+            ],
+            resolver: { info in
+                let id = info.arguments["id"] as? String ?? ""
+                let title = info.arguments["title"] as? String
+                let body = info.arguments["body"] as? String
+                
+                let db = info.context as? PrismDatabase
+                if let title {
+                    try await db?.execute(
+                        "UPDATE posts SET title = ? WHERE id = ?",
+                        parameters: [.text(title), .text(id)]
+                    )
+                }
+                if let body {
+                    try await db?.execute(
+                        "UPDATE posts SET body = ? WHERE id = ?",
+                        parameters: [.text(body), .text(id)]
+                    )
+                }
+                let row = try await db?.queryFirst(
+                    "SELECT * FROM posts WHERE id = ?",
+                    parameters: [.text(id)]
+                )
+                return row.map { ["id": $0["id"], "title": $0["title"], "body": $0["body"]] }
+            }
+        ),
+        
+        // DELETE
+        "deletePost": PrismGraphQLField(
+            name: "deletePost",
+            type: .boolean,
+            args: [
+                PrismGraphQLArgument(name: "id", type: .nonNull(.id))
+            ],
+            resolver: { info in
+                let id = info.arguments["id"] as? String ?? ""
+                let db = info.context as? PrismDatabase
+                let affected = try await db?.execute(
+                    "DELETE FROM posts WHERE id = ?",
+                    parameters: [.text(id)]
+                )
+                return (affected ?? 0) > 0
+            }
+        )
+    ]
+)
+```
+
+## Input Validation
+
+Validate inputs before persisting data:
+
+```swift title="Validation in Resolvers"
+"createUser": PrismGraphQLField(
+    name: "createUser",
+    type: .object("User"),
+    args: [
+        PrismGraphQLArgument(name: "name", type: .nonNull(.string)),
+        PrismGraphQLArgument(name: "email", type: .nonNull(.string)),
+        PrismGraphQLArgument(name: "age", type: .int)
+    ],
+    resolver: { info in
+        let name = info.arguments["name"] as? String ?? ""
+        let email = info.arguments["email"] as? String ?? ""
+        let age = info.arguments["age"] as? Int
+        
+        // Validate
+        guard name.count >= 2 else {
+            throw PrismAppError.badRequest("Name must be at least 2 characters")
+        }
+        guard email.contains("@") else {
+            throw PrismAppError.badRequest("Invalid email address")
+        }
+        if let age, age < 0 || age > 150 {
+            throw PrismAppError.badRequest("Age must be between 0 and 150")
+        }
+        
+        // Persist...
+        return ["id": "1", "name": name, "email": email]
+    }
+)
+```
+
+<Warning>
+Always validate inputs in mutations. GraphQL type checking only verifies that arguments are the right type — it doesn't enforce business rules like "email must be unique" or "name must be at least 2 characters."
+</Warning>
+
+## Error Handling
+
+Mutations that throw errors return structured error responses:
+
+```swift title="Error Responses"
+"transfer": PrismGraphQLField(
+    name: "transfer",
+    type: .boolean,
+    args: [
+        PrismGraphQLArgument(name: "from", type: .nonNull(.id)),
+        PrismGraphQLArgument(name: "to", type: .nonNull(.id)),
+        PrismGraphQLArgument(name: "amount", type: .nonNull(.float))
+    ],
+    resolver: { info in
+        let amount = info.arguments["amount"] as? Double ?? 0
+        
+        guard amount > 0 else {
+            throw PrismAppError.badRequest("Amount must be positive")
+        }
+        guard amount <= 10000 else {
+            throw PrismAppError.badRequest("Amount exceeds transfer limit", code: "TRANSFER_LIMIT")
+        }
+        
+        // Process transfer...
+        return true
+    }
+)
+```
+
+The client receives:
+
+```json
+{
+  "data": { "transfer": null },
+  "errors": [{ "message": "Amount exceeds transfer limit", "path": ["transfer"] }]
+}
+```
+
+## What's Next
+
+<CardGroup cols={2}>
+  <Card title="Playground" icon="play" href="/graphql/playground">
+    Test your mutations interactively with the built-in playground
+  </Card>
+  <Card title="Schema" icon="diagram-project" href="/graphql/schema">
+    Refine your schema with more types and relationships
+  </Card>
+</CardGroup>

@@ -1,0 +1,132 @@
+---
+title: "API Versioning"
+description: "Version your API with URL prefixes, headers, or query parameters."
+icon: "code-branch"
+---
+
+# API Versioning
+
+APIs evolve. Prism supports three versioning strategies — URL prefix, header, and query parameter — so you can introduce breaking changes without breaking existing clients.
+
+## Quick Start
+
+```swift title="URL-Based Versioning"
+await server.use(PrismVersioningMiddleware(
+    strategy: .urlPrefix,
+    supportedVersions: [
+        PrismAPIVersion(major: 1),
+        PrismAPIVersion(major: 2)
+    ],
+    defaultVersion: PrismAPIVersion(major: 1)
+))
+
+// GET /v1/users → version 1
+// GET /v2/users → version 2
+// GET /users → version 1 (default)
+```
+
+## Versioning Strategies
+
+<Tabs>
+  <Tab title="URL Prefix">
+    ```swift
+    // /v1/users, /v2/users
+    .urlPrefix
+    ```
+    The version prefix is stripped from the path — your route handler sees `/users`, not `/v1/users`.
+  </Tab>
+  <Tab title="Header">
+    ```swift
+    // Accept-Version: v2
+    .header("Accept-Version")
+    ```
+    Version lives in a custom header. Clean URLs, but less discoverable.
+  </Tab>
+  <Tab title="Query Parameter">
+    ```swift
+    // /users?version=v2
+    .queryParam("version")
+    ```
+    Easy to test in browsers. Less common in production APIs.
+  </Tab>
+</Tabs>
+
+## Version Format
+
+```swift title="Parsing Versions"
+PrismAPIVersion.parse("v1")     // major: 1, minor: 0
+PrismAPIVersion.parse("v2.1")   // major: 2, minor: 1
+PrismAPIVersion.parse("1")      // major: 1, minor: 0
+PrismAPIVersion.parse("1.3")    // major: 1, minor: 3
+```
+
+Versions are `Comparable` — `v1 < v2 < v2.1`.
+
+## Accessing the Version
+
+```swift title="In Route Handlers"
+await server.get("/users") { request in
+    let version = request.apiVersion  // PrismAPIVersion?
+
+    if version?.major == 2 {
+        return .json(["users": usersV2])
+    }
+    return .json(["users": usersV1])
+}
+```
+
+## Versioned Router
+
+For cleaner separation, use `PrismVersionedRouter`:
+
+```swift title="Version-Specific Routes"
+var router = PrismVersionedRouter()
+
+router.route(version: PrismAPIVersion(major: 1), .GET, "/users") { request in
+    .json(["format": "v1", "users": usersArrayV1])
+}
+
+router.route(version: PrismAPIVersion(major: 2), .GET, "/users") { request in
+    .json(["data": usersArrayV2, "meta": pagination])
+}
+
+await server.get("/users") { request in
+    if let response = try await router.handle(request) {
+        return response
+    }
+    return .json(["error": "Not found"], status: .notFound)
+}
+```
+
+## Unsupported Version Response
+
+When a client requests an unsupported version, the middleware returns a 400:
+
+```json title="400 Response"
+{
+    "error": "UNSUPPORTED_VERSION",
+    "message": "API version v3 is not supported. Supported: v1, v2"
+}
+```
+
+## URL Prefix Path Stripping
+
+With `.urlPrefix`, the version prefix is removed. The original versioned path is stored in `userInfo["versionedPath"]`:
+
+```swift title="Path Handling"
+// Request: GET /v2/users/123
+await server.get("/users/:id") { request in
+    let version = request.apiVersion         // v2
+    let path = request.path                  // /users/123 (stripped)
+    let original = request.userInfo["versionedPath"]  // /users/123
+    // ...
+}
+```
+
+<Tip>
+  URL prefix versioning is the most common approach for public APIs — it's explicit, easy to document, and works with any HTTP client. Use header versioning for internal APIs where you want clean URLs and controlled clients.
+</Tip>
+
+<Warning>
+  Set `defaultVersion` to your oldest supported version, not the latest. This way, existing clients that don't send a version continue to work. New clients explicitly opt in to newer versions.
+</Warning>

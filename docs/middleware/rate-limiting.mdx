@@ -1,0 +1,48 @@
+---
+title: "Rate Limiting"
+description: "Protect your API from abuse with token bucket rate limiting."
+icon: "gauge-high"
+---
+
+# Rate Limiting
+
+`PrismRateLimitMiddleware` uses a token bucket algorithm to limit request rates. Clients exceeding the limit receive a `429 Too Many Requests` response.
+
+## Quick Setup
+
+```swift title="Basic Rate Limiting"
+await server.use(PrismRateLimitMiddleware(maxRequestsPerMinute: 60))
+```
+
+That's it — 60 requests per minute per client.
+
+## Protecting Specific Routes
+
+Apply rate limiting to sensitive endpoints only:
+
+```swift title="Targeted Rate Limiting"
+await server.group("/api/auth", middlewares: [
+    PrismRateLimitMiddleware(maxRequestsPerMinute: 10)  // Strict for auth
+]) { auth in
+    auth.post("/login") { request in
+        // Login logic
+        .json(["token": "abc123"])
+    }
+}
+
+await server.group("/api", middlewares: [
+    PrismRateLimitMiddleware(maxRequestsPerMinute: 100)  // Relaxed for general API
+]) { api in
+    api.get("/data") { _ in .json(["data": []]) }
+}
+```
+
+<Note>
+For more advanced rate limiting with sliding windows, per-user limits, and `X-RateLimit` headers, see [Advanced Rate Limiting](/middleware/rate-limiting-v2).
+</Note>
+
+<CardGroup cols={1}>
+  <Card title="Advanced Rate Limiting" icon="gauge" href="/middleware/rate-limiting-v2">
+    Sliding windows, per-API-key limits, and rate limit headers.
+  </Card>
+</CardGroup>

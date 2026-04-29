@@ -1,0 +1,138 @@
+---
+title: "Cluster Mode"
+description: "Scale across CPU cores with multi-process worker management."
+icon: "server"
+---
+
+# Cluster Mode
+
+A single Swift process uses one CPU core efficiently. To use all available cores, Prism can spawn multiple worker processes — each running its own copy of the server. `PrismClusterManager` handles spawning, monitoring, and restarting workers.
+
+## Quick Start
+
+```swift title="Multi-Process Server"
+switch PrismClusterMode.current {
+case .primary:
+    let cluster = PrismClusterManager(config: PrismClusterConfig(
+        workerCount: ProcessInfo.processInfo.activeProcessorCount,
+        restartOnCrash: true
+    ))
+
+    try await cluster.start(executable: ProcessInfo.processInfo.arguments[0])
+    print("Primary: spawned \(await cluster.activeWorkerCount) workers")
+
+case .worker(let id):
+    print("Worker \(id) starting")
+    let server = PrismHTTPServer(port: 8080)
+    await server.get("/") { _ in .json(["worker": id]) }
+    try await server.start()
+}
+```
+
+## Cluster Configuration
+
+```swift title="Configuration Options"
+let config = PrismClusterConfig(
+    workerCount: 4,                     // Number of workers (default: CPU count)
+    restartOnCrash: true,               // Auto-restart crashed workers
+    shutdownTimeout: .seconds(30)       // Grace period for worker shutdown
+)
+```
+
+## Detecting Primary vs Worker
+
+```swift title="Process Role Detection"
+PrismCluster.isWorker    // true if PRISM_WORKER=true
+PrismCluster.isPrimary   // true if not a worker
+PrismCluster.workerID    // Int? from PRISM_WORKER_ID env var
+
+// Pattern matching
+switch PrismClusterMode.current {
+case .primary:
+    // Manager process — spawn workers
+case .worker(let id):
+    // Worker process — run server
+}
+```
+
+The primary process sets `PRISM_WORKER=true` and `PRISM_WORKER_ID=N` in the environment of each child process.
+
+## Managing Workers
+
+```swift title="Worker Management"
+let cluster = PrismClusterManager()
+try await cluster.start(executable: "/usr/local/bin/myserver")
+
+// List workers
+for worker in await cluster.workers {
+    print("Worker \(worker.workerID): PID \(worker.pid), status: \(worker.status.rawValue)")
+}
+
+// Count active workers
+let active = await cluster.activeWorkerCount
+
+// Restart a specific worker
+try await cluster.restart(pid: workerPID)
+
+// Stop all workers
+await cluster.stop()
+```
+
+## Worker Status
+
+| Status | Meaning |
+|--------|---------|
+| `.running` | Process is active |
+| `.stopped` | Clean exit (exit code 0) |
+| `.crashed` | Non-zero exit — auto-restarted if `restartOnCrash` is on |
+
+## Auto-Restart
+
+When `restartOnCrash` is enabled, the manager monitors workers every second. If a worker exits with a non-zero status, it's automatically replaced:
+
+```
+Primary: Worker 2 (PID 4521) crashed with status 1
+Primary: Restarting worker 2...
+Primary: Worker 2 respawned as PID 4535
+```
+
+## Practical Example
+
+```swift title="Production Cluster"
+@main
+struct MyServer {
+    static func main() async throws {
+        let config = PrismConfig.load()
+
+        switch PrismClusterMode.current {
+        case .primary:
+            let workerCount = config.getInt("WORKERS", default: ProcessInfo.processInfo.activeProcessorCount)
+            let cluster = PrismClusterManager(config: PrismClusterConfig(
+                workerCount: workerCount,
+                restartOnCrash: config.isProduction
+            ))
+
+            try await cluster.start(
+                executable: ProcessInfo.processInfo.arguments[0]
+            )
+
+            // Primary stays alive monitoring workers
+            try await Task.sleep(for: .seconds(.max))
+
+        case .worker(let id):
+            let server = PrismHTTPServer(port: config.port)
+            // ... configure routes, middleware ...
+            print("Worker \(id) listening on :\(config.port)")
+            try await server.start()
+        }
+    }
+}
+```
+
+<Note>
+  All workers share the same port. On macOS, Network.framework handles port sharing via SO_REUSEPORT. Each incoming connection is distributed to one worker.
+</Note>
+
+<Tip>
+  In containerized environments (Docker, Kubernetes), you often don't need cluster mode — the orchestrator handles scaling by running multiple container instances. Use cluster mode when running on bare metal or a single VM where you want to saturate all CPU cores.
+</Tip>

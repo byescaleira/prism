@@ -1,0 +1,114 @@
+---
+title: "Dependency Injection"
+description: "Manage service lifetimes with an actor-based IoC container."
+icon: "syringe"
+---
+
+# Dependency Injection
+
+`PrismContainer` is an actor-based IoC container that manages service lifetimes — singletons shared across the app, transient instances created fresh each time, and scoped instances tied to a request.
+
+## Registering Services
+
+```swift title="Register Services"
+let container = PrismContainer()
+
+// Singleton — created once, shared everywhere
+await container.register(PrismDatabase.self, lifetime: .singleton) {
+    try PrismDatabase(path: "app.db")
+}
+
+// Transient — new instance every time
+await container.register(EmailService.self, lifetime: .transient) {
+    EmailService(apiKey: ProcessInfo.processInfo.environment["EMAIL_KEY"]!)
+}
+
+// Scoped — one instance per scope (typically per request)
+await container.register(RequestLogger.self, lifetime: .scoped) {
+    RequestLogger()
+}
+```
+
+## Resolving Services
+
+```swift title="Resolve by Type"
+let db = try await container.resolve(PrismDatabase.self)
+let email = try await container.resolve(EmailService.self)
+```
+
+## Service Lifetimes
+
+| Lifetime | Created | Destroyed |
+|----------|---------|-----------|
+| `.singleton` | First resolve | App shutdown |
+| `.transient` | Every resolve | Immediately (caller owns it) |
+| `.scoped` | First resolve per scope | End of scope |
+
+## Request-Scoped Services
+
+Create a scope per request for services that should be unique to each request but shared within it:
+
+```swift title="Scoped Resolution"
+await server.post("/orders") { request in
+    let result = try await container.scoped { scope in
+        let logger = try await scope.resolve(RequestLogger.self)
+        let db = try await scope.resolve(OrderRepository.self)
+
+        logger.info("Processing order")
+        let order = try await db.create(from: request)
+        logger.info("Order \(order.id) created")
+
+        return order
+    }
+
+    return .json(["orderId": result.id], status: .created)
+}
+```
+
+## Using in Route Handlers
+
+Since `userInfo` is `[String: String]`, you can't store the container in the request. Instead, capture it in route closures:
+
+```swift title="Container in Routes"
+let container = PrismContainer()
+
+// Register services
+await container.register(UserService.self, lifetime: .singleton) {
+    UserService(db: try await container.resolve(PrismDatabase.self))
+}
+
+// Use in routes
+await server.get("/users/:id") { request in
+    let userService = try await container.resolve(UserService.self)
+    let id = request.parameters["id"]!
+    let user = try await userService.find(id: id)
+    return .json(user)
+}
+
+await server.post("/users") { request in
+    let userService = try await container.resolve(UserService.self)
+    let input: CreateUserInput = try request.decodeJSON()
+    let user = try await userService.create(input)
+    return .json(user, status: .created)
+}
+```
+
+## Error Handling
+
+```swift title="Handle Missing Services"
+do {
+    let service = try await container.resolve(MissingService.self)
+} catch PrismServiceError.notRegistered(let type) {
+    print("Service not registered: \(type)")
+} catch PrismServiceError.resolutionFailed(let type) {
+    print("Failed to create: \(type)")
+}
+```
+
+<Note>
+  Singletons can only be resolved from `PrismContainer`, not from `PrismScope`. If you try to resolve a singleton from a scope, it throws `.resolutionFailed`. This prevents accidental lifecycle mismatches.
+</Note>
+
+<Tip>
+  Register your database, caches, and HTTP clients as singletons. Register request-specific services (loggers with request context, transaction managers) as scoped. Register stateless utilities as transient.
+</Tip>

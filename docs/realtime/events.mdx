@@ -1,0 +1,169 @@
+---
+title: "Event Bus"
+description: "Typed publish/subscribe event system for decoupled server components."
+icon: "bolt"
+---
+
+# Event Bus
+
+`PrismEventBus` is an actor-based pub/sub system that lets different parts of your application communicate without direct dependencies. Define typed events, subscribe to them, and emit them from anywhere.
+
+## Defining Events
+
+```swift title="Custom Events"
+struct UserRegistered: PrismEvent {
+    let userId: Int
+    let email: String
+}
+
+struct OrderPlaced: PrismEvent {
+    let orderId: Int
+    let total: Double
+    let userId: Int
+}
+
+struct PaymentFailed: PrismEvent {
+    let orderId: Int
+    let reason: String
+}
+```
+
+<Note>
+  Events conform to `PrismEvent` which requires `Sendable`. The event name defaults to the type name — you can override `static var name: String` if needed.
+</Note>
+
+## Subscribing
+
+```swift title="Listen for Events"
+let bus = PrismEventBus()
+
+// Subscribe to user registrations
+await bus.on(UserRegistered.self) { event in
+    print("New user: \(event.email)")
+    // Send welcome email, create default settings, etc.
+}
+
+// Subscribe to orders
+await bus.on(OrderPlaced.self) { event in
+    print("Order #\(event.orderId) for $\(event.total)")
+    // Update inventory, notify warehouse, etc.
+}
+```
+
+### One-Time Listeners
+
+```swift title="Listen Once"
+await bus.once(PaymentFailed.self) { event in
+    print("First payment failure: \(event.reason)")
+    // Alert on-call, only triggers once
+}
+```
+
+## Emitting Events
+
+```swift title="Publish Events"
+// From a route handler
+await server.post("/users") { request in
+    let user = try createUser(from: request)
+
+    await bus.emit(UserRegistered(userId: user.id, email: user.email))
+
+    return .json(["id": user.id], status: .created)
+}
+
+await server.post("/orders") { request in
+    let order = try processOrder(from: request)
+
+    await bus.emit(OrderPlaced(
+        orderId: order.id,
+        total: order.total,
+        userId: order.userId
+    ))
+
+    return .json(["orderId": order.id], status: .created)
+}
+```
+
+## Practical Example: Audit Logging
+
+```swift title="Audit Log System"
+// Define audit events
+struct AuditEvent: PrismEvent {
+    let action: String
+    let userId: Int?
+    let resource: String
+    let details: String
+}
+
+// Subscribe — writes to database
+await bus.on(AuditEvent.self) { event in
+    try? await db.execute(
+        "INSERT INTO audit_log (action, user_id, resource, details, created_at) VALUES (?, ?, ?, ?, datetime('now'))",
+        parameters: [
+            .text(event.action),
+            event.userId.map { .integer($0) } ?? .null,
+            .text(event.resource),
+            .text(event.details)
+        ]
+    )
+}
+
+// Emit from routes
+await server.delete("/users/:id") { request in
+    let id = Int(request.parameters["id"] ?? "")!
+    try await db.execute("DELETE FROM users WHERE id = ?", parameters: [.integer(id)])
+
+    await bus.emit(AuditEvent(
+        action: "DELETE",
+        userId: id,
+        resource: "users",
+        details: "User account deleted"
+    ))
+
+    return PrismHTTPResponse(status: .noContent)
+}
+```
+
+## Managing Listeners
+
+```swift title="Unsubscribe"
+// on() returns a listener ID
+let listenerId = await bus.on(UserRegistered.self) { event in
+    print(event.email)
+}
+
+// Remove specific listener
+await bus.off(id: listenerId)
+
+// Remove all listeners for an event type
+await bus.removeAll(for: UserRegistered.self)
+
+// Check listener count
+let count = await bus.listenerCount(for: OrderPlaced.self)
+```
+
+## Built-In Server Events
+
+Prism emits several events automatically:
+
+```swift title="Server Lifecycle Events"
+await bus.on(PrismServerStarted.self) { event in
+    print("Server running on \(event.host):\(event.port)")
+}
+
+await bus.on(PrismServerStopped.self) { _ in
+    print("Server stopped")
+}
+
+await bus.on(PrismRequestCompleted.self) { event in
+    print("\(event.method) \(event.path) → \(event.statusCode) (\(event.duration))")
+}
+
+await bus.on(PrismServerError.self) { event in
+    print("Error: \(event.error) at \(event.path ?? "unknown")")
+}
+```
+
+<Tip>
+  The event bus is great for cross-cutting concerns like logging, analytics, notifications, and cache invalidation. It keeps your route handlers focused on the primary business logic.
+</Tip>

@@ -1,0 +1,110 @@
+---
+title: "Authentication"
+description: "Protect routes with bearer tokens, sessions, and custom auth strategies."
+icon: "lock"
+---
+
+# Authentication
+
+Prism offers multiple authentication approaches: bearer token middleware for APIs, session-based auth for web apps, and the flexibility to build custom strategies.
+
+## Bearer Token Auth
+
+`PrismAuthMiddleware` validates `Authorization: Bearer <token>` headers:
+
+```swift title="Token Auth"
+let authMiddleware = PrismAuthMiddleware { token in
+    // Return true if token is valid
+    return token == "my-secret-token"
+}
+
+await server.group("/api", middlewares: [authMiddleware]) { api in
+    api.get("/protected") { _ in
+        .json(["message": "You're in!"])
+    }
+}
+```
+
+### Database-backed Tokens
+
+```swift title="DB Token Validation"
+let auth = PrismAuthMiddleware { token in
+    let row = try? db.queryFirst(
+        "SELECT id FROM api_tokens WHERE token = ? AND expires_at > datetime('now')",
+        parameters: [.text(token)]
+    )
+    return row != nil
+}
+```
+
+## Session-based Auth
+
+For web applications with cookies:
+
+```swift title="Session Auth"
+let sessionStore = PrismMemorySessionStore()
+let sessionMiddleware = PrismSessionMiddleware(
+    store: sessionStore,
+    secret: "your-32-char-secret-key-here!!!!"
+)
+
+await server.use(sessionMiddleware)
+
+await server.post("/login") { request in
+    let username = request.formData["username"] ?? ""
+    // Validate credentials...
+
+    var session = request.session ?? PrismSession()
+    session.data["userId"] = "42"
+    session.data["username"] = username
+    // Session is saved via middleware on response
+    return .redirect(to: "/dashboard")
+}
+
+await server.get("/dashboard") { request in
+    guard let session = request.session,
+          let username = session.data["username"] else {
+        return .redirect(to: "/login")
+    }
+    return .html("<h1>Welcome, \(username)!</h1>")
+}
+```
+
+## Custom Auth Middleware
+
+Build your own for complex auth flows:
+
+```swift title="Custom Auth"
+struct JWTAuthMiddleware: PrismMiddleware, Sendable {
+    func handle(_ request: PrismHTTPRequest, next: @escaping PrismRouteHandler) async throws -> PrismHTTPResponse {
+        guard let authHeader = request.headers.value(for: "Authorization"),
+              authHeader.hasPrefix("Bearer ") else {
+            throw PrismAppError.unauthorized("Missing authorization header")
+        }
+
+        let token = String(authHeader.dropFirst(7))
+
+        // Validate your JWT here
+        guard let userId = validateJWT(token) else {
+            throw PrismAppError.unauthorized("Invalid token")
+        }
+
+        var req = request
+        req.userInfo["userId"] = userId
+        return try await next(req)
+    }
+}
+```
+
+<Tip>
+Apply auth middleware to specific route groups instead of globally. Public routes like `/health` and `/login` shouldn't require authentication.
+</Tip>
+
+<CardGroup cols={2}>
+  <Card title="Sessions" icon="cookie" href="/security/sessions">
+    Deep dive into cookie-based sessions.
+  </Card>
+  <Card title="Rate Limiting" icon="gauge-high" href="/middleware/rate-limiting">
+    Protect authenticated endpoints from abuse.
+  </Card>
+</CardGroup>

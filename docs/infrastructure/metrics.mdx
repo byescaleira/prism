@@ -1,0 +1,119 @@
+---
+title: "Metrics"
+description: "Track request counts, latency, error rates, and popular endpoints."
+icon: "chart-line"
+---
+
+# Metrics
+
+`PrismMetrics` collects request-level statistics — how many requests your server handled, how fast it responded, which endpoints are hot, and how many errors occurred. All exposed through a `/metrics` endpoint.
+
+## Quick Setup
+
+```swift title="Enable Metrics"
+let metrics = PrismMetrics()
+await server.use(PrismMetricsMiddleware(metrics: metrics))
+// GET /metrics → JSON metrics snapshot
+```
+
+Every request (except to `/metrics` itself) is automatically tracked.
+
+## What's Tracked
+
+```json title="GET /metrics Response"
+{
+    "requestCount": 15234,
+    "errorCount": 42,
+    "activeRequests": 3,
+    "averageLatencyMs": 12.5,
+    "statusCounts": {
+        "200": 14800,
+        "404": 350,
+        "500": 42,
+        "201": 42
+    },
+    "topPaths": {
+        "/api/users": 5000,
+        "/api/products": 3200,
+        "/health": 2100
+    }
+}
+```
+
+| Metric | Description |
+|--------|-------------|
+| `requestCount` | Total requests handled |
+| `errorCount` | Requests with status >= 400 |
+| `activeRequests` | Currently processing |
+| `averageLatencyMs` | Average response time in milliseconds |
+| `statusCounts` | Breakdown by HTTP status code |
+| `topPaths` | Top 20 most-requested endpoints |
+
+## Custom Metrics Path
+
+```swift title="Custom Path"
+await server.use(PrismMetricsMiddleware(metrics: metrics, path: "/api/metrics"))
+```
+
+## Programmatic Access
+
+Read metrics from your own code — useful for logging or alerting:
+
+```swift title="Read Metrics Snapshot"
+let snapshot = await metrics.snapshot()
+
+print("Total requests: \(snapshot.requestCount)")
+print("Error rate: \(Double(snapshot.errorCount) / Double(snapshot.requestCount) * 100)%")
+print("Average latency: \(Double(snapshot.averageLatencyNanos) / 1_000_000)ms")
+
+if snapshot.activeRequests > 100 {
+    print("Warning: high concurrent load")
+}
+```
+
+## Manual Recording
+
+Record metrics from outside the middleware pipeline:
+
+```swift title="Manual Metrics"
+await metrics.requestStarted()
+let clock = ContinuousClock()
+let start = clock.now
+
+// ... do work ...
+
+let duration = clock.now - start
+await metrics.recordRequest(path: "/background-job", statusCode: 200, duration: duration)
+await metrics.requestEnded()
+```
+
+## Reset Metrics
+
+```swift title="Reset"
+await metrics.reset()
+// All counters back to zero — useful for testing or periodic snapshots
+```
+
+## Combining with Health Checks
+
+```swift title="Metrics-Aware Health Check"
+let health = PrismHealthMonitor()
+
+await health.register(PrismHealthCheck(name: "error-rate") {
+    let snapshot = await metrics.snapshot()
+    guard snapshot.requestCount > 100 else {
+        return PrismHealthCheckResult(name: "error-rate", status: .healthy, message: "Insufficient data")
+    }
+    let errorRate = Double(snapshot.errorCount) / Double(snapshot.requestCount)
+    if errorRate > 0.1 {
+        return PrismHealthCheckResult(name: "error-rate", status: .unhealthy, message: "Error rate: \(Int(errorRate * 100))%")
+    } else if errorRate > 0.05 {
+        return PrismHealthCheckResult(name: "error-rate", status: .degraded, message: "Error rate: \(Int(errorRate * 100))%")
+    }
+    return PrismHealthCheckResult(name: "error-rate", status: .healthy)
+})
+```
+
+<Tip>
+  Place `PrismMetricsMiddleware` early in your middleware stack so it captures the full request lifecycle, including time spent in other middleware. Middleware runs in order — earlier middleware wraps later middleware.
+</Tip>

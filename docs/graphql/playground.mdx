@@ -1,0 +1,147 @@
+---
+title: "Playground"
+description: "Set up the interactive GraphQL playground to explore and test your API in the browser."
+icon: "play"
+---
+
+# GraphQL Playground
+
+Prism ships with a built-in GraphQL playground — an interactive browser UI where you can write queries, explore your schema, and test mutations in real time.
+
+## Quick Setup
+
+<Steps>
+  <Step title="Define your schema">
+    Create your `PrismGraphQLSchema` with query and mutation types.
+  </Step>
+  <Step title="Add the middleware">
+    Mount `PrismGraphQLMiddleware` on your server.
+  </Step>
+  <Step title="Add the playground">
+    Mount `PrismGraphQLPlayground` for the interactive UI.
+  </Step>
+  <Step title="Open in browser">
+    Navigate to `http://localhost:8080/graphql/playground`.
+  </Step>
+</Steps>
+
+```swift title="Complete Setup"
+let server = PrismHTTPServer(port: 8080)
+
+// Your schema
+let schema = PrismGraphQLSchema(query: queryType, mutation: mutationType)
+
+// Mount GraphQL endpoint at /graphql
+let graphqlMiddleware = PrismGraphQLMiddleware(schema: schema, path: "/graphql")
+await server.use(graphqlMiddleware)
+
+// Mount playground UI at /graphql/playground
+let playground = PrismGraphQLPlayground(
+    path: "/graphql/playground",
+    graphqlEndpoint: "/graphql"
+)
+await server.use(playground)
+
+try await server.start()
+```
+
+Now visit [http://localhost:8080/graphql/playground](http://localhost:8080/graphql/playground) to start exploring.
+
+## How It Works
+
+The playground provides:
+
+- **Query editor** with syntax highlighting
+- **Variables panel** for parameterized queries
+- **Response viewer** with formatted JSON
+- **Keyboard shortcut** — Cmd+Enter (or Ctrl+Enter) to execute
+
+<Tip>
+The playground is a self-contained HTML page embedded in the binary — no external CDN or network requests needed. It works completely offline.
+</Tip>
+
+## Passing Context
+
+Pass application context (like a database connection) to your resolvers via the middleware:
+
+```swift title="Context Setup"
+let db = try PrismDatabase(path: "app.db")
+
+let graphqlMiddleware = PrismGraphQLMiddleware(
+    schema: schema,
+    path: "/graphql",
+    context: db  // Available as info.context in resolvers
+)
+```
+
+## API Endpoints
+
+The middleware handles both GET and POST requests:
+
+<Tabs>
+  <Tab title="POST (recommended)">
+    ```bash
+    curl -X POST http://localhost:8080/graphql \
+      -H "Content-Type: application/json" \
+      -d '{"query": "{ hello }", "variables": {}}'
+    ```
+  </Tab>
+  <Tab title="GET">
+    ```bash
+    curl "http://localhost:8080/graphql?query=%7B%20hello%20%7D"
+    ```
+  </Tab>
+</Tabs>
+
+## Introspection
+
+The playground uses introspection to discover your schema. Try this query to see all available types:
+
+```graphql title="Schema Introspection"
+{
+  __schema {
+    queryType {
+      name
+    }
+    mutationType {
+      name
+    }
+    types {
+      name
+      fields {
+        name
+        type {
+          name
+        }
+      }
+    }
+  }
+}
+```
+
+## Production Considerations
+
+<Warning>
+The GraphQL playground should typically be disabled in production to prevent unauthorized schema exploration. Consider mounting it conditionally:
+</Warning>
+
+```swift title="Conditional Playground"
+let config = PrismConfig.load()
+
+await server.use(graphqlMiddleware)
+
+if config.isDevelopment {
+    await server.use(PrismGraphQLPlayground())
+}
+```
+
+## What's Next
+
+<CardGroup cols={2}>
+  <Card title="Schema" icon="diagram-project" href="/graphql/schema">
+    Define more complex schemas with nested types
+  </Card>
+  <Card title="MCP Server" icon="robot" href="/mcp/overview">
+    Build AI tool servers with MCP
+  </Card>
+</CardGroup>

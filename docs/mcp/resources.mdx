@@ -1,0 +1,129 @@
+---
+title: "Resources"
+description: "Expose data as readable resources that AI assistants can access — config files, database records, documentation."
+icon: "folder-open"
+---
+
+# MCP Resources
+
+Resources provide read-only data to AI assistants. Unlike tools (which perform actions), resources simply expose information — configuration files, database records, logs, documentation, or any other data your application manages.
+
+## Registering Resources
+
+```swift title="Basic Resource"
+await mcp.registerResource(
+    PrismMCPResource(
+        uri: "app://config",
+        name: "App Configuration",
+        description: "Current application configuration settings",
+        mimeType: "text/plain"
+    ),
+    handler: {
+        let config = PrismConfig.load()
+        return """
+        environment: \(config.environment)
+        port: \(config.port)
+        host: \(config.host)
+        """
+    }
+)
+```
+
+## Resource URIs
+
+Resources are identified by URIs. Use a scheme that makes sense for your domain:
+
+| URI Pattern | Use Case |
+|-------------|----------|
+| `app://config` | Application configuration |
+| `db://users/123` | Database record |
+| `file:///path/to/file` | File on disk |
+| `log://app/latest` | Application logs |
+| `docs://api/users` | API documentation |
+
+## Practical Examples
+
+<AccordionGroup>
+  <Accordion title="Database Records">
+    ```swift
+    await mcp.registerResource(
+        PrismMCPResource(
+            uri: "db://schema",
+            name: "Database Schema",
+            description: "All tables and columns in the database"
+        ),
+        handler: {
+            let tables = try await db.query(
+                "SELECT name FROM sqlite_master WHERE type='table'"
+            )
+            var output = ""
+            for table in tables {
+                let name = table["name"]
+                output += "\n## \(name)\n"
+                let cols = try await db.query("PRAGMA table_info(\(name))")
+                for col in cols {
+                    output += "  - \(col["name"]) (\(col["type"]))\n"
+                }
+            }
+            return output
+        }
+    )
+    ```
+  </Accordion>
+
+  <Accordion title="Log Files">
+    ```swift
+    await mcp.registerResource(
+        PrismMCPResource(
+            uri: "log://app/latest",
+            name: "Recent Logs",
+            description: "Last 100 lines of application logs"
+        ),
+        handler: {
+            let logPath = "/var/log/myapp/app.log"
+            let content = try String(contentsOfFile: logPath, encoding: .utf8)
+            let lines = content.split(separator: "\n").suffix(100)
+            return lines.joined(separator: "\n")
+        }
+    )
+    ```
+  </Accordion>
+
+  <Accordion title="API Documentation">
+    ```swift
+    await mcp.registerResource(
+        PrismMCPResource(
+            uri: "docs://api",
+            name: "API Documentation",
+            description: "REST API endpoints and their descriptions",
+            mimeType: "text/markdown"
+        ),
+        handler: {
+            """
+            # API Endpoints
+            
+            ## Users
+            - GET /api/users - List all users
+            - POST /api/users - Create a user
+            - GET /api/users/:id - Get user by ID
+            
+            ## Posts  
+            - GET /api/posts - List all posts
+            - POST /api/posts - Create a post
+            """
+        }
+    )
+    ```
+  </Accordion>
+</AccordionGroup>
+
+## What's Next
+
+<CardGroup cols={2}>
+  <Card title="Tools" icon="wrench" href="/mcp/tools">
+    Build tools the AI can call
+  </Card>
+  <Card title="Transports" icon="network-wired" href="/mcp/transports">
+    Deploy your MCP server
+  </Card>
+</CardGroup>

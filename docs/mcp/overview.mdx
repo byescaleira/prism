@@ -1,0 +1,156 @@
+---
+title: "MCP Overview"
+description: "Build Model Context Protocol servers that let AI assistants like Claude use your tools, read your resources, and follow your prompts."
+icon: "robot"
+---
+
+# Model Context Protocol (MCP)
+
+MCP is an open protocol that lets AI assistants interact with external tools and data sources. With Prism's MCP server, you can expose your application's capabilities to AI models — letting them query databases, call APIs, read files, and more.
+
+## Why MCP?
+
+Think of MCP as a standard interface between AI assistants and your code:
+
+<CardGroup cols={3}>
+  <Card title="Tools" icon="wrench">
+    Functions the AI can call — like "search the database" or "send an email"
+  </Card>
+  <Card title="Resources" icon="folder-open">
+    Data the AI can read — like config files, database records, or logs
+  </Card>
+  <Card title="Prompts" icon="message">
+    Pre-built prompt templates the AI can use for common tasks
+  </Card>
+</CardGroup>
+
+## Quick Start
+
+```swift title="Simple MCP Server"
+let mcp = PrismMCPServer(name: "my-app", version: "1.0.0")
+
+// Register a tool
+await mcp.registerTool(
+    "greet",
+    description: "Generate a greeting for a person",
+    inputSchema: ["name": "string"],
+    handler: { args in
+        let name = args["name"] as? String ?? "World"
+        return PrismMCPToolResult(
+            content: [.text("Hello, \(name)!")],
+            isError: false
+        )
+    }
+)
+
+// Register a resource
+await mcp.registerResource(
+    PrismMCPResource(uri: "app://config", name: "App Config", description: "Current configuration"),
+    handler: { "environment: production\nversion: 1.0.0" }
+)
+
+// Start the server (stdio transport for CLI tools)
+let transport = PrismMCPStdioTransport(server: mcp)
+await transport.start()
+```
+
+<Tip>
+When running with stdio transport, the MCP server reads JSON-RPC messages from stdin and writes responses to stdout — perfect for CLI tools that Claude Desktop or other AI clients launch as subprocesses.
+</Tip>
+
+## Architecture
+
+```
+┌─────────────────┐    JSON-RPC 2.0    ┌──────────────────┐
+│  AI Assistant    │ ◄──────────────► │  PrismMCPServer  │
+│  (Claude, etc.)  │    stdio / HTTP   │                  │
+└─────────────────┘                    │  ┌─── Tools      │
+                                       │  ├─── Resources  │
+                                       │  └─── Prompts    │
+                                       └──────────────────┘
+```
+
+The server handles:
+- **Capability negotiation** — tells the client what features are available
+- **Tool execution** — routes tool calls to your handlers
+- **Resource serving** — provides data on demand
+- **Prompt templates** — offers pre-built prompts for common workflows
+
+## Real-World Example
+
+Here's an MCP server that gives an AI assistant access to a task database:
+
+```swift title="Task Manager MCP"
+let db = try PrismDatabase(path: "tasks.db")
+let mcp = PrismMCPServer(name: "task-manager", version: "1.0.0")
+
+// Tool: List tasks
+await mcp.registerTool(
+    "list_tasks",
+    description: "List all tasks, optionally filtered by status",
+    inputSchema: ["status": "string"],
+    handler: { args in
+        let status = args["status"] as? String
+        var sql = "SELECT * FROM tasks"
+        if let status { sql += " WHERE status = '\(status)'" }
+        
+        let rows = try await db.query(sql)
+        let tasks = rows.map { "- [\($0["status"])] \($0["title"])" }
+        return PrismMCPToolResult(
+            content: [.text(tasks.joined(separator: "\n"))],
+            isError: false
+        )
+    }
+)
+
+// Tool: Create task
+await mcp.registerTool(
+    "create_task",
+    description: "Create a new task",
+    inputSchema: ["title": "string", "priority": "string"],
+    handler: { args in
+        let title = args["title"] as? String ?? ""
+        let priority = args["priority"] as? String ?? "medium"
+        
+        try await db.execute(
+            "INSERT INTO tasks (title, priority, status) VALUES (?, ?, 'pending')",
+            parameters: [.text(title), .text(priority)]
+        )
+        return PrismMCPToolResult(
+            content: [.text("Created task: \(title)")],
+            isError: false
+        )
+    }
+)
+
+// Resource: Project README
+await mcp.registerResource(
+    PrismMCPResource(uri: "project://readme", name: "README", description: "Project documentation"),
+    handler: { try String(contentsOfFile: "README.md", encoding: .utf8) }
+)
+```
+
+## Transports
+
+Prism supports two MCP transport modes:
+
+| Transport | Use Case | Protocol |
+|-----------|----------|----------|
+| **Stdio** | CLI tools, Claude Desktop | stdin/stdout |
+| **HTTP** | Web applications, remote servers | HTTP POST + SSE |
+
+See [Transports](/mcp/transports) for setup details.
+
+## What's Next
+
+<CardGroup cols={3}>
+  <Card title="Tools" icon="wrench" href="/mcp/tools">
+    Build powerful tools for AI assistants
+  </Card>
+  <Card title="Resources" icon="folder-open" href="/mcp/resources">
+    Expose data as readable resources
+  </Card>
+  <Card title="Transports" icon="network-wired" href="/mcp/transports">
+    Choose the right transport for your use case
+  </Card>
+</CardGroup>

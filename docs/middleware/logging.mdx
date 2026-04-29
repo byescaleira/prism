@@ -1,0 +1,36 @@
+---
+title: "Logging"
+description: "Log every request and response with timing information."
+icon: "file-lines"
+---
+
+# Logging Middleware
+
+`PrismLoggingMiddleware` prints a log line for every request, including the HTTP method, path, status code, and response time.
+
+## Setup
+
+```swift title="Enable Logging"
+await server.use(PrismLoggingMiddleware())
+```
+
+Output:
+
+```
+GET /api/users → 200 OK (2.3ms)
+POST /api/users → 201 Created (15.1ms)
+GET /api/users/999 → 404 Not Found (0.8ms)
+```
+
+## Combine with Tracing
+
+For production, pair logging with request tracing so every log line includes a unique request ID:
+
+```swift title="Traced Logging"
+await server.use(PrismTracingMiddleware())
+await server.use(PrismLoggingMiddleware())
+```
+
+<Tip>
+Add logging middleware early in the stack to capture timing for the entire request lifecycle, including other middleware execution.
+</Tip>

@@ -1,0 +1,39 @@
+---
+title: "Compression"
+description: "Compress HTTP responses to reduce bandwidth using Apple's Compression framework."
+icon: "compress"
+---
+
+# Compression Middleware
+
+`PrismCompressionMiddleware` compresses response bodies using deflate compression — powered by Apple's native Compression framework. No zlib, no third-party libraries.
+
+## Setup
+
+```swift title="Enable Compression"
+await server.use(PrismCompressionMiddleware())
+```
+
+When a client sends `Accept-Encoding: deflate`, responses are automatically compressed. The middleware adds the `Content-Encoding: deflate` header.
+
+## When to Use
+
+Compression is most effective for:
+- JSON API responses (typically 60-80% reduction)
+- HTML pages
+- Large text payloads
+
+<Tip>
+Place compression middleware after caching middleware. You don't want to compress the same cached response on every request.
+</Tip>
+
+## Production Stack
+
+```swift title="With Caching"
+await server.use(PrismResponseCacheMiddleware(ttl: 300)) // Cache first
+await server.use(PrismCompressionMiddleware())            // Then compress
+```
+
+<Note>
+Small responses (under ~150 bytes) may actually get larger after compression overhead. The middleware handles this gracefully — it only compresses responses above a meaningful threshold.
+</Note>

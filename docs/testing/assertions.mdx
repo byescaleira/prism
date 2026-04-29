@@ -1,0 +1,163 @@
+---
+title: "Assertions"
+description: "Chainable response assertions for clean, expressive test code."
+icon: "list-check"
+---
+
+# Assertions
+
+`PrismAssertResponse` wraps an HTTP response with chainable assertion methods. Instead of manually checking status codes, headers, and body content, chain assertions for readable, expressive tests.
+
+## Quick Start
+
+```swift title="Chainable Assertions"
+let response = try await client.get("/users")
+
+PrismAssertResponse(response)
+    .assertStatus(.ok)
+    .assertHeader("Content-Type", "application/json; charset=utf-8")
+    .assertBodyContains("Alice")
+```
+
+## Available Assertions
+
+### Status Code
+
+```swift title="Assert Status"
+PrismAssertResponse(response)
+    .assertStatus(.ok)              // 200
+    .assertStatus(.created)         // 201
+    .assertStatus(.noContent)       // 204
+    .assertStatus(.notFound)        // 404
+    .assertStatus(.badRequest)      // 400
+```
+
+### Headers
+
+```swift title="Assert Headers"
+PrismAssertResponse(response)
+    .assertHeader("Content-Type", "application/json; charset=utf-8")
+    .assertHeader("X-Cache", "HIT")
+    .assertHeader("X-Request-ID", requestId)
+```
+
+### Body Content
+
+```swift title="Assert Body"
+PrismAssertResponse(response)
+    .assertBodyContains("success")
+    .assertBodyContains("user_id")
+```
+
+### JSON Decoding
+
+```swift title="Assert and Decode JSON"
+struct UserResponse: Decodable {
+    let id: Int
+    let name: String
+}
+
+let user = try PrismAssertResponse(response)
+    .assertStatus(.ok)
+    .assertJSON(UserResponse.self)
+
+#expect(user.name == "Alice")
+#expect(user.id == 1)
+```
+
+## Chaining
+
+Every assertion returns `self`, so you can chain multiple checks:
+
+```swift title="Chain Everything"
+let user = try PrismAssertResponse(response)
+    .assertStatus(.created)
+    .assertHeader("Content-Type", "application/json; charset=utf-8")
+    .assertHeader("X-Request-ID", "test-123")
+    .assertBodyContains("Alice")
+    .assertJSON(UserResponse.self)
+```
+
+## Reading the Body
+
+```swift title="Body Access"
+let assert = PrismAssertResponse(response)
+let body = assert.bodyString  // String? (UTF-8 decoded)
+
+// The wrapped response is still accessible
+let status = assert.response.status
+let headers = assert.response.headers
+```
+
+## Complete Test Example
+
+```swift title="Full Test Suite"
+@Suite("Todo API")
+struct TodoAPITests {
+    let client: PrismTestClient
+
+    init() {
+        client = PrismTestClientBuilder()
+            .get("/todos") { _ in
+                .json(["todos": [["id": 1, "title": "Write tests", "done": false]]])
+            }
+            .post("/todos") { request in
+                let todo = try request.decodeJSON() as CreateTodo
+                return .json(["id": 2, "title": todo.title], status: .created)
+            }
+            .get("/todos/:id") { request in
+                let id = request.parameters["id"]!
+                if id == "999" {
+                    return .json(["error": "Not found"], status: .notFound)
+                }
+                return .json(["id": id, "title": "Test todo"])
+            }
+            .build()
+    }
+
+    @Test func listTodos() async throws {
+        let response = try await client.get("/todos")
+        PrismAssertResponse(response)
+            .assertStatus(.ok)
+            .assertBodyContains("Write tests")
+    }
+
+    @Test func createTodo() async throws {
+        let response = try await client.postJSON("/todos", body: CreateTodo(title: "New"))
+        PrismAssertResponse(response)
+            .assertStatus(.created)
+            .assertBodyContains("New")
+    }
+
+    @Test func todoNotFound() async throws {
+        let response = try await client.get("/todos/999")
+        PrismAssertResponse(response)
+            .assertStatus(.notFound)
+            .assertBodyContains("Not found")
+    }
+
+    @Test func decodeResponse() async throws {
+        let response = try await client.get("/todos/1")
+        let todo = try PrismAssertResponse(response)
+            .assertStatus(.ok)
+            .assertJSON(TodoResponse.self)
+
+        #expect(todo.title == "Test todo")
+    }
+}
+```
+
+## Error Types
+
+```swift title="Test Errors"
+PrismTestError.emptyBody       // assertJSON called on empty response
+PrismTestError.serverNotStarted // Server not available
+```
+
+<Tip>
+  Use `assertJSON` at the end of your chain — it returns the decoded value, not `PrismAssertResponse`, so you can't chain more assertions after it. Put status and header checks first.
+</Tip>
+
+<Note>
+  Assertions use Swift's `assert()`, which is removed in release builds. For tests (which always run in debug mode), this is fine. If you need assertions in release builds, use `precondition()` or Swift Testing's `#expect`.
+</Note>

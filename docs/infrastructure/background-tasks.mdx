@@ -1,0 +1,135 @@
+---
+title: "Background Tasks"
+description: "Run fire-and-forget tasks and manage task groups without blocking requests."
+icon: "gears"
+---
+
+# Background Tasks
+
+Some work shouldn't block the HTTP response — sending emails, processing images, updating search indexes. `PrismBackgroundTaskManager` runs tasks in the background with tracking and cancellation support.
+
+## Fire and Forget
+
+```swift title="Background Task"
+let tasks = PrismBackgroundTaskManager()
+
+await server.post("/orders") { request in
+    let order = try request.decodeJSON() as Order
+
+    // Process order immediately
+    try await db.execute("INSERT INTO orders ...")
+
+    // Send confirmation email in background
+    await tasks.run("send-confirmation") {
+        try await sendEmail(to: order.email, subject: "Order Confirmed")
+    }
+
+    // Response returns immediately, email sends async
+    return .json(["orderId": order.id], status: .created)
+}
+```
+
+## Tasks with Results
+
+When you need the result later:
+
+```swift title="Get Task Result"
+let task = await tasks.runWithResult("generate-report") {
+    try await generateMonthlyReport()
+    return reportURL
+}
+
+// Later, await the result
+let url = try await task.value
+```
+
+## Monitoring Active Tasks
+
+```swift title="Check Running Tasks"
+let active = await tasks.activeTasks
+for task in active {
+    print("\(task.name) started at \(task.startedAt)")
+}
+
+let count = await tasks.activeCount  // Number of running tasks
+```
+
+## Cancellation
+
+```swift title="Cancel Tasks"
+// Cancel a specific task
+await tasks.cancel(id: taskId)
+
+// Cancel everything (e.g., during shutdown)
+await tasks.cancelAll()
+```
+
+## Task Groups
+
+Group related tasks and wait for all of them:
+
+```swift title="Task Group"
+let group = PrismTaskGroup()
+
+await group.add("resize-small") {
+    try await resizeImage(image, to: .small)
+}
+
+await group.add("resize-medium") {
+    try await resizeImage(image, to: .medium)
+}
+
+await group.add("resize-large") {
+    try await resizeImage(image, to: .large)
+}
+
+// Wait for all three to finish
+await group.awaitAll()
+print("All sizes generated")
+```
+
+## Practical Example: Image Processing Pipeline
+
+```swift title="Upload + Background Processing"
+let tasks = PrismBackgroundTaskManager()
+
+await server.post("/photos") { request in
+    let result = try uploader.process(request)
+    defer { result.cleanup() }
+
+    guard let photo = result.file else {
+        return .json(["error": "No photo"], status: .badRequest)
+    }
+
+    let photoId = UUID().uuidString
+    let originalPath = "/var/photos/\(photoId)/original"
+    try photo.move(to: originalPath)
+
+    // Generate thumbnails in background
+    await tasks.run("thumbnails-\(photoId)") {
+        let group = PrismTaskGroup()
+
+        await group.add("thumb-150") {
+            try await generateThumbnail(originalPath, size: 150, output: "/var/photos/\(photoId)/thumb_150")
+        }
+        await group.add("thumb-300") {
+            try await generateThumbnail(originalPath, size: 300, output: "/var/photos/\(photoId)/thumb_300")
+        }
+        await group.add("thumb-600") {
+            try await generateThumbnail(originalPath, size: 600, output: "/var/photos/\(photoId)/thumb_600")
+        }
+
+        await group.awaitAll()
+    }
+
+    return .json(["photoId": photoId], status: .created)
+}
+```
+
+<Note>
+  Fire-and-forget tasks (`run`) swallow errors silently. If you need error handling, use `runWithResult` and `try await task.value`, or handle errors inside the task closure itself.
+</Note>
+
+<Tip>
+  Register a shutdown hook to cancel background tasks during graceful shutdown. Otherwise, in-flight tasks may be interrupted abruptly when the process exits.
+</Tip>

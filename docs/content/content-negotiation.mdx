@@ -1,0 +1,108 @@
+---
+title: "Content Negotiation"
+description: "Serve responses in multiple formats based on the client's Accept header."
+icon: "arrows-split-up-and-left"
+---
+
+# Content Negotiation
+
+Not every client wants JSON. Browsers prefer HTML, spreadsheet tools want CSV, and some integrations need XML. Content negotiation lets a single endpoint serve multiple formats — the client's `Accept` header decides which one.
+
+## How It Works
+
+1. Client sends `Accept: application/xml, application/json;q=0.9`
+2. Prism parses and ranks the media types by quality factor
+3. Your available formats are matched against the client's preferences
+4. The best match wins
+
+## Quick Example
+
+```swift title="Multi-Format Endpoint"
+await server.get("/status") { request in
+    let data: [String: Any] = [
+        "status": "healthy",
+        "uptime": 86400,
+        "version": "2.1.0"
+    ]
+
+    return PrismNegotiatedResponse.respond(
+        to: request,
+        data: data,
+        available: [.json, .xml, .html, .csv, .text]
+    )
+}
+```
+
+This single endpoint responds with JSON, XML, HTML table, CSV, or plain text — based on what the client asks for.
+
+## Supported Formats
+
+```swift title="Available Formats"
+PrismResponseFormat.json    // application/json
+PrismResponseFormat.xml     // application/xml
+PrismResponseFormat.html    // text/html — renders as HTML table
+PrismResponseFormat.csv     // text/csv — header row + values
+PrismResponseFormat.text    // text/plain — key=value pairs
+PrismResponseFormat.custom("application/yaml")
+```
+
+## Parsing Accept Headers
+
+`PrismMediaType.parse` handles the full Accept header spec — quality factors, wildcards, and multiple types:
+
+```swift title="Accept Header Parsing"
+let types = PrismMediaType.parse("text/html, application/json;q=0.9, */*;q=0.1")
+// Sorted by quality: text/html (1.0), application/json (0.9), */* (0.1)
+```
+
+## Manual Negotiation
+
+For custom rendering logic, use `PrismContentNegotiator` directly:
+
+```swift title="Custom Negotiation"
+await server.get("/users") { request in
+    let accept = request.headers.value(for: "Accept") ?? "application/json"
+    let format = PrismContentNegotiator.negotiate(
+        accept: accept,
+        available: [.json, .csv]
+    )
+
+    let users = try await fetchUsers()
+
+    switch format {
+    case .csv:
+        let csv = users.map { "\($0.id),\($0.name),\($0.email)" }.joined(separator: "\n")
+        let header = "id,name,email\n"
+        var headers = PrismHTTPHeaders()
+        headers.set(name: "Content-Type", value: "text/csv")
+        return PrismHTTPResponse(status: .ok, headers: headers, body: .text(header + csv))
+    default:
+        return .json(users)
+    }
+}
+```
+
+## Rendering Specific Formats
+
+Skip negotiation and render data in a known format:
+
+```swift title="Direct Rendering"
+// Force XML output
+let response = PrismNegotiatedResponse.render(
+    data: ["name": "Alice", "role": "admin"],
+    as: .xml
+)
+// <?xml version="1.0" encoding="UTF-8"?>
+// <root>
+//   <name>Alice</name>
+//   <role>admin</role>
+// </root>
+```
+
+<Tip>
+  When no Accept header is present, `PrismNegotiatedResponse` defaults to JSON. When the client sends `Accept: */*`, the first format in your available list wins — so order your formats by preference.
+</Tip>
+
+<Note>
+  The built-in HTML renderer creates a simple key-value table. For rich HTML, use content negotiation to detect when HTML is wanted, then render your own template.
+</Note>

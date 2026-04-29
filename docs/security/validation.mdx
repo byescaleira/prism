@@ -1,0 +1,148 @@
+---
+title: "Validation"
+description: "Validate request data with composable rules and structured error responses."
+icon: "check-double"
+---
+
+# Validation
+
+Never trust user input. Prism's validation system lets you declare rules for each field, run them against request data, and return structured error responses — all in a few lines.
+
+## Quick Example
+
+```swift title="Validate a Registration Form"
+await server.post("/register") { request in
+    let result = request.validateJSON { v in
+        v.field("name", .required, .minLength(2), .maxLength(100))
+        v.field("email", .required, .email)
+        v.field("password", .required, .minLength(8))
+        v.field("age", .integer, .min(13), .max(120))
+    }
+
+    if let errorResponse = result.errorResponse() {
+        return errorResponse  // 422 with field-level errors
+    }
+
+    // Input is valid — proceed
+    let input: RegisterInput = try request.decodeJSON()
+    return .json(["status": "registered"], status: .created)
+}
+```
+
+If validation fails, the response looks like:
+
+```json title="422 Validation Error"
+{
+    "errors": {
+        "name": ["is required"],
+        "email": ["must be a valid email"],
+        "password": ["must be at least 8 characters"]
+    }
+}
+```
+
+## Built-In Rules
+
+| Rule | What It Checks |
+|------|---------------|
+| `.required` | Value must be present and non-empty |
+| `.email` | Valid email format |
+| `.minLength(n)` | At least n characters |
+| `.maxLength(n)` | At most n characters |
+| `.integer` | Valid integer |
+| `.numeric` | Valid number (integer or decimal) |
+| `.min(n)` | Integer value >= n |
+| `.max(n)` | Integer value <= n |
+| `.pattern(regex, message)` | Matches regex pattern |
+| `.oneOf([values])` | Value is in the allowed list |
+| `.url` | Valid HTTP/HTTPS URL |
+| `.uuid` | Valid UUID string |
+
+<Note>
+  All rules except `.required` skip validation when the value is empty or nil. This means optional fields only get validated when they're provided. Combine with `.required` to make a field mandatory.
+</Note>
+
+## Validating Different Sources
+
+### JSON Body
+
+```swift title="Validate JSON"
+let result = request.validateJSON { v in
+    v.field("title", .required, .maxLength(200))
+    v.field("priority", .oneOf(["low", "medium", "high"]))
+}
+```
+
+### Form Data & Query Parameters
+
+```swift title="Validate Form/Query"
+let result = request.validate { v in
+    v.field("search", .required, .minLength(3))
+    v.field("page", .integer, .min(1))
+    v.field("limit", .integer, .min(1), .max(100))
+}
+// Uses formData if body present, queryParameters otherwise
+```
+
+## Manual Validation
+
+Build a validator and run it against any data:
+
+```swift title="Standalone Validator"
+var validator = PrismValidator()
+validator.field("username", .required, .minLength(3), .maxLength(30),
+    .pattern("^[a-zA-Z0-9_]+$", "must contain only letters, numbers, and underscores"))
+validator.field("website", .url)
+
+let data = ["username": "alice_42", "website": "https://alice.dev"]
+let result = validator.validate(data)
+
+if result.isValid {
+    print("All good")
+} else {
+    print(result.allErrors)
+    // ["username must contain only letters...", ...]
+}
+```
+
+## Custom Validation Rules
+
+Create your own rules with `PrismValidationRule`:
+
+```swift title="Custom Rule"
+let noSpaces = PrismValidationRule(name: "noSpaces") { value in
+    guard let value, value.contains(" ") else { return nil }
+    return "must not contain spaces"
+}
+
+let strongPassword = PrismValidationRule(name: "strongPassword") { value in
+    guard let value, !value.isEmpty else { return nil }
+    let hasUpper = value.contains(where: { $0.isUppercase })
+    let hasDigit = value.contains(where: { $0.isNumber })
+    guard hasUpper && hasDigit else {
+        return "must contain at least one uppercase letter and one number"
+    }
+    return nil
+}
+
+var validator = PrismValidator()
+validator.field("username", .required, noSpaces)
+validator.field("password", .required, .minLength(8), strongPassword)
+```
+
+## Validation Result
+
+`PrismValidationResult` gives you structured access to errors:
+
+```swift title="Working with Results"
+let result = validator.validate(data)
+
+result.isValid          // true if no errors
+result.errors           // ["field": ["error1", "error2"]]
+result.allErrors        // ["field error1", "field error2"]
+result.errorResponse()  // PrismHTTPResponse with 422 status, or nil if valid
+```
+
+<Tip>
+  Validate early in your route handler — before any database queries or side effects. If validation fails, return `result.errorResponse()` immediately for a clean 422 response with structured error details.
+</Tip>

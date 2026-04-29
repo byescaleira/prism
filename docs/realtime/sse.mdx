@@ -1,0 +1,148 @@
+---
+title: "Server-Sent Events"
+description: "Push real-time updates to browsers over HTTP with Server-Sent Events."
+icon: "satellite-dish"
+---
+
+# Server-Sent Events
+
+SSE is the simplest way to push real-time updates from server to browser. Unlike WebSocket (bidirectional), SSE is one-way: the server pushes, the client listens. It works over plain HTTP, reconnects automatically, and is supported by all modern browsers.
+
+**When to use SSE over WebSocket:**
+- Live dashboards and feeds
+- Notification streams
+- Progress updates
+- Any scenario where the client only needs to receive data
+
+## Events
+
+```swift title="Creating Events"
+// Simple data-only event
+let event = PrismSSEvent(data: "Hello, World!")
+
+// Named event with ID
+let update = PrismSSEvent(
+    data: "{\"price\": 42.50}",
+    id: "msg-123",
+    event: "price-update"
+)
+
+// With retry hint (milliseconds)
+let retryEvent = PrismSSEvent(data: "reconnect test", retry: 5000)
+```
+
+Events serialize to the SSE wire format:
+
+```
+id: msg-123
+event: price-update
+data: {"price": 42.50}
+
+```
+
+## Connection Manager
+
+`PrismSSEManager` tracks connected clients and handles broadcasting:
+
+```swift title="SSE Manager"
+let sse = PrismSSEManager()
+
+// New client connects
+let connection = await sse.addConnection()
+
+// Send to specific client
+await sse.send(PrismSSEvent(data: "just for you"), to: connection.id)
+
+// Broadcast to all
+await sse.broadcast(PrismSSEvent(data: "everyone gets this"))
+
+// Client disconnects
+await sse.removeConnection(id: connection.id)
+
+// Stats
+let count = await sse.connectionCount
+```
+
+## Middleware Endpoint
+
+The simplest way to expose an SSE endpoint:
+
+```swift title="SSE Middleware"
+let sse = PrismSSEManager()
+let sseMiddleware = PrismSSEMiddleware(manager: sse, path: "/events")
+
+await server.use(sseMiddleware)
+```
+
+Clients connect with `GET /events` and receive a `text/event-stream` response.
+
+## Live Dashboard Example
+
+```swift title="Stock Price Dashboard"
+let sse = PrismSSEManager()
+
+// SSE endpoint
+await server.use(PrismSSEMiddleware(manager: sse, path: "/prices"))
+
+// Simulated price updates
+Task {
+    while true {
+        let price = Double.random(in: 100...200)
+        let event = PrismSSEvent(
+            data: "{\"symbol\": \"AAPL\", \"price\": \(String(format: "%.2f", price))}",
+            event: "price-update"
+        )
+        await sse.broadcast(event)
+        try? await Task.sleep(for: .seconds(2))
+    }
+}
+```
+
+```javascript title="Browser Client"
+const source = new EventSource('/prices');
+
+source.addEventListener('price-update', (e) => {
+    const data = JSON.parse(e.data);
+    document.getElementById('price').textContent = `$${data.price}`;
+});
+
+source.onerror = () => {
+    console.log('Connection lost, reconnecting...');
+};
+```
+
+<Tip>
+  The browser's `EventSource` API automatically reconnects when the connection drops. Use the `retry` field in your events to control how quickly clients reconnect.
+</Tip>
+
+## Notification Feed
+
+```swift title="User Notifications via SSE"
+let notifications = PrismSSEManager()
+
+await server.use(PrismSSEMiddleware(manager: notifications, path: "/notifications"))
+
+// From your API routes, push notifications
+await server.post("/orders") { request in
+    // ... process order ...
+
+    await notifications.broadcast(PrismSSEvent(
+        data: "{\"type\": \"order\", \"message\": \"New order #1234\"}",
+        event: "notification"
+    ))
+
+    return .json(["status": "created"], status: .created)
+}
+```
+
+## SSE vs WebSocket
+
+| Feature | SSE | WebSocket |
+|---------|-----|-----------|
+| Direction | Server → Client | Bidirectional |
+| Protocol | HTTP | WebSocket |
+| Reconnection | Automatic | Manual |
+| Binary data | No (text only) | Yes |
+| Browser support | All modern | All modern |
+| Proxy friendly | Yes | Sometimes tricky |
+| Use case | Feeds, notifications | Chat, gaming, collaboration |

@@ -1,0 +1,122 @@
+---
+title: "Configuration"
+description: "Type-safe configuration from environment variables and .env files."
+icon: "gear"
+---
+
+# Configuration
+
+`PrismConfig` loads settings from environment variables and `.env` files with type-safe accessors. No YAML, no TOML — just key-value pairs with built-in support for environment-specific overrides.
+
+## Loading Configuration
+
+```swift title="Load from .env"
+let config = PrismConfig.load()
+// Reads .env, then .env.{PRISM_ENV} if set
+// Environment variables always win over file values
+```
+
+```swift title="From Environment Only"
+let config = PrismConfig.fromEnvironment(overrides: [
+    "PORT": "3000",
+    "LOG_LEVEL": "debug"
+])
+```
+
+## .env File Format
+
+```bash title=".env"
+# Database
+DATABASE_URL=sqlite:///data/app.db
+DATABASE_POOL_SIZE=5
+
+# Server
+PORT=8080
+HOST=0.0.0.0
+
+# App
+APP_SECRET=my-secret-key
+PRISM_ENV=development
+```
+
+```bash title=".env.production"
+PORT=443
+PRISM_ENV=production
+LOG_LEVEL=warn
+```
+
+<Note>
+  Environment variables take priority over `.env` file values. This lets you override settings per-deployment without changing files. The `.env.{environment}` file loads after `.env`, letting you layer environment-specific values.
+</Note>
+
+## Type-Safe Accessors
+
+```swift title="Reading Values"
+// Strings
+let dbURL = config.get("DATABASE_URL")              // String?
+let host = config.get("HOST", default: "0.0.0.0")   // String
+
+// Required values (throws if missing)
+let secret = try config.require("APP_SECRET")        // String
+
+// Integers
+let poolSize = config.getInt("POOL_SIZE")            // Int?
+let port = config.getInt("PORT", default: 8080)      // Int
+
+// Booleans (accepts: true/1/yes, false/0/no)
+let debug = config.getBool("DEBUG")                  // Bool?
+let verbose = config.getBool("VERBOSE", default: false) // Bool
+
+// Doubles
+let timeout = config.getDouble("TIMEOUT")            // Double?
+```
+
+## Built-In Properties
+
+```swift title="Convenience Properties"
+config.environment    // PRISM_ENV or "development"
+config.isProduction   // true if PRISM_ENV == "production"
+config.isDevelopment  // true if PRISM_ENV == "development"
+config.port           // PORT as UInt16, default 8080
+config.host           // HOST or "0.0.0.0"
+config.keys           // All loaded configuration keys
+```
+
+## Practical Example
+
+```swift title="Configure Server from .env"
+let config = PrismConfig.load()
+
+let server = PrismHTTPServer(port: config.port)
+
+if config.isProduction {
+    await server.use(PrismSecurityHeadersMiddleware())
+    await server.use(PrismHSTSMiddleware())
+}
+
+let db = try PrismDatabase(path: config.get("DATABASE_URL", default: ":memory:"))
+let poolSize = config.getInt("POOL_SIZE", default: 5)
+let pool = PrismConnectionPool(factory: { try PrismDatabase(path: dbPath) }, maxConnections: poolSize)
+
+print("Starting \(config.environment) server on \(config.host):\(config.port)")
+try await server.start()
+```
+
+## Error Handling
+
+```swift title="Handle Missing Config"
+do {
+    let secret = try config.require("JWT_SECRET")
+    let dbURL = try config.require("DATABASE_URL")
+} catch PrismConfigError.missingKey(let key) {
+    fatalError("Missing required configuration: \(key)")
+}
+```
+
+<Tip>
+  Keep your `.env` file out of version control (add it to `.gitignore`). Commit a `.env.example` with placeholder values so new developers know which keys to set.
+</Tip>
+
+<Warning>
+  Never put secrets directly in code. Always load them from environment variables or `.env` files. In production, use your platform's secret management (Docker secrets, Kubernetes ConfigMap, etc.) to inject environment variables.
+</Warning>

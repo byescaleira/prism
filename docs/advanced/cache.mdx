@@ -1,0 +1,130 @@
+---
+title: "Caching"
+description: "In-memory LRU caching with TTL eviction and HTTP response cache middleware."
+icon: "bolt"
+---
+
+# Caching
+
+Prism provides two caching layers: `PrismCache` for general-purpose key-value caching, and `PrismResponseCacheMiddleware` for automatic HTTP response caching with ETag and Cache-Control support.
+
+## PrismCache
+
+An actor-based LRU cache with time-to-live eviction:
+
+```swift title="Basic Cache Usage"
+let cache = PrismCache<String, User>(maxEntries: 1000, defaultTTL: 300)
+
+// Store
+await cache.set("user:1", value: user)
+
+// Retrieve
+if let cached = await cache.get("user:1") {
+    print("Cache hit: \(cached.name)")
+}
+
+// Store with custom TTL
+await cache.set("session:abc", value: session, ttl: 3600)
+```
+
+### Cache Operations
+
+```swift title="Cache API"
+await cache.set(key, value: value)           // Store with default TTL
+await cache.set(key, value: value, ttl: 60)  // Store with custom TTL
+await cache.get(key)                         // Get or nil if expired
+await cache.has(key)                         // Check existence
+await cache.remove(key)                      // Remove specific key
+await cache.clear()                          // Remove everything
+await cache.purgeExpired()                   // Remove only expired entries
+await cache.count                            // Number of entries
+```
+
+### LRU Eviction
+
+When the cache exceeds `maxEntries`, the least recently used entries are evicted first. Accessing an entry via `get` promotes it to most-recently-used.
+
+```swift title="LRU Behavior"
+let cache = PrismCache<String, String>(maxEntries: 3, defaultTTL: 60)
+
+await cache.set("a", value: "1")
+await cache.set("b", value: "2")
+await cache.set("c", value: "3")
+_ = await cache.get("a")          // "a" promoted to most recent
+
+await cache.set("d", value: "4")  // "b" evicted (least recently used)
+await cache.get("b")              // nil — evicted
+```
+
+## Response Cache Middleware
+
+Automatically cache HTTP responses with proper ETag and Cache-Control headers:
+
+```swift title="Enable Response Caching"
+await server.use(PrismResponseCacheMiddleware(
+    maxEntries: 500,
+    ttl: 60
+))
+```
+
+### How It Works
+
+1. **Cache MISS** — request passes through, response is cached and returned with `X-Cache: MISS`, `ETag`, and `Cache-Control` headers
+2. **Cache HIT** — cached response returned immediately with `X-Cache: HIT`
+3. **Conditional request** — if client sends `If-None-Match` matching the ETag, returns `304 Not Modified` (no body)
+
+### Cache Headers
+
+| Header | Value | Purpose |
+|--------|-------|---------|
+| `X-Cache` | `HIT` or `MISS` | Indicates cache status |
+| `ETag` | Hash of response body | Enables conditional requests |
+| `Cache-Control` | `public, max-age=60` | Browser/proxy caching hint |
+
+### Custom Cache Predicate
+
+By default, only GET requests are cached. Customize this:
+
+```swift title="Custom Predicate"
+await server.use(PrismResponseCacheMiddleware(
+    maxEntries: 1000,
+    ttl: 120,
+    cachePredicate: { request in
+        request.method == .GET && request.path.hasPrefix("/api/")
+    }
+))
+```
+
+## Practical Example: Expensive Query Cache
+
+```swift title="Cache Database Results"
+let queryCache = PrismCache<String, [User]>(maxEntries: 100, defaultTTL: 60)
+
+await server.get("/users") { request in
+    let cacheKey = "users:\(request.queryParameters["page"] ?? "1")"
+
+    if let cached = await queryCache.get(cacheKey) {
+        return .json(cached)
+    }
+
+    let users = try await db.query("SELECT * FROM users LIMIT 20")
+    await queryCache.set(cacheKey, value: users)
+    return .json(users)
+}
+
+// Invalidate on writes
+await server.post("/users") { request in
+    let user = try request.decodeJSON() as CreateUser
+    try await db.execute("INSERT INTO users ...")
+    await queryCache.clear()  // Invalidate all user caches
+    return .json(["status": "created"], status: .created)
+}
+```
+
+<Tip>
+  Put `PrismResponseCacheMiddleware` after authentication middleware but before route handlers. This way, only authenticated requests are cached, and the cache key includes the full URI (path + query string).
+</Tip>
+
+<Warning>
+  Don't cache responses that contain user-specific data unless the cache key includes the user identifier. The default key is `METHOD:URI` — two different users requesting `/profile` would get the same cached response.
+</Warning>

@@ -1,0 +1,175 @@
+---
+title: "WebSocket Rooms"
+description: "Named channels, broadcasting, and presence tracking for multi-room real-time apps."
+icon: "users"
+---
+
+# WebSocket Rooms
+
+When your real-time app needs more than a single broadcast channel — chat rooms, game lobbies, collaborative editing — `PrismRoom` and `PrismRoomManager` provide the structure.
+
+## Core Concepts
+
+- **Room**: A named channel that holds connections and can broadcast messages to all members
+- **Room Manager**: Creates, retrieves, and cleans up rooms
+- **Presence**: Tracks who's in each room with custom metadata (name, avatar, status)
+
+## Room Manager
+
+```swift title="Managing Rooms"
+let rooms = PrismRoomManager()
+
+// Get or create a room
+let lobby = await rooms.room("lobby")
+let game1 = await rooms.room("game:1")
+
+// List all rooms
+let roomNames = await rooms.rooms  // ["lobby", "game:1"]
+let count = await rooms.roomCount  // 2
+```
+
+## Joining and Leaving
+
+```swift title="Room-Aware WebSocket Handler"
+actor ChatHandler: PrismWebSocketHandler {
+    let rooms = PrismRoomManager()
+
+    func onConnect(connection: PrismWebSocketConnection) async {
+        // Join default room
+        await rooms.join("lobby", connection: connection)
+    }
+
+    func onMessage(connection: PrismWebSocketConnection, message: PrismWebSocketMessage) async {
+        guard case .text(let text) = message else { return }
+
+        if text.hasPrefix("/join ") {
+            let roomName = String(text.dropFirst(6))
+            await rooms.join(roomName, connection: connection)
+            await connection.send("Joined \(roomName)")
+        } else if text.hasPrefix("/leave ") {
+            let roomName = String(text.dropFirst(7))
+            await rooms.leave(roomName, connectionID: connection.id)
+            await connection.send("Left \(roomName)")
+        } else if text.hasPrefix("/msg ") {
+            // "/msg room:message"
+            let parts = text.dropFirst(5).split(separator: ":", maxSplits: 1)
+            if parts.count == 2 {
+                let roomName = String(parts[0])
+                let msg = String(parts[1])
+                await rooms.broadcast(roomName, message: .text("[\(connection.id.prefix(8))]: \(msg)"))
+            }
+        }
+    }
+
+    func onDisconnect(connection: PrismWebSocketConnection) async {
+        await rooms.leaveAll(connectionID: connection.id)
+    }
+}
+```
+
+## Presence Tracking
+
+Track who's in each room with metadata:
+
+```swift title="Presence Example"
+let presence = PrismPresence()
+
+// User joins with metadata
+await presence.track(
+    roomName: "lobby",
+    connectionID: connection.id,
+    meta: ["name": "Alice", "avatar": "alice.png", "status": "online"]
+)
+
+// List who's in the room
+let members = await presence.list(roomName: "lobby")
+for member in members {
+    print("\(member.meta["name"] ?? "?") is \(member.meta["status"] ?? "unknown")")
+}
+
+// Count
+let online = await presence.count(roomName: "lobby")
+
+// User leaves
+await presence.untrack(roomName: "lobby", connectionID: connection.id)
+```
+
+## Multi-Room Chat App
+
+```swift title="Complete Multi-Room Chat"
+actor MultiRoomChat: PrismWebSocketHandler {
+    let rooms = PrismRoomManager()
+    let presence = PrismPresence()
+    private var userNames: [String: String] = [:]
+
+    func onConnect(connection: PrismWebSocketConnection) async {
+        await connection.send("""
+        Welcome! Commands:
+        /name <your-name> - Set your name
+        /join <room> - Join a room
+        /leave <room> - Leave a room
+        /who <room> - See who's in a room
+        /rooms - List all rooms
+        <room> <message> - Send message to room
+        """)
+    }
+
+    func onMessage(connection: PrismWebSocketConnection, message: PrismWebSocketMessage) async {
+        guard case .text(let text) = message else { return }
+        let id = connection.id
+
+        if text.hasPrefix("/name ") {
+            let name = String(text.dropFirst(6))
+            userNames[id] = name
+            await connection.send("Name set to: \(name)")
+
+        } else if text.hasPrefix("/join ") {
+            let room = String(text.dropFirst(6))
+            await rooms.join(room, connection: connection)
+            let name = userNames[id] ?? id.prefix(8).description
+            await presence.track(roomName: room, connectionID: id, meta: ["name": name])
+            await rooms.broadcast(room, message: .text(">> \(name) joined \(room)"))
+
+        } else if text.hasPrefix("/leave ") {
+            let room = String(text.dropFirst(7))
+            let name = userNames[id] ?? id.prefix(8).description
+            await rooms.broadcast(room, message: .text("<< \(name) left \(room)"))
+            await rooms.leave(room, connectionID: id)
+            await presence.untrack(roomName: room, connectionID: id)
+
+        } else if text.hasPrefix("/who ") {
+            let room = String(text.dropFirst(5))
+            let members = await presence.list(roomName: room)
+            let names = members.map { $0.meta["name"] ?? "?" }.joined(separator: ", ")
+            await connection.send("In \(room): \(names)")
+
+        } else if text.hasPrefix("/rooms") {
+            let list = await rooms.rooms.joined(separator: ", ")
+            await connection.send("Active rooms: \(list)")
+
+        } else {
+            let parts = text.split(separator: " ", maxSplits: 1)
+            if parts.count == 2 {
+                let room = String(parts[0])
+                let msg = String(parts[1])
+                let name = userNames[id] ?? id.prefix(8).description
+                await rooms.broadcast(room, message: .text("[\(name)]: \(msg)"))
+            }
+        }
+    }
+
+    func onDisconnect(connection: PrismWebSocketConnection) async {
+        let name = userNames[connection.id] ?? connection.id.prefix(8).description
+        let allRooms = await rooms.rooms
+        for room in allRooms {
+            await rooms.broadcast(room, message: .text("<< \(name) disconnected"))
+        }
+        await rooms.leaveAll(connectionID: connection.id)
+        userNames.removeValue(forKey: connection.id)
+    }
+}
+```
+
+<Tip>
+  Empty rooms are automatically cleaned up by `PrismRoomManager` when the last connection leaves. No manual cleanup needed.
+</Tip>

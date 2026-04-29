@@ -1,0 +1,133 @@
+---
+title: "Connection Pool"
+description: "Handle concurrent database access with actor-based connection pooling."
+icon: "water"
+---
+
+# Connection Pool
+
+When your server handles many concurrent requests, a single database connection becomes a bottleneck. `PrismConnectionPool` manages a pool of SQLite connections, lending them out to requests and returning them when done.
+
+## Why Pool?
+
+Without a pool, every concurrent request either:
+- **Shares one connection** — serializing all database work, killing throughput
+- **Opens its own connection** — expensive setup cost per request, risk of hitting file descriptor limits
+
+A pool gives you the best of both: connections are reused, concurrent requests get their own connection, and the pool caps the total to prevent resource exhaustion.
+
+## Basic Setup
+
+```swift title="Creating a Pool"
+let pool = try PrismConnectionPool(path: "app.db", maxConnections: 5)
+```
+
+<Note>
+  The pool starts with one connection and creates new ones on demand up to `maxConnections`. When all connections are busy, new requests wait until one is released.
+</Note>
+
+## Using Connections
+
+### Automatic (Recommended)
+
+```swift title="withConnection Pattern"
+let users = try await pool.withConnection { db in
+    try await db.query("SELECT * FROM users")
+}
+// Connection is automatically returned to the pool
+```
+
+The connection is released back to the pool when the closure completes — even if it throws.
+
+### Manual
+
+```swift title="Manual Acquire/Release"
+let conn = try await pool.acquire()
+do {
+    let users = try await conn.query("SELECT * FROM users")
+    await pool.release(conn)
+    return users
+} catch {
+    await pool.release(conn)
+    throw error
+}
+```
+
+<Warning>
+  Always release connections back to the pool. A leaked connection means the pool shrinks permanently. Prefer `withConnection` to avoid this.
+</Warning>
+
+## Pool Monitoring
+
+```swift title="Pool Status"
+let active = await pool.activeCount    // Connections in use
+let idle = await pool.idleCount        // Connections waiting
+let total = await pool.totalCount      // Total (active + idle)
+```
+
+## Server Integration
+
+```swift title="Pool with Route Handlers"
+let pool = try PrismConnectionPool(path: "app.db", maxConnections: 10)
+
+await server.get("/users") { request in
+    let users = try await pool.withConnection { db in
+        try await db.query("SELECT id, name, email FROM users")
+    }
+    return .json(users.map { /* ... */ })
+}
+
+await server.post("/users") { request in
+    let input: CreateUser = try request.decodeJSON()
+    try await pool.withConnection { db in
+        try await db.execute(
+            "INSERT INTO users (name, email) VALUES (?, ?)",
+            parameters: [.text(input.name), .text(input.email)]
+        )
+    }
+    return .json(["status": "created"], status: .created)
+}
+```
+
+## Sizing the Pool
+
+| Scenario | Suggested Max |
+|----------|---------------|
+| Low traffic API | 3–5 |
+| Medium traffic | 5–10 |
+| High concurrency | 10–20 |
+| Background jobs + API | 15–25 |
+
+<Tip>
+  SQLite uses file-level locking, so writes serialize regardless of pool size. The pool helps most with concurrent reads and preventing connection setup overhead. For write-heavy workloads, consider WAL mode: `PRAGMA journal_mode=WAL`.
+</Tip>
+
+## WAL Mode for Better Concurrency
+
+Enable Write-Ahead Logging for concurrent reads during writes:
+
+```swift title="Enable WAL Mode"
+let pool = try PrismConnectionPool(path: "app.db", maxConnections: 10)
+try await pool.withConnection { db in
+    try await db.execute("PRAGMA journal_mode=WAL")
+}
+```
+
+## Health Check Integration
+
+Combine with the health monitoring system:
+
+```swift title="Database Health Check"
+let monitor = PrismHealthMonitor()
+
+await monitor.register(PrismHealthCheck(name: "database") {
+    do {
+        try await pool.withConnection { db in
+            _ = try await db.query("SELECT 1")
+        }
+        return PrismHealthCheckResult(name: "database", status: .healthy)
+    } catch {
+        return PrismHealthCheckResult(name: "database", status: .unhealthy, message: "\(error)")
+    }
+})
+```

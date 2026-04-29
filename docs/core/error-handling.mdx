@@ -1,0 +1,251 @@
+---
+title: "Error Handling"
+description: "Structured error responses, global error middleware, and RFC 7807 Problem Details."
+icon: "triangle-exclamation"
+---
+
+# Error Handling
+
+Prism provides a structured approach to errors: throw typed errors from handlers, and middleware catches them and converts them to consistent JSON responses.
+
+## Quick Start
+
+```swift title="Throw and Catch"
+// 1. Add the error middleware
+await server.use(PrismErrorMiddleware())
+
+// 2. Throw errors from handlers — they become JSON responses
+await server.get("/users/:id") { request in
+    let id = request.parameters["id"]!
+    guard let user = try db.queryFirst("SELECT * FROM users WHERE id = ?", parameters: [.text(id)]) else {
+        throw PrismAppError.notFound("User \(id) not found")
+    }
+    return .json(user.columns)
+}
+```
+
+The client receives:
+
+```json
+{
+    "error": "NOT_FOUND",
+    "message": "User 42 not found"
+}
+```
+
+with HTTP status 404.
+
+## Built-in Error Types
+
+`PrismAppError` provides factory methods for common HTTP errors:
+
+```swift title="Error Factories"
+throw PrismAppError.badRequest("Email is required")       // 400
+throw PrismAppError.unauthorized()                        // 401
+throw PrismAppError.forbidden("Admin access required")    // 403
+throw PrismAppError.notFound("Resource not found")        // 404
+throw PrismAppError.conflict("Email already registered")  // 409
+throw PrismAppError.internalError()                       // 500
+```
+
+### Custom Error Codes
+
+```swift title="Custom Codes"
+throw PrismAppError(
+    status: .badRequest,
+    code: "INVALID_EMAIL_DOMAIN",
+    message: "Only company emails allowed",
+    details: ["allowedDomains": "company.com, corp.com"]
+)
+```
+
+Response:
+
+```json
+{
+    "error": "INVALID_EMAIL_DOMAIN",
+    "message": "Only company emails allowed",
+    "details": {
+        "allowedDomains": "company.com, corp.com"
+    }
+}
+```
+
+## Error Middleware
+
+`PrismErrorMiddleware` catches all errors and converts them to JSON:
+
+<Tabs>
+  <Tab title="Production">
+    ```swift
+    // Hides internal error details
+    await server.use(PrismErrorMiddleware(includeStackTrace: false))
+    ```
+
+    Unknown errors return:
+    ```json
+    { "error": "INTERNAL_ERROR", "message": "An unexpected error occurred" }
+    ```
+  </Tab>
+  <Tab title="Development">
+    ```swift
+    // Shows error details for debugging
+    await server.use(PrismErrorMiddleware(includeStackTrace: true))
+    ```
+
+    Unknown errors include debug info:
+    ```json
+    {
+        "error": "INTERNAL_ERROR",
+        "message": "An unexpected error occurred",
+        "debug": "SQLiteError: no such table: users"
+    }
+    ```
+  </Tab>
+</Tabs>
+
+### Custom Error Handler
+
+Intercept specific errors before the default handler:
+
+```swift title="Custom Handler"
+await server.use(PrismErrorMiddleware(
+    includeStackTrace: false,
+    customHandler: { error, request in
+        if let dbError = error as? PrismDatabaseError {
+            return .json(
+                ["error": "DATABASE_ERROR", "message": "A database error occurred"],
+                status: .internalServerError
+            )
+        }
+        return nil // Fall through to default handling
+    }
+))
+```
+
+## Custom Error Types
+
+Create domain-specific errors by conforming to `PrismHTTPErrorResponse`:
+
+```swift title="Custom Error Type"
+enum PaymentError: PrismHTTPErrorResponse {
+    case insufficientFunds(balance: Double, required: Double)
+    case cardDeclined(reason: String)
+    case invalidCurrency(String)
+
+    var statusCode: PrismHTTPStatus {
+        switch self {
+        case .insufficientFunds: .badRequest
+        case .cardDeclined: .badRequest
+        case .invalidCurrency: .unprocessableEntity
+        }
+    }
+
+    var errorCode: String {
+        switch self {
+        case .insufficientFunds: "INSUFFICIENT_FUNDS"
+        case .cardDeclined: "CARD_DECLINED"
+        case .invalidCurrency: "INVALID_CURRENCY"
+        }
+    }
+
+    var message: String {
+        switch self {
+        case .insufficientFunds(let balance, let required):
+            "Insufficient funds. Balance: \(balance), required: \(required)"
+        case .cardDeclined(let reason):
+            "Card declined: \(reason)"
+        case .invalidCurrency(let currency):
+            "Currency '\(currency)' is not supported"
+        }
+    }
+}
+
+// Usage
+await server.post("/pay") { request in
+    let balance = 10.0
+    let amount = 50.0
+
+    guard balance >= amount else {
+        throw PaymentError.insufficientFunds(balance: balance, required: amount)
+    }
+
+    return .json(["paid": amount])
+}
+```
+
+## Problem Details (RFC 7807)
+
+For standards-compliant error responses, use `PrismProblemDetails`:
+
+```swift title="RFC 7807"
+await server.get("/resource") { request in
+    let problem = PrismProblemDetails(
+        type: "https://api.example.com/errors/rate-limited",
+        title: "Rate Limit Exceeded",
+        status: 429,
+        detail: "You have exceeded 100 requests per minute",
+        instance: request.path
+    )
+    return problem.toResponse()
+}
+```
+
+Response with `Content-Type: application/problem+json`:
+
+```json
+{
+    "type": "https://api.example.com/errors/rate-limited",
+    "title": "Rate Limit Exceeded",
+    "status": 429,
+    "detail": "You have exceeded 100 requests per minute",
+    "instance": "/resource"
+}
+```
+
+## Combining with Validation
+
+```swift title="Validation + Error Handling"
+await server.post("/users") { request in
+    // Validation errors return 422 automatically
+    let validation = request.validate { v in
+        v.field("email", .required, .email)
+        v.field("name", .required, .minLength(2))
+    }
+
+    if let errorResponse = validation.errorResponse() {
+        return errorResponse
+    }
+
+    // Business logic errors
+    let email = request.formData["email"]!
+    let exists = try db.queryFirst(
+        "SELECT id FROM users WHERE email = ?",
+        parameters: [.text(email)]
+    )
+
+    if exists != nil {
+        throw PrismAppError.conflict("Email already registered")
+    }
+
+    try db.execute(
+        "INSERT INTO users (name, email) VALUES (?, ?)",
+        parameters: [.text(request.formData["name"]!), .text(email)]
+    )
+
+    return .json(["email": email], status: .created)
+}
+```
+
+<Warning>
+Always put `PrismErrorMiddleware` as one of the first middleware in your stack. If it's added after other middleware, errors thrown in those middleware won't be caught.
+</Warning>
+
+<CardGroup cols={2}>
+  <Card title="Validation" icon="check" href="/security/validation">
+    Validate request data before processing.
+  </Card>
+  <Card title="Lifecycle Hooks" icon="webhook" href="/middleware/hooks">
+    Custom error hooks for logging and monitoring.
+  </Card>
+</CardGroup>

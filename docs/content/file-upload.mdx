@@ -1,0 +1,131 @@
+---
+title: "File Uploads"
+description: "Process file uploads with size limits, type validation, and secure temporary storage."
+icon: "cloud-arrow-up"
+---
+
+# File Uploads
+
+`PrismUploadProcessor` handles the heavy lifting of file uploads: it parses multipart requests, validates size and type constraints, saves files to a temporary directory, and gives you a clean result object to work with.
+
+## Quick Start
+
+```swift title="Basic File Upload"
+let uploader = PrismUploadProcessor()
+
+await server.post("/upload") { request in
+    let result = try uploader.process(request)
+
+    if let file = result.file {
+        try file.move(to: "/var/uploads/\(file.filename)")
+        return .json(["filename": file.filename, "size": file.size])
+    }
+
+    return .json(["error": "No file provided"], status: .badRequest)
+}
+```
+
+## Upload Configuration
+
+Control what gets accepted before it hits your handler:
+
+```swift title="Configured Upload"
+let config = PrismUploadConfig(
+    maxFileSize: 5_242_880,       // 5 MB per file
+    maxTotalSize: 20_971_520,     // 20 MB total
+    allowedTypes: ["image/jpeg", "image/png", "image/webp"],
+    tempDirectory: "/tmp/prism-uploads"
+)
+
+let uploader = PrismUploadProcessor(config: config)
+```
+
+| Parameter | Default | Purpose |
+|-----------|---------|---------|
+| `maxFileSize` | 10 MB | Maximum size for a single file |
+| `maxTotalSize` | 50 MB | Maximum combined size of all files |
+| `allowedTypes` | `[]` (all) | Allowed MIME types. Empty = accept everything |
+| `tempDirectory` | System temp | Where temporary files are stored |
+
+## Working with Uploaded Files
+
+`PrismUploadedFile` provides everything you need:
+
+```swift title="File Operations"
+await server.post("/avatar") { request in
+    let result = try uploader.process(request)
+    defer { result.cleanup() }
+
+    guard let avatar = result.files["avatar"] else {
+        return .json(["error": "Missing avatar field"], status: .badRequest)
+    }
+
+    print(avatar.filename)     // "photo.jpg"
+    print(avatar.contentType)  // "image/jpeg"
+    print(avatar.size)         // 245760
+
+    // Read into memory
+    let imageData = try avatar.data()
+
+    // Or move to permanent storage
+    try avatar.move(to: "/var/uploads/avatars/\(avatar.filename)")
+
+    return .json(["uploaded": avatar.filename], status: .created)
+}
+```
+
+## Multiple Files with Form Fields
+
+The upload result separates files from regular form fields:
+
+```swift title="Product Listing with Images"
+await server.post("/products") { request in
+    let result = try uploader.process(request)
+    defer { result.cleanup() }
+
+    let name = result.fields["name"] ?? ""
+    let price = result.fields["price"] ?? "0"
+
+    for (fieldName, file) in result.files {
+        let dest = "/var/uploads/products/\(UUID().uuidString)_\(file.filename)"
+        try file.move(to: dest)
+    }
+
+    return .json([
+        "product": name,
+        "price": price,
+        "images": result.files.count
+    ], status: .created)
+}
+```
+
+## Error Handling
+
+Upload errors are typed and specific:
+
+```swift title="Handling Upload Errors"
+await server.post("/upload") { request in
+    do {
+        let result = try uploader.process(request)
+        defer { result.cleanup() }
+        // ... handle upload
+        return .json(["status": "ok"])
+    } catch PrismUploadError.fileTooLarge(let name, let size) {
+        return .json(["error": "\(name) is too large (\(size) bytes)"], status: .badRequest)
+    } catch PrismUploadError.typeNotAllowed(let name, let type) {
+        return .json(["error": "\(name) has disallowed type: \(type)"], status: .badRequest)
+    } catch PrismUploadError.totalSizeTooLarge(let total) {
+        return .json(["error": "Total upload too large: \(total) bytes"], status: .badRequest)
+    } catch {
+        return .json(["error": "Upload failed"], status: .internalServerError)
+    }
+}
+```
+
+<Warning>
+  Always call `result.cleanup()` or `file.cleanup()` after processing to remove temporary files. Use `defer` to ensure cleanup happens even if your handler throws.
+</Warning>
+
+<Tip>
+  Use `result.file` (singular) as a shortcut when you expect exactly one file upload — it returns the first uploaded file or `nil`.
+</Tip>

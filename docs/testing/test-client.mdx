@@ -1,0 +1,145 @@
+---
+title: "Test Client"
+description: "Test your routes and middleware in-process without starting a real server."
+icon: "flask-vial"
+---
+
+# Test Client
+
+`PrismTestClient` lets you test routes and middleware without network I/O — requests go directly through the router. No port binding, no TCP connections, no flaky tests from race conditions.
+
+## Quick Start
+
+```swift title="Build and Test"
+let client = PrismTestClientBuilder()
+    .get("/hello") { _ in .json(["message": "Hello, World!"]) }
+    .post("/echo") { request in
+        let body = String(data: request.body ?? Data(), encoding: .utf8) ?? ""
+        return .json(["echo": body])
+    }
+    .build()
+
+let response = try await client.get("/hello")
+// response.status == .ok
+// response.body contains {"message": "Hello, World!"}
+```
+
+## Building a Test Client
+
+`PrismTestClientBuilder` uses a fluent API to register routes and middleware:
+
+```swift title="Builder API"
+let client = PrismTestClientBuilder()
+    .get("/users") { _ in .json(["users": []]) }
+    .post("/users") { request in
+        let user: CreateUser = try request.decodeJSON()
+        return .json(["id": 1, "name": user.name], status: .created)
+    }
+    .route(.DELETE, "/users/:id") { request in
+        PrismHTTPResponse(status: .noContent)
+    }
+    .use(PrismTracingMiddleware())
+    .use(PrismCORSMiddleware())
+    .build()
+```
+
+## HTTP Methods
+
+The client has convenience methods for all HTTP methods:
+
+```swift title="All Methods"
+let response = try await client.get("/users")
+let response = try await client.post("/users", body: jsonData)
+let response = try await client.postJSON("/users", body: newUser)  // Auto-encodes Encodable
+let response = try await client.put("/users/1", body: updateData)
+let response = try await client.patch("/users/1", body: patchData)
+let response = try await client.delete("/users/1")
+```
+
+## Testing with Middleware
+
+```swift title="Middleware Testing"
+let client = PrismTestClientBuilder()
+    .use(PrismSessionMiddleware(secret: "test-secret"))
+    .use(PrismTracingMiddleware())
+    .get("/protected") { request in
+        let sessionId = request.userInfo["sessionID"] ?? "none"
+        let requestId = request.userInfo["traceContext.requestID"] ?? "none"
+        return .json(["session": sessionId, "trace": requestId])
+    }
+    .build()
+
+let response = try await client.get("/protected")
+// Session and trace middleware both ran
+```
+
+## Sending Custom Headers
+
+```swift title="Headers"
+var headers = PrismHTTPHeaders()
+headers.set(name: "Authorization", value: "Bearer test-token")
+headers.set(name: "Accept", value: "application/json")
+
+let response = try await client.get("/protected", headers: headers)
+```
+
+## Posting JSON
+
+```swift title="JSON Body"
+struct CreateUser: Encodable {
+    let name: String
+    let email: String
+}
+
+let response = try await client.postJSON("/users", body: CreateUser(
+    name: "Alice",
+    email: "alice@example.com"
+))
+// Automatically sets Content-Type: application/json
+```
+
+## Full Test Example
+
+```swift title="Complete Test Suite"
+@Suite("User API")
+struct UserAPITests {
+    let client: PrismTestClient
+
+    init() {
+        client = PrismTestClientBuilder()
+            .get("/users") { _ in .json(["users": ["Alice", "Bob"]]) }
+            .post("/users") { request in
+                let user: CreateUser = try request.decodeJSON()
+                return .json(["id": 1, "name": user.name], status: .created)
+            }
+            .get("/users/:id") { request in
+                let id = request.parameters["id"] ?? "?"
+                return .json(["id": id, "name": "Alice"])
+            }
+            .build()
+    }
+
+    @Test func listUsers() async throws {
+        let response = try await client.get("/users")
+        #expect(response.status == .ok)
+    }
+
+    @Test func createUser() async throws {
+        let response = try await client.postJSON("/users", body: CreateUser(name: "Charlie", email: "c@test.com"))
+        #expect(response.status == .created)
+    }
+
+    @Test func getUserById() async throws {
+        let response = try await client.get("/users/42")
+        #expect(response.status == .ok)
+    }
+}
+```
+
+<Tip>
+  Create a shared test client setup function or use a test suite initializer to avoid duplicating route definitions across tests. Each test gets a fresh client instance.
+</Tip>
+
+<Note>
+  `PrismTestClient` bypasses all network code — it calls the router directly. This means TLS, connection handling, and HTTP parsing are not tested. For end-to-end tests, start a real server on a random port.
+</Note>

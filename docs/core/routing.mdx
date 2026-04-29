@@ -1,0 +1,175 @@
+---
+title: "Routing"
+description: "Define URL patterns, extract parameters, and organize routes into groups."
+icon: "route"
+---
+
+# Routing
+
+Prism's router matches incoming requests to handlers using URL patterns. It supports path parameters, wildcards, route groups, and nested prefixes.
+
+## Basic Routes
+
+Register routes with the HTTP method and a URL pattern:
+
+```swift title="Basic Routes"
+await server.get("/")          { _ in .text("Home") }
+await server.get("/about")     { _ in .text("About") }
+await server.post("/contact")  { _ in .json(["sent": true]) }
+```
+
+You can also use the generic `route` method:
+
+```swift
+await server.route(.PATCH, "/users/:id") { request in
+    .json(["patched": true])
+}
+```
+
+## Path Parameters
+
+Capture dynamic URL segments with `:paramName`:
+
+```swift title="Path Parameters"
+await server.get("/users/:id") { request in
+    let userId = request.parameters["id"]!
+    return .json(["user": userId])
+}
+
+// Multiple parameters
+await server.get("/teams/:teamId/members/:memberId") { request in
+    let teamId = request.parameters["teamId"]!
+    let memberId = request.parameters["memberId"]!
+    return .json(["team": teamId, "member": memberId])
+}
+```
+
+<Tip>
+Parameters are always strings. Parse them in your handler: `Int(request.parameters["id"]!)` for integers.
+</Tip>
+
+## Wildcards
+
+The `*` wildcard matches any remaining path:
+
+```swift title="Wildcard Routes"
+// Matches /files/photo.jpg, /files/docs/report.pdf, etc.
+await server.get("/files/*") { request in
+    let filePath = request.path.replacingOccurrences(of: "/files/", with: "")
+    return .text("Serving: \(filePath)")
+}
+```
+
+## Route Groups
+
+Group related routes under a shared prefix. Groups can have their own middleware:
+
+```swift title="Route Groups"
+await server.group("/api") { api in
+    api.get("/status") { _ in .json(["status": "ok"]) }
+
+    // Nested group with auth
+    api.group("/admin", middlewares: [authMiddleware]) { admin in
+        admin.get("/users")  { _ in .json(["users": []]) }
+        admin.post("/users") { _ in .json(["created": true]) }
+        admin.delete("/users/:id") { request in
+            .text("Deleted \(request.parameters["id"]!)")
+        }
+    }
+}
+```
+
+This produces:
+- `GET /api/status` — no auth required
+- `GET /api/admin/users` — auth required
+- `POST /api/admin/users` — auth required
+- `DELETE /api/admin/users/:id` — auth required
+
+## REST Resource Pattern
+
+A common pattern for building RESTful APIs:
+
+```swift title="REST Resource"
+await server.group("/api/v1") { api in
+    // Products resource
+    api.get("/products") { request in
+        let page = Int(request.queryParameters["page"] ?? "1") ?? 1
+        let products = try db.query(
+            "SELECT * FROM products LIMIT 20 OFFSET ?",
+            parameters: [.integer((page - 1) * 20)]
+        )
+        return .json(["products": products.map { $0.columns }, "page": page])
+    }
+
+    api.get("/products/:id") { request in
+        guard let row = try db.queryFirst(
+            "SELECT * FROM products WHERE id = ?",
+            parameters: [.text(request.parameters["id"]!)]
+        ) else {
+            throw PrismAppError.notFound("Product not found")
+        }
+        return .json(row.columns)
+    }
+
+    api.post("/products") { request in
+        guard let body = request.body,
+              let json = try? JSONSerialization.jsonObject(with: body) as? [String: Any],
+              let name = json["name"] as? String else {
+            throw PrismAppError.badRequest("Missing product name")
+        }
+        try db.execute(
+            "INSERT INTO products (name) VALUES (?)",
+            parameters: [.text(name)]
+        )
+        return .json(["name": name], status: .created)
+    }
+
+    api.delete("/products/:id") { request in
+        try db.execute(
+            "DELETE FROM products WHERE id = ?",
+            parameters: [.text(request.parameters["id"]!)]
+        )
+        return PrismHTTPResponse(status: .noContent)
+    }
+}
+```
+
+## Route Priority
+
+Routes are matched in registration order. The first match wins:
+
+```swift
+// This matches first for "/users/me"
+await server.get("/users/me") { _ in .json(["user": "current"]) }
+
+// This matches "/users/123", "/users/abc", etc.
+await server.get("/users/:id") { request in
+    .json(["user": request.parameters["id"]!])
+}
+```
+
+<Warning>
+Register specific routes before parameterized ones. `/users/me` should come before `/users/:id`, otherwise `:id` will capture "me" as a parameter.
+</Warning>
+
+## Query Parameters
+
+Query parameters are automatically parsed from the URL:
+
+```swift title="Query Parameters"
+// GET /search?q=swift&page=2
+await server.get("/search") { request in
+    let query = request.queryParameters["q"] ?? ""
+    let page = Int(request.queryParameters["page"] ?? "1") ?? 1
+    return .json(["query": query, "page": page])
+}
+```
+
+<CardGroup cols={2}>
+  <Card title="Request" icon="arrow-right-to-bracket" href="/core/request">
+    Learn how to extract data from incoming requests.
+  </Card>
+  <Card title="Middleware" icon="layer-group" href="/core/middleware">
+    Add cross-cutting concerns to route groups.
+  </Card>
+</CardGroup>

@@ -1,0 +1,250 @@
+---
+title: "Installation"
+description: "Add Prism to your Swift project and start building. Supports Swift Package Manager, Docker, and project scaffolding."
+icon: "download"
+---
+
+# Installation
+
+Prism is distributed as a Swift package. No Homebrew formulas, no CocoaPods, no extra tooling — just add it to your `Package.swift`.
+
+## Requirements
+
+| Requirement | Minimum |
+|-------------|---------|
+| Swift | 6.0+ |
+| macOS | 14.0+ (Sonoma) |
+| Linux | Not currently supported (Network.framework is Apple-only) |
+| Xcode | 16.0+ (optional, for IDE support) |
+
+<Warning>
+  Prism uses Apple's Network.framework for its TCP layer, which means it currently runs on **macOS only**. Linux support via raw sockets is on the roadmap.
+</Warning>
+
+## Swift Package Manager
+
+Add Prism as a dependency in your `Package.swift`:
+
+```swift title="Package.swift"
+// swift-tools-version: 6.0
+import PackageDescription
+
+let package = Package(
+    name: "my-server",
+    platforms: [.macOS(.v14)],
+    dependencies: [
+        .package(url: "https://github.com/byescaleira/prism.git", from: "4.4.0")
+    ],
+    targets: [
+        .executableTarget(
+            name: "my-server",
+            dependencies: [
+                .product(name: "PrismServer", package: "prism")
+            ]
+        )
+    ]
+)
+```
+
+Then build:
+
+```bash
+swift build
+```
+
+<Tip>
+  Pin to a specific version for production stability: `.package(url: "...", exact: "4.4.0")`. Use `from:` for automatic minor/patch updates.
+</Tip>
+
+## Available Products
+
+Prism is a monorepo with multiple library products. You only need to import what you use:
+
+| Product | What it includes |
+|---------|-----------------|
+| `PrismServer` | The full server framework — HTTP, routing, middleware, database, WebSocket, GraphQL, MCP, and all 36+ modules |
+| `PrismFoundation` | Core utilities shared across all Prism modules (logging, extensions, protocols) |
+
+For server development, you'll almost always want `PrismServer` — it includes everything.
+
+## Project Scaffolding
+
+Prism includes a built-in project generator that creates a production-ready project structure for you:
+
+```swift
+import PrismServer
+
+// Generate a complete project
+try PrismServerScaffold.generate(
+    name: "my-api",
+    directory: "./my-api"
+)
+```
+
+This creates:
+
+```
+my-api/
+  Package.swift          # Pre-configured with Prism dependency
+  Sources/
+    main.swift           # Server with example routes
+  Dockerfile             # Multi-stage build for production
+  .gitignore             # Swift-appropriate gitignore
+```
+
+<Note>
+  You can also create a project manually — the scaffold is a convenience, not a requirement. The quickstart guide walks through manual setup step by step.
+</Note>
+
+## Docker
+
+The scaffold generates a Dockerfile, but you can also write your own. Here's a production-ready setup:
+
+```dockerfile title="Dockerfile"
+# Build stage
+FROM swift:6.0-jammy AS builder
+WORKDIR /app
+COPY Package.swift Package.resolved ./
+RUN swift package resolve
+COPY Sources/ Sources/
+RUN swift build -c release
+
+# Run stage
+FROM swift:6.0-jammy-slim
+WORKDIR /app
+COPY --from=builder /app/.build/release/my-server .
+EXPOSE 8080
+CMD ["./my-server"]
+```
+
+Build and run:
+
+```bash
+docker build -t my-server .
+docker run -p 8080:8080 my-server
+```
+
+<Info>
+  The multi-stage build keeps your production image small — it only includes the compiled binary and Swift runtime, not the build tools or source code.
+</Info>
+
+## Configuration
+
+Prism reads configuration from environment variables and `.env` files using `PrismConfig`:
+
+<Tabs>
+  <Tab title="Environment Variables">
+    ```bash
+    PORT=3000 HOST=0.0.0.0 PRISM_ENV=production swift run
+    ```
+  </Tab>
+  <Tab title=".env File">
+    Create a `.env` file in your project root:
+    ```bash title=".env"
+    PORT=3000
+    HOST=0.0.0.0
+    DATABASE_PATH=./data/app.db
+    SESSION_SECRET=your-secret-key-here
+    ```
+  </Tab>
+  <Tab title="Environment Profiles">
+    Create environment-specific files that override the base:
+    ```bash title=".env.production"
+    PRISM_ENV=production
+    PORT=80
+    DATABASE_PATH=/data/app.db
+    ```
+    ```bash title=".env.development"
+    PRISM_ENV=development
+    PORT=8080
+    DATABASE_PATH=:memory:
+    ```
+    Prism loads `.env` first, then `.env.{PRISM_ENV}`, with environment variables taking highest priority.
+  </Tab>
+</Tabs>
+
+Access configuration in your code:
+
+```swift
+let config = PrismConfig.load()
+
+let port = config.port              // UInt16, from PORT env var (default 8080)
+let host = config.host              // String, from HOST env var (default "0.0.0.0")
+let isProd = config.isProduction    // Bool, checks PRISM_ENV == "production"
+
+// Custom keys
+let dbPath = config.get("DATABASE_PATH", default: ":memory:")
+let maxConn = config.getInt("MAX_CONNECTIONS", default: 5)
+let debug = config.getBool("DEBUG", default: false)
+let secret = try config.require("SESSION_SECRET")  // Throws if missing
+```
+
+## Verify Installation
+
+Create a minimal server to verify everything works:
+
+```swift title="Sources/main.swift"
+import PrismServer
+
+let server = PrismHTTPServer(port: 8080)
+
+await server.get("/") { _ in
+    .json(["status": "ok", "framework": "Prism", "version": "4.4.0"])
+}
+
+print("Server starting on http://localhost:8080")
+try await server.start()
+try await Task.sleep(for: .seconds(.max))
+```
+
+```bash
+swift run
+```
+
+In another terminal:
+
+```bash
+curl http://localhost:8080
+# {"status":"ok","framework":"Prism","version":"4.4.0"}
+```
+
+If you see the JSON response, Prism is installed and working.
+
+## IDE Setup
+
+<Tabs>
+  <Tab title="Xcode">
+    Open the package directory in Xcode:
+    ```bash
+    open Package.swift
+    ```
+    Xcode resolves dependencies automatically. You get full autocomplete, jump-to-definition, and debugging.
+  </Tab>
+  <Tab title="VS Code">
+    Install the [Swift extension](https://marketplace.visualstudio.com/items?itemName=sswg.swift-lang) for VS Code. It provides SourceKit-LSP integration with autocomplete and diagnostics.
+
+    Open the project folder:
+    ```bash
+    code .
+    ```
+  </Tab>
+  <Tab title="Terminal">
+    No IDE needed. Build and run from the command line:
+    ```bash
+    swift build   # Compile
+    swift run     # Build and run
+    swift test    # Run tests
+    ```
+  </Tab>
+</Tabs>
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Quickstart Tutorial" icon="rocket" href="/quickstart">
+    Build a complete REST API with database, validation, and error handling.
+  </Card>
+  <Card title="Core Concepts" icon="book" href="/core/server">
+    Understand how the server, routing, and middleware pipeline work together.
+  </Card>
+</CardGroup>

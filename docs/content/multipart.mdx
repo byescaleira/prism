@@ -1,0 +1,110 @@
+---
+title: "Multipart Forms"
+description: "Parse multipart/form-data requests for file uploads and complex form submissions."
+icon: "puzzle-piece"
+---
+
+# Multipart Forms
+
+When browsers submit forms with file inputs, they encode the data as `multipart/form-data` — a format that bundles multiple fields (text and binary) into a single HTTP body. Prism parses this format natively, giving you typed access to each part.
+
+## How Multipart Works
+
+A multipart request body is split by a boundary string into parts. Each part has headers (name, filename, content type) and a body. Prism handles the boundary parsing and gives you a clean array of parts.
+
+```swift title="Basic Multipart Parsing"
+await server.post("/submit") { request in
+    let parts = try request.multipartParts()
+
+    for part in parts {
+        print("Field: \(part.name)")
+        if let filename = part.filename {
+            print("  File: \(filename), size: \(part.data.count) bytes")
+            print("  Type: \(part.contentType ?? "unknown")")
+        } else {
+            print("  Value: \(part.stringValue ?? "")")
+        }
+    }
+
+    return .json(["received": parts.count])
+}
+```
+
+## Text Fields vs File Parts
+
+The key difference: file parts have a `filename`, text fields don't.
+
+```swift title="Separating Fields and Files"
+await server.post("/profile") { request in
+    let parts = try request.multipartParts()
+
+    var fields: [String: String] = [:]
+    var files: [String: Data] = [:]
+
+    for part in parts {
+        if let filename = part.filename {
+            files[filename] = part.data
+        } else {
+            fields[part.name] = part.stringValue ?? ""
+        }
+    }
+
+    let name = fields["name"] ?? "Unknown"
+    let bio = fields["bio"] ?? ""
+
+    return .json(["name": name, "bio": bio, "filesUploaded": files.count])
+}
+```
+
+## Contact Form Example
+
+```swift title="Contact Form with Attachment"
+await server.post("/contact") { request in
+    let parts = try request.multipartParts()
+
+    var email = ""
+    var message = ""
+    var attachment: Data?
+
+    for part in parts {
+        switch part.name {
+        case "email":
+            email = part.stringValue ?? ""
+        case "message":
+            message = part.stringValue ?? ""
+        case "attachment":
+            if part.filename != nil {
+                attachment = part.data
+            }
+        default:
+            break
+        }
+    }
+
+    guard !email.isEmpty, !message.isEmpty else {
+        return .json(["error": "Email and message required"], status: .badRequest)
+    }
+
+    // Process the contact form...
+    return .json(["status": "received"])
+}
+```
+
+## HTML Form
+
+```html title="Browser Form"
+<form action="/contact" method="POST" enctype="multipart/form-data">
+    <input type="email" name="email" required>
+    <textarea name="message" required></textarea>
+    <input type="file" name="attachment">
+    <button type="submit">Send</button>
+</form>
+```
+
+<Tip>
+  For structured file upload handling with size limits and type validation, see [File Uploads](/content/file-upload) — it builds on top of multipart parsing with `PrismUploadProcessor`.
+</Tip>
+
+<Note>
+  Each multipart part's `data` property contains the raw bytes. For text fields, use `stringValue` which decodes the data as UTF-8. For files, work with `data` directly or use the upload processor.
+</Note>

@@ -1,0 +1,110 @@
+---
+title: "TLS & HTTPS"
+description: "Secure your server with TLS certificates, HSTS, and security headers."
+icon: "shield-halved"
+---
+
+# TLS & HTTPS
+
+Prism supports TLS natively through Network.framework — no OpenSSL, no BoringSSL, no external dependencies. Load a PKCS#12 certificate, set your minimum protocol version, and your server speaks HTTPS.
+
+## TLS Configuration
+
+```swift title="Enable HTTPS"
+let tls = PrismTLSConfiguration(
+    identityPath: "/path/to/certificate.p12",
+    passphrase: "your-passphrase",
+    minimumVersion: .tlsv12,
+    hstsEnabled: true,
+    hstsMaxAge: 31536000  // 1 year
+)
+
+let server = PrismHTTPServer(port: 443, tls: tls)
+try await server.start()
+```
+
+## TLS Versions
+
+Choose the minimum protocol version your server accepts:
+
+```swift title="Version Options"
+TLSVersion.tlsv10  // Legacy — avoid unless required
+TLSVersion.tlsv11  // Deprecated by most browsers
+TLSVersion.tlsv12  // Recommended minimum (default)
+TLSVersion.tlsv13  // Maximum security, best performance
+```
+
+<Warning>
+  TLS 1.0 and 1.1 are deprecated and have known vulnerabilities. Use `.tlsv12` as the minimum unless you need to support very old clients. For new deployments, prefer `.tlsv13`.
+</Warning>
+
+## HSTS Middleware
+
+HTTP Strict Transport Security tells browsers to always use HTTPS. This prevents protocol downgrade attacks and cookie hijacking:
+
+```swift title="HSTS Headers"
+let hsts = PrismHSTSMiddleware(
+    maxAge: 31536000,        // 1 year
+    includeSubDomains: true, // Apply to all subdomains
+    preload: false           // Set true to submit to browser preload lists
+)
+
+await server.use(hsts)
+// Adds: Strict-Transport-Security: max-age=31536000; includeSubDomains
+```
+
+## Security Headers
+
+`PrismSecurityHeadersMiddleware` adds a suite of protective headers to every response:
+
+```swift title="Security Headers"
+await server.use(PrismSecurityHeadersMiddleware())
+```
+
+This adds:
+- `X-Content-Type-Options: nosniff` — prevents MIME type sniffing
+- `X-Frame-Options: DENY` — blocks clickjacking via iframes
+- `X-XSS-Protection: 1; mode=block` — enables browser XSS filter
+- `Referrer-Policy: strict-origin-when-cross-origin` — controls referrer leakage
+
+## Production Setup
+
+A typical production configuration combines all security layers:
+
+```swift title="Production Security Stack"
+let server = PrismHTTPServer(port: 443, tls: PrismTLSConfiguration(
+    identityPath: ProcessInfo.processInfo.environment["TLS_CERT_PATH"]!,
+    passphrase: ProcessInfo.processInfo.environment["TLS_PASSPHRASE"]!,
+    minimumVersion: .tlsv13
+))
+
+await server.use(PrismSecurityHeadersMiddleware())
+await server.use(PrismHSTSMiddleware(maxAge: 63072000, includeSubDomains: true, preload: true))
+```
+
+## Creating a PKCS#12 Certificate
+
+Convert PEM certificate and key to PKCS#12 format:
+
+```bash title="Convert to PKCS#12"
+openssl pkcs12 -export \
+    -in certificate.pem \
+    -inkey private-key.pem \
+    -out certificate.p12 \
+    -passout pass:your-passphrase
+```
+
+For development, create a self-signed certificate:
+
+```bash title="Self-Signed Certificate"
+openssl req -x509 -newkey rsa:4096 -keyout key.pem -out cert.pem -days 365 -nodes
+openssl pkcs12 -export -in cert.pem -inkey key.pem -out dev.p12 -passout pass:dev
+```
+
+<Tip>
+  For local development, run without TLS on port 8080. Use TLS only in staging and production. The HSTS middleware is safe to add in development — it only affects responses, and browsers won't enforce it for localhost.
+</Tip>
+
+<Note>
+  Prism uses Apple's Security framework (`SecPKCS12Import`) for certificate loading. This is the same system used by iOS and macOS apps — battle-tested and maintained by Apple.
+</Note>

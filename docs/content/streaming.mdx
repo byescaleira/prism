@@ -1,0 +1,122 @@
+---
+title: "Streaming"
+description: "Stream large responses with chunked transfer encoding and AsyncStream."
+icon: "water"
+---
+
+# Streaming
+
+When responses are too large to buffer in memory — or when data arrives over time — chunked transfer encoding lets you send data in pieces. Prism provides both a writer-based API and an `AsyncStream`-based API.
+
+## AsyncStream Responses
+
+The simplest way to stream: pass an `AsyncStream<Data>` and Prism handles the chunked encoding.
+
+```swift title="Stream from AsyncStream"
+await server.get("/download") { _ in
+    let stream = AsyncStream<Data> { continuation in
+        for i in 0..<100 {
+            let chunk = Data("Line \(i)\n".utf8)
+            continuation.yield(chunk)
+        }
+        continuation.finish()
+    }
+
+    return await PrismHTTPResponse.streaming(stream, contentType: "text/plain")
+}
+```
+
+The response uses `Transfer-Encoding: chunked` automatically — no Content-Length needed.
+
+## Stream Writer
+
+For more control over when chunks are written, use `PrismStreamWriter`:
+
+```swift title="Using Stream Writer"
+let writer = PrismStreamWriter()
+
+await writer.write("First chunk of data")
+await writer.write("Second chunk")
+await writer.write(Data([0x00, 0x01, 0x02]))  // Binary data
+await writer.end()
+
+let chunkedBody = await writer.serialize()
+// Produces proper chunked transfer encoding format
+```
+
+## Large File Download
+
+```swift title="Streaming a Large File"
+await server.get("/export") { _ in
+    let stream = AsyncStream<Data> { continuation in
+        Task {
+            let fileHandle = FileHandle(forReadingAtPath: "/data/export.csv")!
+            defer { fileHandle.closeFile() }
+
+            while true {
+                let chunk = fileHandle.readData(ofLength: 8192)
+                if chunk.isEmpty { break }
+                continuation.yield(chunk)
+            }
+            continuation.finish()
+        }
+    }
+
+    return await PrismHTTPResponse.streaming(stream, contentType: "text/csv")
+}
+```
+
+## Reading Request Bodies in Chunks
+
+For large uploads, split the incoming body into fixed-size chunks:
+
+```swift title="Chunked Request Reading"
+await server.post("/ingest") { request in
+    let chunks = request.bodyChunks(size: 4096)
+
+    var totalProcessed = 0
+    for chunk in chunks {
+        totalProcessed += chunk.count
+    }
+
+    return .json(["bytesProcessed": totalProcessed])
+}
+```
+
+## Newline-Delimited JSON Stream
+
+Combine streaming with structured data for progress reporting:
+
+```swift title="NDJSON Stream"
+await server.post("/process") { request in
+    let stream = AsyncStream<Data> { continuation in
+        Task {
+            for step in 1...10 {
+                try? await Task.sleep(for: .milliseconds(500))
+                let progress = "{\"step\": \(step), \"total\": 10}\n"
+                continuation.yield(Data(progress.utf8))
+            }
+            continuation.finish()
+        }
+    }
+
+    return await PrismHTTPResponse.streaming(stream, contentType: "application/x-ndjson")
+}
+```
+
+## Chunked Response Helper
+
+Create a response pre-configured for chunked transfer:
+
+```swift title="Pre-configured Chunked Response"
+let response = PrismChunkedResponse.chunked(contentType: "application/octet-stream")
+// Sets Transfer-Encoding: chunked and Content-Type headers
+```
+
+<Tip>
+  For real-time push to browsers, consider [Server-Sent Events](/realtime/sse) instead of raw chunked streaming — SSE has built-in reconnection and event naming that browsers handle automatically.
+</Tip>
+
+<Warning>
+  The `AsyncStream`-based `.streaming()` collects all chunks before sending the response. For true incremental delivery to the client, use SSE or WebSocket. This API is ideal for generating large responses without holding the entire payload in memory at once.
+</Warning>

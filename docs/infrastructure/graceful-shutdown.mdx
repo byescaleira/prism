@@ -1,0 +1,123 @@
+---
+title: "Graceful Shutdown"
+description: "Handle SIGTERM/SIGINT signals with connection draining and cleanup hooks."
+icon: "power-off"
+---
+
+# Graceful Shutdown
+
+When your server receives a termination signal (Ctrl+C, `kill`, Docker stop), you don't want to drop active requests. `PrismGracefulShutdown` catches signals, runs cleanup hooks, and rejects new requests while in-flight ones finish.
+
+## Quick Setup
+
+```swift title="Enable Graceful Shutdown"
+let shutdown = PrismGracefulShutdown(drainTimeout: .seconds(30))
+
+await shutdown.onShutdown {
+    print("Closing database connections...")
+    await pool.drain()
+}
+
+await shutdown.onShutdown {
+    print("Stopping cron scheduler...")
+    await cron.stop()
+}
+
+await shutdown.installSignalHandlers {
+    print("Server stopped")
+    // Final shutdown action
+}
+```
+
+## Shutdown Middleware
+
+Reject new requests during shutdown with a `503 Service Unavailable`:
+
+```swift title="Reject During Shutdown"
+await server.use(PrismShutdownMiddleware(shutdown: shutdown))
+```
+
+When shutdown begins, new requests get:
+- Status: `503 Service Unavailable`
+- Header: `Connection: close`
+- Header: `Retry-After: 5`
+- Body: `"Server is shutting down"`
+
+In-flight requests that were already past the middleware continue normally.
+
+## How It Works
+
+1. **Signal received** — SIGTERM or SIGINT caught by DispatchSource
+2. **Shutdown begins** — `isShuttingDown` flag set, new requests rejected
+3. **Hooks run** — Each registered `onShutdown` handler runs in order
+4. **Final shutdown** — The closure passed to `installSignalHandlers` runs last
+
+## Practical Example
+
+```swift title="Full Shutdown Setup"
+let shutdown = PrismGracefulShutdown(drainTimeout: .seconds(30))
+
+// Close database pool
+await shutdown.onShutdown {
+    await pool.drain()
+}
+
+// Stop background tasks
+await shutdown.onShutdown {
+    await tasks.cancelAll()
+}
+
+// Stop cron scheduler
+await shutdown.onShutdown {
+    await cron.stop()
+}
+
+// Flush metrics
+await shutdown.onShutdown {
+    let snapshot = await metrics.snapshot()
+    print("Final metrics: \(snapshot.requestCount) requests served")
+}
+
+// Middleware stack
+await server.use(PrismShutdownMiddleware(shutdown: shutdown))
+
+// Install signal handlers
+await shutdown.installSignalHandlers {
+    print("Prism server stopped gracefully")
+}
+
+try await server.start()
+```
+
+## Checking Shutdown State
+
+```swift title="Check State"
+let isShuttingDown = await shutdown.shuttingDown
+
+if isShuttingDown {
+    // Skip non-critical work
+}
+```
+
+## Manual Shutdown
+
+Trigger shutdown programmatically (e.g., from an admin endpoint):
+
+```swift title="Admin Shutdown"
+await server.post("/admin/shutdown") { request in
+    Task {
+        await shutdown.performShutdown {
+            // Stop the server
+        }
+    }
+    return .json(["status": "shutting down"])
+}
+```
+
+<Warning>
+  Place `PrismShutdownMiddleware` early in your middleware stack — before authentication, logging, etc. This ensures new requests are rejected before any middleware processes them.
+</Warning>
+
+<Tip>
+  In Docker/Kubernetes, the orchestrator sends SIGTERM and waits (default 30 seconds) before SIGKILL. Set your `drainTimeout` shorter than the orchestrator's grace period to ensure clean shutdown completes before the process is killed.
+</Tip>

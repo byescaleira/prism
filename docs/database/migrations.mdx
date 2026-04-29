@@ -1,0 +1,171 @@
+---
+title: "Migrations"
+description: "Version your database schema with reversible up/down migrations."
+icon: "arrows-rotate"
+---
+
+# Migrations
+
+Migrations let you evolve your database schema over time. Each migration has an `up` (apply) and `down` (rollback) function, and Prism tracks which migrations have been applied in a `_prism_migrations` table.
+
+## Defining Migrations
+
+```swift title="Migration Definitions"
+let migrations = [
+    PrismMigration(
+        version: 1,
+        name: "create_users",
+        up: { db in
+            try db.execute("""
+                CREATE TABLE users (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    name TEXT NOT NULL,
+                    email TEXT UNIQUE NOT NULL,
+                    created_at TEXT DEFAULT CURRENT_TIMESTAMP
+                )
+            """)
+        },
+        down: { db in
+            try db.execute("DROP TABLE IF EXISTS users")
+        }
+    ),
+    PrismMigration(
+        version: 2,
+        name: "create_posts",
+        up: { db in
+            try db.execute("""
+                CREATE TABLE posts (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    user_id INTEGER NOT NULL,
+                    title TEXT NOT NULL,
+                    body TEXT,
+                    published INTEGER DEFAULT 0,
+                    created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+                    FOREIGN KEY (user_id) REFERENCES users(id)
+                )
+            """)
+        },
+        down: { db in
+            try db.execute("DROP TABLE IF EXISTS posts")
+        }
+    ),
+    PrismMigration(
+        version: 3,
+        name: "add_user_avatar",
+        up: { db in
+            try db.execute("ALTER TABLE users ADD COLUMN avatar_url TEXT")
+        },
+        down: { db in
+            // SQLite doesn't support DROP COLUMN before 3.35.0
+            // For older versions, you'd recreate the table
+        }
+    )
+]
+```
+
+## Running Migrations
+
+<Steps>
+  <Step title="Create a Migrator">
+    ```swift
+    let db = try PrismDatabase(path: "app.db")
+    let migrator = PrismMigrator(database: db, migrations: migrations)
+    ```
+  </Step>
+  <Step title="Run Pending Migrations">
+    ```swift
+    try await migrator.migrate()
+    // Applies all migrations that haven't been run yet
+    ```
+  </Step>
+  <Step title="Check Status">
+    Prism automatically creates a `_prism_migrations` table to track applied migrations.
+  </Step>
+</Steps>
+
+## Rolling Back
+
+```swift title="Rollback Last Migration"
+try await migrator.rollback()
+```
+
+<Warning>
+  Rollbacks can cause data loss. Always back up your database before rolling back in production.
+</Warning>
+
+## Migration Workflow
+
+A typical workflow for adding a new feature:
+
+```swift title="Adding Comments Feature"
+// 1. Define the migration
+let addComments = PrismMigration(
+    version: 4,
+    name: "create_comments",
+    up: { db in
+        try db.execute("""
+            CREATE TABLE comments (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                post_id INTEGER NOT NULL,
+                user_id INTEGER NOT NULL,
+                body TEXT NOT NULL,
+                created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+                FOREIGN KEY (post_id) REFERENCES posts(id) ON DELETE CASCADE,
+                FOREIGN KEY (user_id) REFERENCES users(id)
+            )
+        """)
+        try db.execute("CREATE INDEX idx_comments_post ON comments(post_id)")
+    },
+    down: { db in
+        try db.execute("DROP INDEX IF EXISTS idx_comments_post")
+        try db.execute("DROP TABLE IF EXISTS comments")
+    }
+)
+
+// 2. Add it to your migrations array
+let migrations = [createUsers, createPosts, addAvatar, addComments]
+
+// 3. Run on startup
+let migrator = PrismMigrator(database: db, migrations: migrations)
+try await migrator.migrate()
+```
+
+## Server Startup Pattern
+
+```swift title="Migrate on Boot"
+@main
+struct App {
+    static func main() async throws {
+        let db = try PrismDatabase(path: "app.db")
+
+        // Run migrations before starting the server
+        let migrator = PrismMigrator(database: db, migrations: allMigrations)
+        try await migrator.migrate()
+
+        let server = PrismHTTPServer(port: 8080)
+        // ... register routes ...
+        try await server.start()
+    }
+}
+```
+
+<Tip>
+  Keep migration version numbers sequential and never modify a migration that's already been applied in production. Instead, create a new migration to make changes.
+</Tip>
+
+## Best Practices
+
+<AccordionGroup>
+  <Accordion title="Name migrations descriptively">
+    Use names like `create_users`, `add_user_avatar`, `create_comments_index` so you can tell what each migration does at a glance.
+  </Accordion>
+  <Accordion title="Always write down migrations">
+    Even if you think you won't need to roll back, having a `down` function makes development much smoother.
+  </Accordion>
+  <Accordion title="Test migrations against a copy">
+    Before running migrations in production, test them against a copy of your production database to catch issues early.
+  </Accordion>
+  <Accordion title="Keep migrations small">
+    Each migration should do one thing. It's better to have 10 small migrations than one giant one.
+  </Accordion>
+</AccordionGroup>

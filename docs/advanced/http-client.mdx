@@ -1,0 +1,155 @@
+---
+title: "HTTP Client"
+description: "Make outbound HTTP requests with retry support and response decoding."
+icon: "arrow-up-right-from-square"
+---
+
+# HTTP Client
+
+`PrismHTTPClient` is a lightweight HTTP client built on `URLSession` for making outbound requests — calling external APIs, webhooks, microservices. It supports retries, base URLs, default headers, and typed response decoding.
+
+## Quick Start
+
+```swift title="Basic Requests"
+let client = PrismHTTPClient()
+
+let response = try await client.get("https://api.example.com/users")
+print(response.statusCode)  // 200
+print(response.text ?? "")  // Response body as string
+```
+
+## Convenience Methods
+
+```swift title="HTTP Methods"
+// GET
+let users = try await client.get("/users")
+
+// POST with body
+let body = try JSONEncoder().encode(newUser)
+let created = try await client.post("/users", body: body, headers: ["Content-Type": "application/json"])
+
+// PUT
+let updated = try await client.put("/users/1", body: updateData)
+
+// PATCH
+let patched = try await client.patch("/users/1", body: patchData)
+
+// DELETE
+let deleted = try await client.delete("/users/1")
+```
+
+## Configuration
+
+```swift title="Client Config"
+let client = PrismHTTPClient(config: PrismHTTPClientConfig(
+    baseURL: "https://api.example.com",
+    defaultHeaders: [
+        "Authorization": "Bearer \(apiToken)",
+        "Accept": "application/json"
+    ],
+    timeout: 15,                       // Seconds
+    retryCount: 3,                     // Retry up to 3 times
+    retryDelay: .seconds(2)            // Wait 2s between retries
+))
+
+// Now use relative paths
+let users = try await client.get("/users")  // → https://api.example.com/users
+```
+
+## Response Handling
+
+```swift title="Response Properties"
+let response = try await client.get("/users/1")
+
+response.statusCode     // 200
+response.headers        // [String: String]
+response.body           // Data?
+response.text           // String? (UTF-8 decoded)
+
+// Decode JSON
+let user = try response.json(User.self)
+```
+
+## Retry Logic
+
+The client automatically retries on failure:
+
+```swift title="Retry Configuration"
+let client = PrismHTTPClient(config: PrismHTTPClientConfig(
+    retryCount: 3,           // 3 retries = 4 total attempts
+    retryDelay: .seconds(1)  // 1 second between retries
+))
+
+// If the first attempt fails, waits 1s, retries
+// If second attempt fails, waits 1s, retries again
+// If third attempt fails, waits 1s, final retry
+// If all fail, throws the last error
+```
+
+## Calling External APIs
+
+```swift title="External API Integration"
+let stripe = PrismHTTPClient(config: PrismHTTPClientConfig(
+    baseURL: "https://api.stripe.com/v1",
+    defaultHeaders: ["Authorization": "Bearer sk_test_..."],
+    timeout: 30,
+    retryCount: 2
+))
+
+await server.post("/charge") { request in
+    let input = try request.decodeJSON() as ChargeInput
+
+    let body = "amount=\(input.amount)&currency=usd&source=\(input.token)"
+    let response = try await stripe.post("/charges",
+        body: Data(body.utf8),
+        headers: ["Content-Type": "application/x-www-form-urlencoded"]
+    )
+
+    if response.statusCode == 200 {
+        return .json(["status": "charged"], status: .created)
+    }
+    return .json(["error": "Payment failed"], status: .badRequest)
+}
+```
+
+## Microservice Communication
+
+```swift title="Service-to-Service Calls"
+let userService = PrismHTTPClient(config: PrismHTTPClientConfig(
+    baseURL: "http://user-service:3001"
+))
+
+let orderService = PrismHTTPClient(config: PrismHTTPClientConfig(
+    baseURL: "http://order-service:3002"
+))
+
+await server.get("/dashboard/:userId") { request in
+    let userId = request.parameters["userId"]!
+
+    async let userResponse = userService.get("/users/\(userId)")
+    async let ordersResponse = orderService.get("/users/\(userId)/orders")
+
+    let user = try await userResponse.json(User.self)
+    let orders = try await ordersResponse.json([Order].self)
+
+    return .json(["user": user.name, "orderCount": orders.count])
+}
+```
+
+## Error Handling
+
+```swift title="Handle Client Errors"
+do {
+    let response = try await client.get("/users")
+} catch PrismHTTPClientError.invalidURL {
+    print("Bad URL")
+} catch PrismHTTPClientError.timeout {
+    print("Request timed out")
+} catch PrismHTTPClientError.requestFailed(let message) {
+    print("Request failed: \(message)")
+}
+```
+
+<Tip>
+  Create one `PrismHTTPClient` instance per external service and reuse it. URLSession handles connection pooling internally — creating new clients per request wastes resources.
+</Tip>

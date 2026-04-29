@@ -1,0 +1,210 @@
+---
+title: "Schema Definition"
+description: "Define your GraphQL schema with Prism's native type system — no code generation, no external tools."
+icon: "diagram-project"
+---
+
+# Schema Definition
+
+Prism's GraphQL engine lets you define schemas entirely in Swift using a typed DSL. Every field, argument, and type is a first-class Swift value — you get compiler checks, autocomplete, and zero code generation.
+
+## Type System
+
+GraphQL types map directly to `PrismGraphQLType`:
+
+```swift title="Available Types"
+.string       // GraphQL String
+.int          // GraphQL Int
+.float        // GraphQL Float
+.boolean      // GraphQL Boolean
+.id           // GraphQL ID
+.nonNull(.string)          // String!
+.list(.string)             // [String]
+.list(.nonNull(.string))   // [String!]
+.object("User")            // Custom object type
+.enum("Status", ["ACTIVE", "INACTIVE"])  // Enum type
+.input("CreateUserInput")  // Input type
+```
+
+<Tip>
+Use `.nonNull()` to mark fields as required in your schema. Clients will get a validation error if a non-null field returns nil.
+</Tip>
+
+## Defining Fields
+
+Each field has a name, type, optional arguments, and a resolver function:
+
+```swift title="Field with Resolver"
+let nameField = PrismGraphQLField(
+    name: "name",
+    type: .nonNull(.string),
+    args: [],
+    description: "The user's full name",
+    resolver: { info in
+        let user = info.parentValue as? [String: Any]
+        return user?["name"] as? String
+    }
+)
+```
+
+### Fields with Arguments
+
+```swift title="Field with Arguments"
+let userField = PrismGraphQLField(
+    name: "user",
+    type: .object("User"),
+    args: [
+        PrismGraphQLArgument(name: "id", type: .nonNull(.id), description: "User ID")
+    ],
+    description: "Fetch a single user by ID",
+    resolver: { info in
+        let id = info.arguments["id"] as? String ?? ""
+        return await UserService.find(id: id)
+    }
+)
+```
+
+## Object Types
+
+Group fields into object types:
+
+```swift title="User Type"
+let userType = PrismGraphQLObjectType(
+    name: "User",
+    fields: [
+        "id": PrismGraphQLField(name: "id", type: .nonNull(.id), args: [], resolver: { info in
+            (info.parentValue as? [String: Any])?["id"]
+        }),
+        "name": PrismGraphQLField(name: "name", type: .nonNull(.string), args: [], resolver: { info in
+            (info.parentValue as? [String: Any])?["name"]
+        }),
+        "email": PrismGraphQLField(name: "email", type: .string, args: [], resolver: { info in
+            (info.parentValue as? [String: Any])?["email"]
+        })
+    ],
+    description: "A registered user"
+)
+```
+
+## Building a Complete Schema
+
+<Steps>
+  <Step title="Define your types">
+    Create object types for each entity in your domain.
+  </Step>
+  <Step title="Define the Query type">
+    The Query type is the entry point for all read operations.
+  </Step>
+  <Step title="Define Mutation type (optional)">
+    Mutations handle create, update, and delete operations.
+  </Step>
+  <Step title="Assemble the schema">
+    Combine everything into a `PrismGraphQLSchema`.
+  </Step>
+</Steps>
+
+### Blog Schema Example
+
+```swift title="Complete Blog Schema"
+// Post type
+let postType = PrismGraphQLObjectType(
+    name: "Post",
+    fields: [
+        "id": PrismGraphQLField(name: "id", type: .nonNull(.id), args: [], resolver: { info in
+            (info.parentValue as? [String: Any])?["id"]
+        }),
+        "title": PrismGraphQLField(name: "title", type: .nonNull(.string), args: [], resolver: { info in
+            (info.parentValue as? [String: Any])?["title"]
+        }),
+        "body": PrismGraphQLField(name: "body", type: .string, args: [], resolver: { info in
+            (info.parentValue as? [String: Any])?["body"]
+        }),
+        "authorId": PrismGraphQLField(name: "authorId", type: .nonNull(.id), args: [], resolver: { info in
+            (info.parentValue as? [String: Any])?["authorId"]
+        })
+    ]
+)
+
+// Query type — entry point
+let queryType = PrismGraphQLObjectType(
+    name: "Query",
+    fields: [
+        "posts": PrismGraphQLField(
+            name: "posts",
+            type: .list(.object("Post")),
+            args: [],
+            description: "List all posts",
+            resolver: { _ in
+                return [
+                    ["id": "1", "title": "Hello Prism", "body": "Getting started...", "authorId": "1"],
+                    ["id": "2", "title": "GraphQL in Swift", "body": "Native and fast...", "authorId": "1"]
+                ]
+            }
+        ),
+        "post": PrismGraphQLField(
+            name: "post",
+            type: .object("Post"),
+            args: [PrismGraphQLArgument(name: "id", type: .nonNull(.id))],
+            description: "Get a post by ID",
+            resolver: { info in
+                let id = info.arguments["id"] as? String
+                // In reality, query your database here
+                return ["id": id, "title": "Hello Prism", "body": "Content...", "authorId": "1"]
+            }
+        )
+    ]
+)
+
+// Mutation type
+let mutationType = PrismGraphQLObjectType(
+    name: "Mutation",
+    fields: [
+        "createPost": PrismGraphQLField(
+            name: "createPost",
+            type: .object("Post"),
+            args: [
+                PrismGraphQLArgument(name: "title", type: .nonNull(.string)),
+                PrismGraphQLArgument(name: "body", type: .string)
+            ],
+            resolver: { info in
+                let title = info.arguments["title"] as? String ?? ""
+                let body = info.arguments["body"] as? String
+                // Save to database, return created post
+                return ["id": UUID().uuidString, "title": title, "body": body, "authorId": "1"]
+            }
+        )
+    ]
+)
+
+// Assemble schema
+let schema = PrismGraphQLSchema(
+    query: queryType,
+    mutation: mutationType
+)
+```
+
+<Note>
+The schema object is `Sendable` and can be shared across concurrent requests safely. Define it once at startup and pass it to your middleware.
+</Note>
+
+## Schema with Type Registry
+
+For schemas with nested object types (e.g., a User that has Posts), register types in the schema so the executor can resolve nested selections:
+
+```swift title="Registering Types"
+var schema = PrismGraphQLSchema(query: queryType, mutation: mutationType)
+schema.types["User"] = userType
+schema.types["Post"] = postType
+schema.types["Comment"] = commentType
+```
+
+## What's Next
+
+<CardGroup cols={2}>
+  <Card title="Queries" icon="magnifying-glass" href="/graphql/queries">
+    Learn how to write resolvers and handle nested data
+  </Card>
+  <Card title="Mutations" icon="pen" href="/graphql/mutations">
+    Create, update, and delete data through GraphQL
+  </Card>
+</CardGroup>

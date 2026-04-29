@@ -1,0 +1,117 @@
+---
+title: "JSON"
+description: "Decode JSON requests and send JSON responses with Codable integration."
+icon: "brackets-curly"
+---
+
+# JSON
+
+JSON is the default language of web APIs. Prism makes it easy to decode incoming JSON and send JSON responses using Swift's `Codable` system.
+
+## Sending JSON Responses
+
+```swift title="JSON Response"
+await server.get("/status") { _ in
+    .json(["status": "ok", "version": "1.0"])
+}
+```
+
+With a `Codable` struct:
+
+```swift title="Codable Response"
+struct UserResponse: Codable {
+    let id: Int
+    let name: String
+    let email: String
+}
+
+await server.get("/users/:id") { request in
+    let user = UserResponse(id: 1, name: "Alice", email: "alice@example.com")
+    return .json(user)
+}
+```
+
+## Decoding JSON Requests
+
+```swift title="Decode Request Body"
+struct CreateUser: Decodable {
+    let name: String
+    let email: String
+    let password: String
+}
+
+await server.post("/users") { request in
+    let input: CreateUser = try request.decodeJSON()
+    // input.name, input.email, input.password are now available
+    return .json(["id": 1], status: .created)
+}
+```
+
+## Complete REST API Example
+
+```swift title="Todo API"
+struct Todo: Codable {
+    let id: Int
+    let title: String
+    let completed: Bool
+}
+
+struct CreateTodo: Decodable {
+    let title: String
+}
+
+struct UpdateTodo: Decodable {
+    let title: String?
+    let completed: Bool?
+}
+
+await server.get("/todos") { _ in
+    let todos = try await db.query("SELECT * FROM todos")
+    return .json(todos.map { row in
+        Todo(
+            id: row["id"]?.intValue ?? 0,
+            title: row["title"]?.textValue ?? "",
+            completed: row["completed"]?.intValue == 1
+        )
+    })
+}
+
+await server.post("/todos") { request in
+    let input: CreateTodo = try request.decodeJSON()
+    try await db.execute(
+        "INSERT INTO todos (title, completed) VALUES (?, 0)",
+        parameters: [.text(input.title)]
+    )
+    return .json(["id": await db.lastInsertID], status: .created)
+}
+
+await server.patch("/todos/:id") { request in
+    let id = request.parameters["id"]!
+    let input: UpdateTodo = try request.decodeJSON()
+
+    if let title = input.title {
+        try await db.execute("UPDATE todos SET title = ? WHERE id = ?",
+            parameters: [.text(title), .text(id)])
+    }
+    if let completed = input.completed {
+        try await db.execute("UPDATE todos SET completed = ? WHERE id = ?",
+            parameters: [.integer(completed ? 1 : 0), .text(id)])
+    }
+
+    return .json(["status": "updated"])
+}
+```
+
+<Tip>
+  Use `Decodable` for request types (you only need to decode) and `Codable` for response types (you only need to encode). Using the narrower protocol makes your intent clear.
+</Tip>
+
+## Custom JSON Encoder
+
+```swift title="Custom Date Format"
+let encoder = JSONEncoder()
+encoder.dateEncodingStrategy = .iso8601
+encoder.outputFormatting = .prettyPrinted
+
+return .json(user, encoder: encoder)
+```

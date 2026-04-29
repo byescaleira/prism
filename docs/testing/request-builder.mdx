@@ -1,0 +1,144 @@
+---
+title: "Request Builder"
+description: "Build test requests with a fluent, chainable API."
+icon: "hammer"
+---
+
+# Request Builder
+
+`PrismRequestBuilder` provides a chainable API for constructing test requests. Instead of manually creating `PrismHTTPRequest` instances with method, path, headers, and body, chain methods together for readable test code.
+
+## Basic Usage
+
+```swift title="Building Requests"
+let request = PrismRequestBuilder
+    .get("/users")
+    .header("Accept", "application/json")
+    .build()
+
+let response = try await client.send(request)
+```
+
+## HTTP Methods
+
+```swift title="Method Factories"
+PrismRequestBuilder.get("/users")
+PrismRequestBuilder.post("/users")
+PrismRequestBuilder.put("/users/1")
+PrismRequestBuilder.patch("/users/1")
+PrismRequestBuilder.delete("/users/1")
+```
+
+## Adding Headers
+
+```swift title="Chain Headers"
+let request = PrismRequestBuilder
+    .get("/protected")
+    .header("Authorization", "Bearer token-123")
+    .header("Accept", "application/json")
+    .header("X-Custom", "value")
+    .build()
+```
+
+## Setting the Body
+
+### Raw Data
+
+```swift title="Raw Body"
+let csvData = Data("name,email\nAlice,alice@test.com\n".utf8)
+
+let request = PrismRequestBuilder
+    .post("/import")
+    .header("Content-Type", "text/csv")
+    .body(csvData)
+    .build()
+```
+
+### JSON Body
+
+```swift title="JSON Body"
+struct CreateTodo: Encodable {
+    let title: String
+    let completed: Bool
+}
+
+let request = PrismRequestBuilder
+    .post("/todos")
+    .jsonBody(CreateTodo(title: "Write tests", completed: false))
+    .build()
+
+// Automatically sets:
+// Content-Type: application/json
+// Content-Length: <calculated>
+```
+
+## Complete Examples
+
+```swift title="Test with Request Builder"
+@Suite("Todo API")
+struct TodoTests {
+    let client: PrismTestClient
+
+    @Test func createTodo() async throws {
+        let request = PrismRequestBuilder
+            .post("/todos")
+            .jsonBody(CreateTodo(title: "Test", completed: false))
+            .header("Authorization", "Bearer test-token")
+            .build()
+
+        let response = try await client.send(request)
+        #expect(response.status == .created)
+    }
+
+    @Test func searchTodos() async throws {
+        let request = PrismRequestBuilder
+            .get("/todos?q=test&completed=false")
+            .header("Accept", "application/json")
+            .build()
+
+        let response = try await client.send(request)
+        #expect(response.status == .ok)
+    }
+
+    @Test func updateTodo() async throws {
+        let request = PrismRequestBuilder
+            .patch("/todos/1")
+            .jsonBody(["completed": true])
+            .build()
+
+        let response = try await client.send(request)
+        #expect(response.status == .ok)
+    }
+}
+```
+
+## Why Use Request Builder?
+
+Compare the manual approach vs the builder:
+
+```swift title="Without Builder"
+var headers = PrismHTTPHeaders()
+headers.set(name: "Content-Type", value: "application/json")
+headers.set(name: "Authorization", value: "Bearer token")
+let body = try JSONEncoder().encode(input)
+headers.set(name: "Content-Length", value: "\(body.count)")
+let request = PrismHTTPRequest(method: .POST, uri: "/users", headers: headers, body: body)
+```
+
+```swift title="With Builder"
+let request = PrismRequestBuilder
+    .post("/users")
+    .jsonBody(input)
+    .header("Authorization", "Bearer token")
+    .build()
+```
+
+<Tip>
+  `PrismRequestBuilder` is immutable — each chained method returns a new copy. You can create a base builder and branch from it for variations:
+
+  ```swift
+  let base = PrismRequestBuilder.get("/api").header("Authorization", "Bearer token")
+  let r1 = base.header("Accept", "application/json").build()
+  let r2 = base.header("Accept", "text/csv").build()
+  ```
+</Tip>

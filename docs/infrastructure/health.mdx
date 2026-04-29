@@ -1,0 +1,104 @@
+---
+title: "Health Checks"
+description: "Monitor server health with customizable checks and a /health endpoint."
+icon: "heart-pulse"
+---
+
+# Health Checks
+
+Health checks let load balancers, orchestrators, and monitoring systems know if your server is ready to handle traffic. Prism's `PrismHealthMonitor` runs checks on demand and serves results through a `/health` endpoint.
+
+## Quick Setup
+
+```swift title="Basic Health Endpoint"
+let health = PrismHealthMonitor()
+await server.use(PrismHealthMiddleware(monitor: health))
+// GET /health → {"status": "healthy", "checks": []}
+```
+
+## Adding Checks
+
+```swift title="Register Health Checks"
+let health = PrismHealthMonitor()
+
+// Simple status check
+await health.register("memory") {
+    let info = ProcessInfo.processInfo
+    return info.physicalMemory > 0 ? .healthy : .unhealthy
+}
+
+// Detailed check with messages
+await health.register(PrismHealthCheck(name: "database") {
+    do {
+        try await db.execute("SELECT 1")
+        return PrismHealthCheckResult(name: "database", status: .healthy, message: "Connected")
+    } catch {
+        return PrismHealthCheckResult(name: "database", status: .unhealthy, message: error.localizedDescription)
+    }
+})
+
+await health.register(PrismHealthCheck(name: "disk") {
+    let free = freeDiskSpace()
+    if free < 100_000_000 {
+        return PrismHealthCheckResult(name: "disk", status: .unhealthy, message: "Less than 100MB free")
+    } else if free < 1_000_000_000 {
+        return PrismHealthCheckResult(name: "disk", status: .degraded, message: "Less than 1GB free")
+    }
+    return PrismHealthCheckResult(name: "disk", status: .healthy)
+})
+
+await server.use(PrismHealthMiddleware(monitor: health))
+```
+
+## Health Status Levels
+
+| Status | HTTP Code | Meaning |
+|--------|-----------|---------|
+| `.healthy` | 200 | Everything is operational |
+| `.degraded` | 503 | Running but with issues — may need attention |
+| `.unhealthy` | 503 | Not ready to handle traffic |
+
+The overall status is the worst individual check: if any check is `.unhealthy`, the report is unhealthy. If any is `.degraded` (and none unhealthy), the report is degraded.
+
+## Response Format
+
+```json title="GET /health Response"
+{
+    "status": "degraded",
+    "checks": [
+        {"name": "database", "status": "healthy", "message": "Connected"},
+        {"name": "disk", "status": "degraded", "message": "Less than 1GB free"},
+        {"name": "memory", "status": "healthy"}
+    ]
+}
+```
+
+## Custom Endpoint Path
+
+```swift title="Custom Path"
+await server.use(PrismHealthMiddleware(monitor: health, path: "/api/health"))
+// Now at GET /api/health instead of /health
+```
+
+## Programmatic Health Checks
+
+Run checks without the middleware:
+
+```swift title="Manual Check"
+let report = await health.checkHealth()
+
+if report.status == .unhealthy {
+    print("Server is unhealthy!")
+    for check in report.checks where check.status == .unhealthy {
+        print("  Failed: \(check.name) — \(check.message ?? "unknown")")
+    }
+}
+```
+
+<Tip>
+  Kubernetes uses two kinds of probes: **liveness** (is the process alive?) and **readiness** (can it handle traffic?). Use `/health` for readiness probes. For liveness, a simple 200-OK endpoint that doesn't check dependencies is usually enough.
+</Tip>
+
+<Note>
+  Each check's execution time is measured automatically. This helps identify slow dependencies — a database check that takes 5 seconds is a red flag even if it returns healthy.
+</Note>

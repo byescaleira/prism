@@ -1,0 +1,200 @@
+---
+title: "Database Overview"
+description: "Native SQLite database with actor-based concurrency — no ORM overhead, no external dependencies."
+icon: "database"
+---
+
+# Database Overview
+
+Prism ships with a built-in SQLite database layer that talks directly to the C API through `sqlite3.h`. There's no ORM abstraction tax — you get raw performance with a clean Swift interface, all wrapped in an actor for safe concurrent access.
+
+<Note>
+  Prism uses the system SQLite that ships with macOS and Linux. No additional installation needed.
+</Note>
+
+## Why SQLite?
+
+SQLite is the most deployed database in the world. For many server applications — APIs, microservices, internal tools — it's the right choice:
+
+- **Zero configuration** — no separate database process to manage
+- **Single-file storage** — easy backups, easy deployment
+- **Incredible read performance** — faster than client-server databases for most workloads
+- **ACID compliant** — full transaction support
+
+<Tip>
+  SQLite handles thousands of concurrent reads and hundreds of writes per second. For most APIs, that's more than enough. When you outgrow it, Prism's `PrismDatabase` protocol makes it straightforward to swap backends.
+</Tip>
+
+## Creating a Database
+
+```swift title="Basic Setup"
+let db = try PrismDatabase(path: "app.db")
+```
+
+For testing, use an in-memory database:
+
+```swift title="In-Memory Database"
+let db = try PrismDatabase(path: ":memory:")
+```
+
+## Creating Tables
+
+```swift title="Creating a Users Table"
+try await db.execute("""
+    CREATE TABLE IF NOT EXISTS users (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        name TEXT NOT NULL,
+        email TEXT UNIQUE NOT NULL,
+        created_at TEXT DEFAULT CURRENT_TIMESTAMP
+    )
+""")
+```
+
+## Basic CRUD Operations
+
+<Tabs>
+  <Tab title="Insert">
+    ```swift title="Insert a Row"
+    try await db.execute(
+        "INSERT INTO users (name, email) VALUES (?, ?)",
+        parameters: [.text("Alice"), .text("alice@example.com")]
+    )
+
+    let id = await db.lastInsertID
+    print("Created user with ID: \(id)")
+    ```
+  </Tab>
+  <Tab title="Query">
+    ```swift title="Query Rows"
+    let users = try await db.query(
+        "SELECT * FROM users WHERE name LIKE ?",
+        parameters: [.text("%Ali%")]
+    )
+
+    for user in users {
+        let name = user["name"]?.textValue ?? "Unknown"
+        let email = user["email"]?.textValue ?? ""
+        print("\(name) — \(email)")
+    }
+    ```
+  </Tab>
+  <Tab title="Update">
+    ```swift title="Update a Row"
+    let affected = try await db.execute(
+        "UPDATE users SET name = ? WHERE id = ?",
+        parameters: [.text("Alice Smith"), .integer(1)]
+    )
+    print("Updated \(affected) rows")
+    ```
+  </Tab>
+  <Tab title="Delete">
+    ```swift title="Delete a Row"
+    let affected = try await db.execute(
+        "DELETE FROM users WHERE id = ?",
+        parameters: [.integer(1)]
+    )
+    print("Deleted \(affected) rows")
+    ```
+  </Tab>
+</Tabs>
+
+## Parameter Binding
+
+Always use parameterized queries to prevent SQL injection:
+
+```swift title="Safe Parameter Binding"
+// PrismDatabaseValue enum
+let params: [PrismDatabaseValue] = [
+    .text("Alice"),          // String
+    .integer(42),            // Int
+    .real(3.14),             // Double
+    .blob(imageData),        // Data
+    .null                    // NULL
+]
+
+try await db.execute("INSERT INTO items (name, count, price, image, notes) VALUES (?, ?, ?, ?, ?)", parameters: params)
+```
+
+<Warning>
+  Never interpolate user input directly into SQL strings. Always use `?` placeholders and pass values through the `parameters` array.
+</Warning>
+
+## Transactions
+
+Group multiple operations into an atomic transaction:
+
+```swift title="Transaction Example"
+try await db.transaction { db in
+    try db.execute(
+        "INSERT INTO orders (user_id, total) VALUES (?, ?)",
+        parameters: [.integer(1), .real(99.99)]
+    )
+    try db.execute(
+        "UPDATE users SET order_count = order_count + 1 WHERE id = ?",
+        parameters: [.integer(1)]
+    )
+}
+```
+
+If any statement fails, the entire transaction rolls back automatically.
+
+## Query Results
+
+`PrismRow` gives you typed access to column values:
+
+```swift title="Working with Rows"
+let row = try await db.queryFirst("SELECT * FROM users WHERE id = ?", parameters: [.integer(1)])
+
+if let user = row {
+    let name = user["name"]?.textValue      // String?
+    let age = user["age"]?.intValue          // Int?
+    let score = user["score"]?.realValue     // Double?
+    let avatar = user["avatar"]?.blobValue   // Data?
+}
+```
+
+## Using with the Server
+
+```swift title="Database in Route Handlers"
+let db = try PrismDatabase(path: "app.db")
+let server = PrismHTTPServer(port: 8080)
+
+await server.get("/users") { request in
+    let users = try await db.query("SELECT id, name, email FROM users")
+    let result = users.map { row in
+        [
+            "id": row["id"]?.intValue ?? 0,
+            "name": row["name"]?.textValue ?? "",
+            "email": row["email"]?.textValue ?? ""
+        ] as [String: Any]
+    }
+    return .json(result)
+}
+
+await server.post("/users") { request in
+    let name: String = try request.decodeJSON(key: "name")
+    let email: String = try request.decodeJSON(key: "email")
+
+    try await db.execute(
+        "INSERT INTO users (name, email) VALUES (?, ?)",
+        parameters: [.text(name), .text(email)]
+    )
+
+    return .json(["id": await db.lastInsertID], status: .created)
+}
+```
+
+<CardGroup cols={2}>
+  <Card title="Query Builder" icon="magnifying-glass" href="/database/queries">
+    Build queries fluently without writing raw SQL
+  </Card>
+  <Card title="Models" icon="cube" href="/database/models">
+    Map database rows to Swift structs automatically
+  </Card>
+  <Card title="Migrations" icon="arrows-rotate" href="/database/migrations">
+    Version your database schema with up/down migrations
+  </Card>
+  <Card title="Connection Pool" icon="water" href="/database/connection-pool">
+    Handle concurrent requests with pooled connections
+  </Card>
+</CardGroup>

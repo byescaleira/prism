@@ -1,0 +1,117 @@
+---
+title: "Transports"
+description: "Deploy your MCP server over stdio for CLI tools or HTTP/SSE for web applications."
+icon: "network-wired"
+---
+
+# MCP Transports
+
+Prism supports two transport modes for MCP communication. Choose based on how your AI client connects.
+
+## Stdio Transport
+
+The stdio transport reads JSON-RPC messages from stdin and writes responses to stdout. This is the standard for CLI-based MCP servers that AI clients launch as subprocesses.
+
+```swift title="Stdio Server"
+@main
+struct MyMCPServer {
+    static func main() async throws {
+        let mcp = PrismMCPServer(name: "my-tools", version: "1.0.0")
+        
+        await mcp.registerTool("hello", description: "Say hello", inputSchema: [:]) { _ in
+            PrismMCPToolResult(content: [.text("Hello from Prism!")], isError: false)
+        }
+        
+        let transport = PrismMCPStdioTransport(server: mcp)
+        await transport.start()  // Blocks, reading stdin
+    }
+}
+```
+
+### Claude Desktop Configuration
+
+Add your server to Claude Desktop's config file:
+
+```json title="claude_desktop_config.json"
+{
+  "mcpServers": {
+    "my-tools": {
+      "command": "/path/to/your/binary",
+      "args": []
+    }
+  }
+}
+```
+
+<Tip>
+Build your server as a release binary with `swift build -c release`, then point Claude Desktop to the binary in `.build/release/`.
+</Tip>
+
+## HTTP Transport
+
+The HTTP transport integrates with your Prism web server, handling MCP requests over HTTP POST and server notifications over SSE:
+
+```swift title="HTTP Transport"
+let server = PrismHTTPServer(port: 8080)
+let mcp = PrismMCPServer(name: "web-tools", version: "1.0.0")
+
+// Register tools...
+await mcp.registerTool("search", description: "Search", inputSchema: ["q": "string"]) { args in
+    PrismMCPToolResult(content: [.text("Results for: \(args["q"] ?? "")")], isError: false)
+}
+
+// Mount MCP on the HTTP server
+let mcpTransport = PrismMCPHTTPTransport(server: mcp, path: "/mcp")
+await server.use(mcpTransport)
+
+try await server.start()
+```
+
+### Endpoints
+
+| Method | Path | Purpose |
+|--------|------|---------|
+| POST | `/mcp` | Send JSON-RPC requests |
+| GET | `/mcp/sse` | SSE stream for server notifications |
+
+### Testing with curl
+
+```bash title="Initialize"
+curl -X POST http://localhost:8080/mcp \
+  -H "Content-Type: application/json" \
+  -d '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"clientInfo":{"name":"test"}}}'
+```
+
+```bash title="List Tools"
+curl -X POST http://localhost:8080/mcp \
+  -H "Content-Type: application/json" \
+  -d '{"jsonrpc":"2.0","id":2,"method":"tools/list","params":{}}'
+```
+
+```bash title="Call a Tool"
+curl -X POST http://localhost:8080/mcp \
+  -H "Content-Type: application/json" \
+  -d '{"jsonrpc":"2.0","id":3,"method":"tools/call","params":{"name":"search","arguments":{"q":"prism"}}}'
+```
+
+## Choosing a Transport
+
+<CardGroup cols={2}>
+  <Card title="Use Stdio When..." icon="terminal">
+    Building CLI tools, local development servers, or Claude Desktop integrations. The AI client launches your binary as a subprocess.
+  </Card>
+  <Card title="Use HTTP When..." icon="globe">
+    Running a web service, hosting MCP alongside a REST/GraphQL API, or serving remote AI clients over the network.
+  </Card>
+</CardGroup>
+
+## What's Next
+
+<CardGroup cols={2}>
+  <Card title="Tools" icon="wrench" href="/mcp/tools">
+    Build powerful tools for AI assistants
+  </Card>
+  <Card title="Resources" icon="folder-open" href="/mcp/resources">
+    Expose data as readable resources
+  </Card>
+</CardGroup>
