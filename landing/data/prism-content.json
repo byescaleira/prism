@@ -1,0 +1,644 @@
+{
+  "generatedAt": "2026-04-29T14:09:49.446Z",
+  "source": {
+    "docsUrl": "https://docs.prism.byescaleira.com",
+    "docsCount": 92,
+    "commit": "27f1d2b",
+    "branch": "codex/landing-spm",
+    "latestTag": "v4.4.0",
+    "latestVersion": "3.2.0",
+    "latestDate": "2026-04-28"
+  },
+  "navigationGroups": [
+    {
+      "group": "Getting Started",
+      "count": 3
+    },
+    {
+      "group": "Core",
+      "count": 6
+    },
+    {
+      "group": "Middleware",
+      "count": 7
+    },
+    {
+      "group": "Database",
+      "count": 6
+    },
+    {
+      "group": "Real-Time",
+      "count": 4
+    },
+    {
+      "group": "Content",
+      "count": 7
+    },
+    {
+      "group": "Security",
+      "count": 3
+    },
+    {
+      "group": "GraphQL",
+      "count": 4
+    },
+    {
+      "group": "MCP",
+      "count": 4
+    },
+    {
+      "group": "Infrastructure",
+      "count": 7
+    },
+    {
+      "group": "Advanced",
+      "count": 6
+    },
+    {
+      "group": "Testing",
+      "count": 3
+    },
+    {
+      "group": "Architecture",
+      "count": 5
+    },
+    {
+      "group": "UI Components",
+      "count": 7
+    },
+    {
+      "group": "Network Client",
+      "count": 5
+    },
+    {
+      "group": "Foundation",
+      "count": 4
+    },
+    {
+      "group": "Intelligence",
+      "count": 4
+    },
+    {
+      "group": "Capabilities",
+      "count": 6
+    },
+    {
+      "group": "Video",
+      "count": 1
+    }
+  ],
+  "docs": [
+    {
+      "slug": "advanced/cache",
+      "url": "https://docs.prism.byescaleira.com/advanced/cache",
+      "title": "Caching",
+      "description": "In-memory LRU caching with TTL eviction and HTTP response cache middleware."
+    },
+    {
+      "slug": "advanced/dependency-injection",
+      "url": "https://docs.prism.byescaleira.com/advanced/dependency-injection",
+      "title": "Dependency Injection",
+      "description": "Manage service lifetimes with an actor-based IoC container."
+    },
+    {
+      "slug": "advanced/http-client",
+      "url": "https://docs.prism.byescaleira.com/advanced/http-client",
+      "title": "HTTP Client",
+      "description": "Make outbound HTTP requests with retry support and response decoding."
+    },
+    {
+      "slug": "advanced/openapi",
+      "url": "https://docs.prism.byescaleira.com/advanced/openapi",
+      "title": "OpenAPI",
+      "description": "Auto-generate OpenAPI 3.0 specs and serve Swagger UI documentation."
+    },
+    {
+      "slug": "advanced/tracing",
+      "url": "https://docs.prism.byescaleira.com/advanced/tracing",
+      "title": "Request Tracing",
+      "description": "Track requests across services with correlation IDs and structured logging."
+    },
+    {
+      "slug": "advanced/versioning",
+      "url": "https://docs.prism.byescaleira.com/advanced/versioning",
+      "title": "API Versioning",
+      "description": "Version your API with URL prefixes, headers, or query parameters."
+    },
+    {
+      "slug": "architecture/advanced",
+      "url": "https://docs.prism.byescaleira.com/architecture/advanced",
+      "title": "Advanced Features",
+      "description": "State persistence, time-travel debugging, undo/redo, derived stores, and testing utilities."
+    },
+    {
+      "slug": "architecture/middleware",
+      "url": "https://docs.prism.byescaleira.com/architecture/middleware",
+      "title": "Middleware",
+      "description": "Intercept actions with PrismMiddleware for logging, analytics, and cross-cutting concerns."
+    },
+    {
+      "slug": "architecture/reducer",
+      "url": "https://docs.prism.byescaleira.com/architecture/reducer",
+      "title": "Reducers & Effects",
+      "description": "Define business logic with PrismReducer and model side effects with PrismEffect."
+    },
+    {
+      "slug": "architecture/router",
+      "url": "https://docs.prism.byescaleira.com/architecture/router",
+      "title": "Router",
+      "description": "Type-safe navigation with push, sheet, and full-screen presentations via PrismRouter."
+    },
+    {
+      "slug": "architecture/store",
+      "url": "https://docs.prism.byescaleira.com/architecture/store",
+      "title": "Store",
+      "description": "The observable hub that holds state, dispatches actions, and manages effects in PrismArchitecture."
+    },
+    {
+      "slug": "capabilities/auth",
+      "url": "https://docs.prism.byescaleira.com/capabilities/auth",
+      "title": "Authentication",
+      "description": "Biometric authentication and Sign in with Apple — Face ID, Touch ID, Optic ID, and Apple ID integration wrapped in Prism-native APIs."
+    },
+    {
+      "slug": "capabilities/connectivity",
+      "url": "https://docs.prism.byescaleira.com/capabilities/connectivity",
+      "title": "Connectivity & Hardware",
+      "description": "Bluetooth, NFC, Multipeer, Nearby Interaction, CallKit, CoreMotion, and GameKit — hardware and connectivity APIs with Prism-native types."
+    },
+    {
+      "slug": "capabilities/health",
+      "url": "https://docs.prism.byescaleira.com/capabilities/health",
+      "title": "HealthKit",
+      "description": "Read and write health data — steps, heart rate, sleep, body metrics, and more through a type-safe HealthKit wrapper."
+    },
+    {
+      "slug": "capabilities/location",
+      "url": "https://docs.prism.byescaleira.com/capabilities/location",
+      "title": "Location & Maps",
+      "description": "Core Location and MapKit integration — GPS tracking, geocoding, geofencing, and map annotations with Prism-native types."
+    },
+    {
+      "slug": "capabilities/media",
+      "url": "https://docs.prism.byescaleira.com/capabilities/media",
+      "title": "Camera & Media",
+      "description": "AVFoundation camera capture with Prism-native types — photo and video capture, flash control, and quality settings."
+    },
+    {
+      "slug": "capabilities/platform",
+      "url": "https://docs.prism.byescaleira.com/capabilities/platform",
+      "title": "Platform Services",
+      "description": "StoreKit, CloudKit, WidgetKit, Push Notifications, App Intents, and App Clips — Apple platform services wrapped in Prism-native APIs."
+    },
+    {
+      "slug": "content/body-parser",
+      "url": "https://docs.prism.byescaleira.com/content/body-parser",
+      "title": "Body Parser",
+      "description": "Automatic body parsing for JSON, URL-encoded forms, XML, and multipart data."
+    },
+    {
+      "slug": "content/content-negotiation",
+      "url": "https://docs.prism.byescaleira.com/content/content-negotiation",
+      "title": "Content Negotiation",
+      "description": "Serve responses in multiple formats based on the client's Accept header."
+    },
+    {
+      "slug": "content/file-upload",
+      "url": "https://docs.prism.byescaleira.com/content/file-upload",
+      "title": "File Uploads",
+      "description": "Process file uploads with size limits, type validation, and secure temporary storage."
+    },
+    {
+      "slug": "content/json",
+      "url": "https://docs.prism.byescaleira.com/content/json",
+      "title": "JSON",
+      "description": "Decode JSON requests and send JSON responses with Codable integration."
+    },
+    {
+      "slug": "content/multipart",
+      "url": "https://docs.prism.byescaleira.com/content/multipart",
+      "title": "Multipart Forms",
+      "description": "Parse multipart/form-data requests for file uploads and complex form submissions."
+    },
+    {
+      "slug": "content/streaming",
+      "url": "https://docs.prism.byescaleira.com/content/streaming",
+      "title": "Streaming",
+      "description": "Stream large responses with chunked transfer encoding and AsyncStream."
+    },
+    {
+      "slug": "content/templates",
+      "url": "https://docs.prism.byescaleira.com/content/templates",
+      "title": "HTML Responses",
+      "description": "Generate HTML responses with Swift string interpolation and response helpers."
+    },
+    {
+      "slug": "core/error-handling",
+      "url": "https://docs.prism.byescaleira.com/core/error-handling",
+      "title": "Error Handling",
+      "description": "Structured error responses, global error middleware, and RFC 7807 Problem Details."
+    },
+    {
+      "slug": "core/middleware",
+      "url": "https://docs.prism.byescaleira.com/core/middleware",
+      "title": "Middleware",
+      "description": "Intercept, transform, and compose request/response processing with the middleware pipeline."
+    },
+    {
+      "slug": "core/request",
+      "url": "https://docs.prism.byescaleira.com/core/request",
+      "title": "Request",
+      "description": "Access headers, body, parameters, and parsed data from incoming HTTP requests."
+    },
+    {
+      "slug": "core/response",
+      "url": "https://docs.prism.byescaleira.com/core/response",
+      "title": "Response",
+      "description": "Build HTTP responses with JSON, HTML, redirects, streaming, and custom headers."
+    },
+    {
+      "slug": "core/routing",
+      "url": "https://docs.prism.byescaleira.com/core/routing",
+      "title": "Routing",
+      "description": "Define URL patterns, extract parameters, and organize routes into groups."
+    },
+    {
+      "slug": "core/server",
+      "url": "https://docs.prism.byescaleira.com/core/server",
+      "title": "Server",
+      "description": "Configure and run your PrismHTTPServer — the foundation of every Prism application."
+    },
+    {
+      "slug": "database/connection-pool",
+      "url": "https://docs.prism.byescaleira.com/database/connection-pool",
+      "title": "Connection Pool",
+      "description": "Handle concurrent database access with actor-based connection pooling."
+    },
+    {
+      "slug": "database/migrations",
+      "url": "https://docs.prism.byescaleira.com/database/migrations",
+      "title": "Migrations",
+      "description": "Version your database schema with reversible up/down migrations."
+    },
+    {
+      "slug": "database/models",
+      "url": "https://docs.prism.byescaleira.com/database/models",
+      "title": "Models",
+      "description": "Map database rows to Swift structs with the PrismModel protocol."
+    },
+    {
+      "slug": "database/overview",
+      "url": "https://docs.prism.byescaleira.com/database/overview",
+      "title": "Database Overview",
+      "description": "Native SQLite database with actor-based concurrency — no ORM overhead, no external dependencies."
+    },
+    {
+      "slug": "database/queries",
+      "url": "https://docs.prism.byescaleira.com/database/queries",
+      "title": "Query Builder",
+      "description": "Build type-safe SQL queries fluently without writing raw strings."
+    },
+    {
+      "slug": "database/relationships",
+      "url": "https://docs.prism.byescaleira.com/database/relationships",
+      "title": "Relationships",
+      "description": "Define hasMany, belongsTo, and hasOne relationships between your models."
+    },
+    {
+      "slug": "foundation/observability",
+      "url": "https://docs.prism.byescaleira.com/foundation/observability",
+      "title": "Observability",
+      "description": "Performance tracing, structured logging, crash reporting, analytics funnels, and network inspection."
+    },
+    {
+      "slug": "foundation/protocols",
+      "url": "https://docs.prism.byescaleira.com/foundation/protocols",
+      "title": "Core Protocols",
+      "description": "Base protocols that all Prism modules build on — PrismEntity, PrismError, PrismMock, PrismLogger, and PrismSystemLogger."
+    },
+    {
+      "slug": "foundation/resources",
+      "url": "https://docs.prism.byescaleira.com/foundation/resources",
+      "title": "Resource System",
+      "description": "Typed string resources, image resources, and structured log messages used across Prism modules."
+    },
+    {
+      "slug": "foundation/utilities",
+      "url": "https://docs.prism.byescaleira.com/foundation/utilities",
+      "title": "Utilities",
+      "description": "UserDefaults wrapper, date formatting, file management, locale handling, and Swift type extensions."
+    },
+    {
+      "slug": "graphql/mutations",
+      "url": "https://docs.prism.byescaleira.com/graphql/mutations",
+      "title": "Mutations",
+      "description": "Create, update, and delete data through GraphQL mutations with input validation and error handling."
+    },
+    {
+      "slug": "graphql/playground",
+      "url": "https://docs.prism.byescaleira.com/graphql/playground",
+      "title": "Playground",
+      "description": "Set up the interactive GraphQL playground to explore and test your API in the browser."
+    },
+    {
+      "slug": "graphql/queries",
+      "url": "https://docs.prism.byescaleira.com/graphql/queries",
+      "title": "Queries",
+      "description": "Write resolvers that fetch data, handle arguments, and resolve nested relationships."
+    },
+    {
+      "slug": "graphql/schema",
+      "url": "https://docs.prism.byescaleira.com/graphql/schema",
+      "title": "Schema Definition",
+      "description": "Define your GraphQL schema with Prism's native type system — no code generation, no external tools."
+    },
+    {
+      "slug": "infrastructure/background-tasks",
+      "url": "https://docs.prism.byescaleira.com/infrastructure/background-tasks",
+      "title": "Background Tasks",
+      "description": "Run fire-and-forget tasks and manage task groups without blocking requests."
+    },
+    {
+      "slug": "infrastructure/cluster",
+      "url": "https://docs.prism.byescaleira.com/infrastructure/cluster",
+      "title": "Cluster Mode",
+      "description": "Scale across CPU cores with multi-process worker management."
+    },
+    {
+      "slug": "infrastructure/config",
+      "url": "https://docs.prism.byescaleira.com/infrastructure/config",
+      "title": "Configuration",
+      "description": "Type-safe configuration from environment variables and .env files."
+    },
+    {
+      "slug": "infrastructure/cron",
+      "url": "https://docs.prism.byescaleira.com/infrastructure/cron",
+      "title": "Cron Jobs",
+      "description": "Schedule recurring tasks with standard cron expressions."
+    },
+    {
+      "slug": "infrastructure/graceful-shutdown",
+      "url": "https://docs.prism.byescaleira.com/infrastructure/graceful-shutdown",
+      "title": "Graceful Shutdown",
+      "description": "Handle SIGTERM/SIGINT signals with connection draining and cleanup hooks."
+    },
+    {
+      "slug": "infrastructure/health",
+      "url": "https://docs.prism.byescaleira.com/infrastructure/health",
+      "title": "Health Checks",
+      "description": "Monitor server health with customizable checks and a /health endpoint."
+    },
+    {
+      "slug": "infrastructure/metrics",
+      "url": "https://docs.prism.byescaleira.com/infrastructure/metrics",
+      "title": "Metrics",
+      "description": "Track request counts, latency, error rates, and popular endpoints."
+    },
+    {
+      "slug": "installation",
+      "url": "https://docs.prism.byescaleira.com/installation",
+      "title": "Installation",
+      "description": "Add Prism to your Swift project and start building. Supports Swift Package Manager, Docker, and project scaffolding."
+    },
+    {
+      "slug": "intelligence/apple-intelligence",
+      "url": "https://docs.prism.byescaleira.com/intelligence/apple-intelligence",
+      "title": "Apple Intelligence",
+      "description": "Generate text using Apple's FoundationModels framework with system models, adapters, and streaming."
+    },
+    {
+      "slug": "intelligence/nlp-rag",
+      "url": "https://docs.prism.byescaleira.com/intelligence/nlp-rag",
+      "title": "NLP & RAG",
+      "description": "Sentiment analysis, named entity extraction, embeddings, and retrieval-augmented generation — all on-device."
+    },
+    {
+      "slug": "intelligence/overview",
+      "url": "https://docs.prism.byescaleira.com/intelligence/overview",
+      "title": "Intelligence Overview",
+      "description": "Unified ML/AI client supporting on-device CoreML, Apple Intelligence, and remote LLM backends."
+    },
+    {
+      "slug": "intelligence/training",
+      "url": "https://docs.prism.byescaleira.com/intelligence/training",
+      "title": "On-Device Training",
+      "description": "Train text and tabular ML models on-device using CreateML with zero network dependencies."
+    },
+    {
+      "slug": "introduction",
+      "url": "https://docs.prism.byescaleira.com/introduction",
+      "title": "Introduction",
+      "description": "Prism is a full-stack Swift ecosystem with zero third-party dependencies. Build servers, iOS/macOS apps, ML pipelines, and more — using only Apple frameworks."
+    },
+    {
+      "slug": "mcp/overview",
+      "url": "https://docs.prism.byescaleira.com/mcp/overview",
+      "title": "MCP Overview",
+      "description": "Build Model Context Protocol servers that let AI assistants like Claude use your tools, read your resources, and follow your prompts."
+    },
+    {
+      "slug": "mcp/resources",
+      "url": "https://docs.prism.byescaleira.com/mcp/resources",
+      "title": "Resources",
+      "description": "Expose data as readable resources that AI assistants can access — config files, database records, documentation."
+    },
+    {
+      "slug": "mcp/tools",
+      "url": "https://docs.prism.byescaleira.com/mcp/tools",
+      "title": "Tools",
+      "description": "Register tools that AI assistants can call to perform actions — query databases, call APIs, process data."
+    },
+    {
+      "slug": "mcp/transports",
+      "url": "https://docs.prism.byescaleira.com/mcp/transports",
+      "title": "Transports",
+      "description": "Deploy your MCP server over stdio for CLI tools or HTTP/SSE for web applications."
+    },
+    {
+      "slug": "middleware/auth",
+      "url": "https://docs.prism.byescaleira.com/middleware/auth",
+      "title": "Authentication",
+      "description": "Protect routes with bearer tokens, sessions, and custom auth strategies."
+    },
+    {
+      "slug": "middleware/compression",
+      "url": "https://docs.prism.byescaleira.com/middleware/compression",
+      "title": "Compression",
+      "description": "Compress HTTP responses to reduce bandwidth using Apple's Compression framework."
+    },
+    {
+      "slug": "middleware/cors",
+      "url": "https://docs.prism.byescaleira.com/middleware/cors",
+      "title": "CORS",
+      "description": "Configure Cross-Origin Resource Sharing for browser-based API consumers."
+    },
+    {
+      "slug": "middleware/hooks",
+      "url": "https://docs.prism.byescaleira.com/middleware/hooks",
+      "title": "Lifecycle Hooks",
+      "description": "Fine-grained request, response, and error hooks for cross-cutting concerns."
+    },
+    {
+      "slug": "middleware/logging",
+      "url": "https://docs.prism.byescaleira.com/middleware/logging",
+      "title": "Logging",
+      "description": "Log every request and response with timing information."
+    },
+    {
+      "slug": "middleware/rate-limiting",
+      "url": "https://docs.prism.byescaleira.com/middleware/rate-limiting",
+      "title": "Rate Limiting",
+      "description": "Protect your API from abuse with token bucket rate limiting."
+    },
+    {
+      "slug": "middleware/rate-limiting-v2",
+      "url": "https://docs.prism.byescaleira.com/middleware/rate-limiting-v2",
+      "title": "Advanced Rate Limiting",
+      "description": "Sliding window rate limiting with per-user limits, custom keys, and standard headers."
+    },
+    {
+      "slug": "network/advanced-network",
+      "url": "https://docs.prism.byescaleira.com/network/advanced-network",
+      "title": "Advanced Features",
+      "description": "Request deduplication, offline queues, multipart uploads, upload progress tracking, and a typed GraphQL client."
+    },
+    {
+      "slug": "network/cache-retry",
+      "url": "https://docs.prism.byescaleira.com/network/cache-retry",
+      "title": "Caching & Retry",
+      "description": "Actor-based LRU response caching and configurable retry policies with exponential backoff and linear strategies."
+    },
+    {
+      "slug": "network/client",
+      "url": "https://docs.prism.byescaleira.com/network/client",
+      "title": "Network Client",
+      "description": "Type-safe HTTP networking with PrismNetworkClient, PrismNetworkAdapter, and PrismNetworkRequest."
+    },
+    {
+      "slug": "network/endpoints",
+      "url": "https://docs.prism.byescaleira.com/network/endpoints",
+      "title": "Type-Safe Endpoints",
+      "description": "Define HTTP endpoints with PrismNetworkEndpoint — scheme, host, path, method, headers, body, caching, and timeout."
+    },
+    {
+      "slug": "network/websocket-client",
+      "url": "https://docs.prism.byescaleira.com/network/websocket-client",
+      "title": "WebSocket Client",
+      "description": "Real-time bidirectional communication with PrismNetworkSocketClient, type-safe endpoints, and command protocols."
+    },
+    {
+      "slug": "quickstart",
+      "url": "https://docs.prism.byescaleira.com/quickstart",
+      "title": "Quickstart",
+      "description": "Build a complete REST API with database, authentication, and validation in under 15 minutes."
+    },
+    {
+      "slug": "realtime/events",
+      "url": "https://docs.prism.byescaleira.com/realtime/events",
+      "title": "Event Bus",
+      "description": "Typed publish/subscribe event system for decoupled server components."
+    },
+    {
+      "slug": "realtime/sse",
+      "url": "https://docs.prism.byescaleira.com/realtime/sse",
+      "title": "Server-Sent Events",
+      "description": "Push real-time updates to browsers over HTTP with Server-Sent Events."
+    },
+    {
+      "slug": "realtime/websocket",
+      "url": "https://docs.prism.byescaleira.com/realtime/websocket",
+      "title": "WebSocket",
+      "description": "Build real-time features with native WebSocket support — RFC 6455 compliant."
+    },
+    {
+      "slug": "realtime/websocket-rooms",
+      "url": "https://docs.prism.byescaleira.com/realtime/websocket-rooms",
+      "title": "WebSocket Rooms",
+      "description": "Named channels, broadcasting, and presence tracking for multi-room real-time apps."
+    },
+    {
+      "slug": "security/sessions",
+      "url": "https://docs.prism.byescaleira.com/security/sessions",
+      "title": "Sessions & Cookies",
+      "description": "Manage user sessions with signed cookies and pluggable storage backends."
+    },
+    {
+      "slug": "security/tls",
+      "url": "https://docs.prism.byescaleira.com/security/tls",
+      "title": "TLS & HTTPS",
+      "description": "Secure your server with TLS certificates, HSTS, and security headers."
+    },
+    {
+      "slug": "security/validation",
+      "url": "https://docs.prism.byescaleira.com/security/validation",
+      "title": "Validation",
+      "description": "Validate request data with composable rules and structured error responses."
+    },
+    {
+      "slug": "testing/assertions",
+      "url": "https://docs.prism.byescaleira.com/testing/assertions",
+      "title": "Assertions",
+      "description": "Chainable response assertions for clean, expressive test code."
+    },
+    {
+      "slug": "testing/request-builder",
+      "url": "https://docs.prism.byescaleira.com/testing/request-builder",
+      "title": "Request Builder",
+      "description": "Build test requests with a fluent, chainable API."
+    },
+    {
+      "slug": "testing/test-client",
+      "url": "https://docs.prism.byescaleira.com/testing/test-client",
+      "title": "Test Client",
+      "description": "Test your routes and middleware in-process without starting a real server."
+    },
+    {
+      "slug": "ui/advanced-ui",
+      "url": "https://docs.prism.byescaleira.com/ui/advanced-ui",
+      "title": "Advanced UI",
+      "description": "Animations, accessibility tools, performance utilities, view modifiers, rich text, SwiftData integration, widgets, internationalization, and developer tools."
+    },
+    {
+      "slug": "ui/components",
+      "url": "https://docs.prism.byescaleira.com/ui/components",
+      "title": "Core Components",
+      "description": "PrismUI's primitive components — buttons, cards, text fields, avatars, progress bars, and more — all themed and accessible."
+    },
+    {
+      "slug": "ui/composites",
+      "url": "https://docs.prism.byescaleira.com/ui/composites",
+      "title": "Composite Components",
+      "description": "Higher-level components — sheets, carousels, charts, dashboards, and communication views built from PrismUI primitives."
+    },
+    {
+      "slug": "ui/forms",
+      "url": "https://docs.prism.byescaleira.com/ui/forms",
+      "title": "Forms & Validation",
+      "description": "Form components with built-in validation rules, error display, and accessible input handling."
+    },
+    {
+      "slug": "ui/layout-navigation",
+      "url": "https://docs.prism.byescaleira.com/ui/layout-navigation",
+      "title": "Layout & Navigation",
+      "description": "Responsive layouts, navigation containers, and multi-platform navigation with PrismRouter integration."
+    },
+    {
+      "slug": "ui/theme",
+      "url": "https://docs.prism.byescaleira.com/ui/theme",
+      "title": "Theming",
+      "description": "PrismUI's theming system uses semantic color tokens and protocol-based themes for consistent, adaptive styling across all platforms."
+    },
+    {
+      "slug": "ui/tokens",
+      "url": "https://docs.prism.byescaleira.com/ui/tokens",
+      "title": "Design Tokens",
+      "description": "Semantic design tokens for colors, spacing, typography, corner radius, elevation, and motion — the foundation of every PrismUI component."
+    },
+    {
+      "slug": "video/overview",
+      "url": "https://docs.prism.byescaleira.com/video/overview",
+      "title": "Video",
+      "description": "Video metadata, download management with progress streaming, resolution detection, and export — built on AVFoundation."
+    }
+  ]
+}
