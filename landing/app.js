@@ -2,7 +2,7 @@ const modules = [
   {
     name: "Server",
     kind: "PrismServer",
-    accent: "#18c8ff",
+    accent: "#2EF3D0",
     count: 36,
     description:
       "HTTP server, routing, database, GraphQL, MCP, WebSocket rooms, middleware, cron, background tasks, cluster mode, and production infrastructure.",
@@ -11,7 +11,7 @@ const modules = [
   {
     name: "UI",
     kind: "PrismUI",
-    accent: "#2ef3d0",
+    accent: "#2EF3D0",
     count: 100,
     description:
       "SwiftUI components, design tokens, theming, charts, forms, accessibility tools, animations, and developer experience utilities.",
@@ -20,7 +20,7 @@ const modules = [
   {
     name: "Architecture",
     kind: "PrismArchitecture",
-    accent: "#ffb020",
+    accent: "#2EF3D0",
     count: 18,
     description:
       "Composable state management with stores, reducers, effects, middleware, type-safe routing, persistence, time travel, and undo/redo.",
@@ -29,7 +29,7 @@ const modules = [
   {
     name: "Network",
     kind: "PrismNetwork",
-    accent: "#a66cff",
+    accent: "#2EF3D0",
     count: 19,
     description:
       "Type-safe HTTP client with endpoints, caching, retry policies, request deduplication, offline queue, multipart uploads, GraphQL, and WebSocket client.",
@@ -38,7 +38,7 @@ const modules = [
   {
     name: "Intelligence",
     kind: "PrismIntelligence",
-    accent: "#ff4f8b",
+    accent: "#2EF3D0",
     count: 16,
     description:
       "On-device ML, Apple Intelligence, NLP, RAG pipelines, vector embeddings, model lifecycle management, and structured output parsing.",
@@ -47,7 +47,7 @@ const modules = [
   {
     name: "Capabilities",
     kind: "PrismCapabilities",
-    accent: "#24e187",
+    accent: "#2EF3D0",
     count: 27,
     description:
       "Native wrappers for StoreKit, HealthKit, CloudKit, Apple Pay, CallKit, CoreBluetooth, NFC, Camera, GameKit, Location, Motion, and biometrics.",
@@ -56,7 +56,7 @@ const modules = [
   {
     name: "Video",
     kind: "PrismVideo",
-    accent: "#9ee821",
+    accent: "#2EF3D0",
     count: 11,
     description:
       "Video metadata, actor-based downloading, AsyncStream progress, resolution detection, and AVFoundation export helpers.",

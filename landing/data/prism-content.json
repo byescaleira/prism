@@ -1,10 +1,10 @@
 {
-  "generatedAt": "2026-04-29T14:09:49.446Z",
+  "generatedAt": "2026-04-29T14:31:10.445Z",
   "source": {
     "docsUrl": "https://docs.prism.byescaleira.com",
     "docsCount": 92,
-    "commit": "27f1d2b",
-    "branch": "codex/landing-spm",
+    "commit": "bdee2d1",
+    "branch": "main",
     "latestTag": "v4.4.0",
     "latestVersion": "3.2.0",
     "latestDate": "2026-04-28"
