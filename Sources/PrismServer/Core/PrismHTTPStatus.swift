@@ -21,6 +21,7 @@ public struct PrismHTTPStatus: Sendable, Equatable, Hashable {
     public static let created = PrismHTTPStatus(code: 201, reason: "Created")
     public static let accepted = PrismHTTPStatus(code: 202, reason: "Accepted")
     public static let noContent = PrismHTTPStatus(code: 204, reason: "No Content")
+    public static let partialContent = PrismHTTPStatus(code: 206, reason: "Partial Content")
 
     // MARK: - 3xx Redirection
     public static let movedPermanently = PrismHTTPStatus(code: 301, reason: "Moved Permanently")
@@ -39,7 +40,9 @@ public struct PrismHTTPStatus: Sendable, Equatable, Hashable {
     public static let gone = PrismHTTPStatus(code: 410, reason: "Gone")
     public static let tooManyRequests = PrismHTTPStatus(code: 429, reason: "Too Many Requests")
     public static let unprocessableEntity = PrismHTTPStatus(code: 422, reason: "Unprocessable Entity")
+    public static let requestTimeout = PrismHTTPStatus(code: 408, reason: "Request Timeout")
     public static let requestEntityTooLarge = PrismHTTPStatus(code: 413, reason: "Request Entity Too Large")
+    public static let rangeNotSatisfiable = PrismHTTPStatus(code: 416, reason: "Range Not Satisfiable")
 
     // MARK: - 5xx Server Errors
     public static let internalServerError = PrismHTTPStatus(code: 500, reason: "Internal Server Error")
