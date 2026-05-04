@@ -1,3 +1,23 @@
+# Prism — Session Rules
+
+## MANDATORY: Read `.prism/` Before Any Work
+Every session MUST read `.prism/profile.md` and the relevant rules before starting work.
+- Code changes → read `.prism/rules/swift.md`, `.prism/rules/architecture.md`
+- Git operations → read `.prism/rules/git.md`
+- New features → read `.prism/trackers/roadmap.md` to understand current phase
+- PRs → read `.prism/rules/review.md`
+- New module/component/middleware → read matching `.prism/skills/` file
+- Track progress in `.prism/trackers/roadmap.md` and `.prism/trackers/tech-debt.md`
+
+## Quick Reference
+- **Rules**: `.prism/rules/` — swift, git, testing, naming, architecture, review
+- **Skills**: `.prism/skills/` — new-module, new-component, new-middleware
+- **Patterns**: `.prism/patterns/` — error-handling, concurrency, di
+- **Templates**: `.prism/templates/` — store.swift, endpoint.swift, middleware.swift
+- **Trackers**: `.prism/trackers/` — roadmap, tech-debt, changelog-next
+
+---
+
 # Web Engineering & Design Skill (Elite Standards)
 
 ## 1. Documentation-First (Inspirado em MDN/Stripe)
