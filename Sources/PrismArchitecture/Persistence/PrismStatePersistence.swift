@@ -39,12 +39,14 @@ public struct PrismDiskPersistence: PrismPersistenceStrategy, Sendable {
         self.directory = directory
     }
 
+    /// Encodes the state as JSON and writes it to a file named after the key.
     public func save<State: Codable & Sendable>(_ state: State, key: String) throws {
         let data = try JSONEncoder().encode(state)
         let fileURL = directory.appendingPathComponent("\(key).json")
         try data.write(to: fileURL, options: .atomic)
     }
 
+    /// Reads and decodes the JSON file for the given key, returning `nil` if it does not exist.
     public func load<State: Codable & Sendable>(key: String) throws -> State? {
         let fileURL = directory.appendingPathComponent("\(key).json")
         guard FileManager.default.fileExists(atPath: fileURL.path) else {
@@ -54,6 +56,7 @@ public struct PrismDiskPersistence: PrismPersistenceStrategy, Sendable {
         return try JSONDecoder().decode(State.self, from: data)
     }
 
+    /// Deletes the JSON file for the given key if it exists.
     public func clear(key: String) throws {
         let fileURL = directory.appendingPathComponent("\(key).json")
         if FileManager.default.fileExists(atPath: fileURL.path) {
@@ -69,6 +72,7 @@ public struct PrismKeychainPersistence: PrismPersistenceStrategy, Sendable {
     /// Creates a Keychain persistence strategy.
     public init() {}
 
+    /// Encodes the state and stores it in the Keychain under the given key.
     public func save<State: Codable & Sendable>(_ state: State, key: String) throws {
         let data = try JSONEncoder().encode(state)
 
@@ -92,6 +96,7 @@ public struct PrismKeychainPersistence: PrismPersistenceStrategy, Sendable {
         }
     }
 
+    /// Retrieves and decodes the state stored in the Keychain under the given key.
     public func load<State: Codable & Sendable>(key: String) throws -> State? {
         let query: [String: Any] = [
             kSecClass as String: kSecClassGenericPassword,
@@ -115,6 +120,7 @@ public struct PrismKeychainPersistence: PrismPersistenceStrategy, Sendable {
         return try JSONDecoder().decode(State.self, from: data)
     }
 
+    /// Removes the Keychain item stored under the given key.
     public func clear(key: String) throws {
         let query: [String: Any] = [
             kSecClass as String: kSecClassGenericPassword,
@@ -151,11 +157,13 @@ public struct PrismUserDefaultsPersistence: PrismPersistenceStrategy, Sendable {
         return .standard
     }
 
+    /// Encodes the state and writes it to UserDefaults under a prefixed key.
     public func save<State: Codable & Sendable>(_ state: State, key: String) throws {
         let data = try JSONEncoder().encode(state)
         defaults.set(data, forKey: "PrismState.\(key)")
     }
 
+    /// Reads and decodes the state from UserDefaults for the given key, returning `nil` if absent.
     public func load<State: Codable & Sendable>(key: String) throws -> State? {
         guard let data = defaults.data(forKey: "PrismState.\(key)") else {
             return nil
@@ -163,6 +171,7 @@ public struct PrismUserDefaultsPersistence: PrismPersistenceStrategy, Sendable {
         return try JSONDecoder().decode(State.self, from: data)
     }
 
+    /// Removes the UserDefaults entry for the given key.
     public func clear(key: String) throws {
         defaults.removeObject(forKey: "PrismState.\(key)")
     }
@@ -198,6 +207,7 @@ public struct PrismPersistMiddleware<State: PrismState & Codable, Action: Sendab
         self.key = key
     }
 
+    /// Persists the current state after every action and returns no further effects.
     public func run(
         state: State,
         action: Action

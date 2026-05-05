@@ -28,6 +28,7 @@ public struct PrismLoggingMiddleware: PrismChainableMiddleware, Sendable {
         self.logger = logger
     }
 
+    /// Logs the action and state type, then forwards the action to the next handler.
     public func handle<State: Sendable, Action: Sendable>(
         state: State,
         action: Action,
@@ -51,6 +52,7 @@ public final class PrismThrottleMiddleware: PrismChainableMiddleware, @unchecked
         self.interval = interval
     }
 
+    /// Forwards the action to the next handler only if the throttle interval has elapsed since the last identical action.
     public func handle<State: Sendable, Action: Sendable>(
         state: State,
         action: Action,

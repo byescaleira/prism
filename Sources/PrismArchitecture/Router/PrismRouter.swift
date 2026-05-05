@@ -170,6 +170,7 @@ public final class PrismRouter<Route: PrismRoutable>: Equatable {
 }
 
 extension PrismRouter {
+    /// Returns whether two routers have the same path, presented route, and full-screen route.
     nonisolated public static func == (lhs: PrismRouter<Route>, rhs: PrismRouter<Route>) -> Bool {
         MainActor.assumeIsolated {
             lhs.path == rhs.path
