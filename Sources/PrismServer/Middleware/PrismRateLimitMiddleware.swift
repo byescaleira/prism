@@ -6,11 +6,13 @@ public actor PrismRateLimiter {
     private let maxRequests: Int
     private let windowSeconds: Double
 
+    /// Creates a new `PrismRateLimiter` with the specified configuration.
     public init(maxRequests: Int, windowSeconds: Double) {
         self.maxRequests = maxRequests
         self.windowSeconds = windowSeconds
     }
 
+    /// Returns whether the request key is within the rate limit.
     public func shouldAllow(key: String) -> Bool {
         let now = Date.now.timeIntervalSince1970
         var bucket = buckets[key] ?? TokenBucket(tokens: maxRequests, lastRefill: now)
@@ -43,6 +45,7 @@ public struct PrismRateLimitMiddleware: PrismMiddleware {
     private let limiter: PrismRateLimiter
     private let keyExtractor: @Sendable (PrismHTTPRequest) -> String
 
+    /// Creates a new `PrismRateLimitMiddleware` with the specified configuration.
     public init(
         maxRequests: Int = 100,
         windowSeconds: Double = 60,
@@ -52,6 +55,7 @@ public struct PrismRateLimitMiddleware: PrismMiddleware {
         self.keyExtractor = keyExtractor
     }
 
+    /// Handles the request and returns a response.
     public func handle(_ request: PrismHTTPRequest, next: @escaping PrismRouteHandler) async throws -> PrismHTTPResponse {
         let key = keyExtractor(request)
         let allowed = await limiter.shouldAllow(key: key)

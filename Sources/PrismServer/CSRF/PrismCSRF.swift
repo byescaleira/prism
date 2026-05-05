@@ -1,14 +1,23 @@
 import Foundation
 
+/// Configuration for CSRF protection middleware.
 public struct PrismCSRFConfig: Sendable {
+    /// The byte length of generated CSRF tokens.
     public let tokenLength: Int
+    /// The name of the cookie storing the CSRF token.
     public let cookieName: String
+    /// The header name used to submit the CSRF token.
     public let headerName: String
+    /// The form field name used to submit the CSRF token.
     public let formFieldName: String
+    /// HTTP methods exempt from CSRF validation.
     public let safeMethods: Set<PrismHTTPMethod>
+    /// Whether the CSRF cookie requires a secure connection.
     public let secureCookie: Bool
+    /// The path scope for the CSRF cookie.
     public let cookiePath: String
 
+    /// Creates a CSRF configuration with the specified options.
     public init(
         tokenLength: Int = 32,
         cookieName: String = "_csrf",
@@ -28,18 +37,24 @@ public struct PrismCSRFConfig: Sendable {
     }
 }
 
+/// Errors thrown during CSRF validation.
 public enum PrismCSRFError: Error, Sendable {
+    /// No CSRF token was provided in the request.
     case missingToken
+    /// The submitted CSRF token does not match the expected token.
     case tokenMismatch
 }
 
+/// Middleware that validates CSRF tokens on state-changing requests.
 public struct PrismCSRFMiddleware: PrismMiddleware {
     private let config: PrismCSRFConfig
 
+    /// Creates a CSRF middleware with the given configuration.
     public init(config: PrismCSRFConfig = PrismCSRFConfig()) {
         self.config = config
     }
 
+    /// Validates CSRF tokens for unsafe methods and sets tokens for safe methods.
     public func handle(_ request: PrismHTTPRequest, next: @escaping PrismRouteHandler) async throws -> PrismHTTPResponse {
         let cookieToken = request.cookies[config.cookieName]
 

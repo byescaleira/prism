@@ -1,16 +1,27 @@
 import Foundation
 
+/// Configuration options for SecurityHeaders.
 public struct PrismSecurityHeadersConfig: Sendable {
+    /// The content type options.
     public let contentTypeOptions: String?
+    /// The frame options.
     public let frameOptions: String?
+    /// The xss protection.
     public let xssProtection: String?
+    /// The referrer policy.
     public let referrerPolicy: String?
+    /// The content security policy.
     public let contentSecurityPolicy: String?
+    /// The permissions policy.
     public let permissionsPolicy: String?
+    /// The cross origin embedder policy.
     public let crossOriginEmbedderPolicy: String?
+    /// The cross origin opener policy.
     public let crossOriginOpenerPolicy: String?
+    /// The cross origin resource policy.
     public let crossOriginResourcePolicy: String?
 
+    /// Creates a new `PrismSecurityHeadersConfig` with the specified configuration.
     public init(
         contentTypeOptions: String? = "nosniff",
         frameOptions: String? = "DENY",
@@ -33,8 +44,10 @@ public struct PrismSecurityHeadersConfig: Sendable {
         self.crossOriginResourcePolicy = crossOriginResourcePolicy
     }
 
+    /// A configuration with sensible security header defaults.
     public static let `default` = PrismSecurityHeadersConfig()
 
+    /// The `strict` constant.
     public static let strict = PrismSecurityHeadersConfig(
         contentSecurityPolicy: "default-src 'self'",
         permissionsPolicy: "camera=(), microphone=(), geolocation=()",
@@ -44,13 +57,16 @@ public struct PrismSecurityHeadersConfig: Sendable {
     )
 }
 
+/// Middleware that sets security-related HTTP headers on responses.
 public struct PrismHelmetMiddleware: PrismMiddleware {
     private let config: PrismSecurityHeadersConfig
 
+    /// Creates a new `PrismHelmetMiddleware` with the specified configuration.
     public init(config: PrismSecurityHeadersConfig = .default) {
         self.config = config
     }
 
+    /// Handles the request and returns a response.
     public func handle(_ request: PrismHTTPRequest, next: @escaping PrismRouteHandler) async throws -> PrismHTTPResponse {
         var response = try await next(request)
 

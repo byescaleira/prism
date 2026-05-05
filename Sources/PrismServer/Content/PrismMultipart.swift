@@ -11,6 +11,7 @@ public struct PrismMultipartPart: Sendable {
     /// The raw data of this part.
     public let data: Data
 
+    /// Creates a multipart part with the given field name, optional filename, content type, and data.
     public init(name: String, filename: String? = nil, contentType: String? = nil, data: Data) {
         self.name = name
         self.filename = filename
@@ -27,6 +28,7 @@ public struct PrismMultipartPart: Sendable {
 /// Parser for multipart/form-data request bodies.
 public struct PrismMultipartParser: Sendable {
 
+    /// Creates a multipart parser.
     public init() {}
 
     /// Extracts the boundary string from a Content-Type header.

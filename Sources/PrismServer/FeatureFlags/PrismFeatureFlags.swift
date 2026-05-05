@@ -2,18 +2,28 @@ import Foundation
 
 // MARK: - Feature Flag Types
 
+/// The value type of a feature flag.
 public enum PrismFlagValue: Sendable {
+    /// A simple on/off boolean flag.
     case boolean(Bool)
+    /// A percentage rollout (0-100).
     case percentage(Double)
+    /// A string variant value.
     case string(String)
+    /// An integer variant value.
     case integer(Int)
 }
 
+/// Context passed to feature flag evaluation for targeting.
 public struct PrismFlagContext: Sendable {
+    /// The user ID for user-level targeting.
     public let userId: String?
+    /// The groups the user belongs to.
     public let groups: [String]
+    /// Arbitrary key-value attributes for rule evaluation.
     public let attributes: [String: String]
 
+    /// Creates a flag context with optional user ID, groups, and attributes.
     public init(userId: String? = nil, groups: [String] = [], attributes: [String: String] = [:]) {
         self.userId = userId
         self.groups = groups
@@ -21,15 +31,24 @@ public struct PrismFlagContext: Sendable {
     }
 }
 
+/// A feature flag with targeting rules and value.
 public struct PrismFeatureFlag: Sendable {
+    /// The unique name of this flag.
     public let name: String
+    /// The value of this flag.
     public let value: PrismFlagValue
+    /// A human-readable description of what this flag controls.
     public let description: String?
+    /// Whether this flag is globally enabled.
     public let enabled: Bool
+    /// Specific user IDs that should always see this flag enabled.
     public let targetUsers: Set<String>
+    /// Groups that should always see this flag enabled.
     public let targetGroups: Set<String>
+    /// Attribute-based rules for fine-grained targeting.
     public let rules: [PrismFlagRule]
 
+    /// Creates a feature flag with the given name, value, and targeting options.
     public init(
         name: String,
         value: PrismFlagValue = .boolean(true),
@@ -51,17 +70,36 @@ public struct PrismFeatureFlag: Sendable {
 
 // MARK: - Flag Rules
 
+/// A rule that evaluates a context attribute to determine flag eligibility.
 public struct PrismFlagRule: Sendable {
+    /// Comparison operators for flag rule evaluation.
     public enum Operator: String, Sendable {
-        case equals, notEquals, contains, startsWith, endsWith
-        case greaterThan, lessThan
+        /// The attribute equals the value.
+        case equals
+        /// The attribute does not equal the value.
+        case notEquals
+        /// The attribute contains the value as a substring.
+        case contains
+        /// The attribute starts with the value.
+        case startsWith
+        /// The attribute ends with the value.
+        case endsWith
+        /// The attribute is numerically greater than the value.
+        case greaterThan
+        /// The attribute is numerically less than the value.
+        case lessThan
     }
 
+    /// The context attribute key to evaluate.
     public let attribute: String
+    /// The comparison operator.
     public let op: Operator
+    /// The value to compare against.
     public let value: String
+    /// The result to return if the rule matches.
     public let result: Bool
 
+    /// Creates a flag rule with the given attribute, operator, value, and result.
     public init(attribute: String, op: Operator, value: String, result: Bool = true) {
         self.attribute = attribute
         self.op = op
@@ -69,6 +107,7 @@ public struct PrismFlagRule: Sendable {
         self.result = result
     }
 
+    /// Evaluates this rule against the given context, returning nil if the attribute is missing.
     public func evaluate(against context: PrismFlagContext) -> Bool? {
         guard let attrValue = context.attributes[attribute] else { return nil }
         let matches: Bool
@@ -91,25 +130,31 @@ public struct PrismFlagRule: Sendable {
 
 // MARK: - Feature Flag Store
 
+/// Actor-based store for managing feature flags and evaluating them against contexts.
 public actor PrismFeatureFlagStore {
     private var flags: [String: PrismFeatureFlag] = [:]
 
+    /// Creates an empty feature flag store.
     public init() {}
 
+    /// Registers a feature flag in the store.
     public func register(_ flag: PrismFeatureFlag) {
         flags[flag.name] = flag
     }
 
+    /// Registers multiple feature flags at once.
     public func registerAll(_ flagList: [PrismFeatureFlag]) {
         for flag in flagList {
             flags[flag.name] = flag
         }
     }
 
+    /// Removes a feature flag by name.
     public func remove(_ name: String) {
         flags.removeValue(forKey: name)
     }
 
+    /// Returns whether the named flag is enabled for the given context.
     public func isEnabled(_ name: String, context: PrismFlagContext = PrismFlagContext()) -> Bool {
         guard let flag = flags[name] else { return false }
         guard flag.enabled else { return false }
@@ -140,12 +185,14 @@ public actor PrismFeatureFlagStore {
         }
     }
 
+    /// Returns the value of the named flag if enabled, or nil otherwise.
     public func getValue(_ name: String, context: PrismFlagContext = PrismFlagContext()) -> PrismFlagValue? {
         guard let flag = flags[name], flag.enabled else { return nil }
         guard isEnabled(name, context: context) else { return nil }
         return flag.value
     }
 
+    /// Returns the string value of the named flag, or the default if not available.
     public func getString(_ name: String, context: PrismFlagContext = PrismFlagContext(), default defaultValue: String = "") -> String {
         guard let value = getValue(name, context: context) else { return defaultValue }
         switch value {
@@ -156,16 +203,19 @@ public actor PrismFeatureFlagStore {
         }
     }
 
+    /// Returns the integer value of the named flag, or the default if not available.
     public func getInt(_ name: String, context: PrismFlagContext = PrismFlagContext(), default defaultValue: Int = 0) -> Int {
         guard let value = getValue(name, context: context) else { return defaultValue }
         if case .integer(let i) = value { return i }
         return defaultValue
     }
 
+    /// Returns all registered feature flags.
     public func allFlags() -> [PrismFeatureFlag] {
         Array(flags.values)
     }
 
+    /// Loads feature flags from a JSON data array.
     public func loadJSON(data: Data) throws {
         guard let arr = try JSONSerialization.jsonObject(with: data) as? [[String: Any]] else {
             throw PrismFeatureFlagError.invalidFormat
@@ -222,10 +272,12 @@ public actor PrismFeatureFlagStore {
 
 // MARK: - Feature Flag Middleware
 
+/// Middleware that evaluates feature flags and stores enabled flag names in the request.
 public struct PrismFeatureFlagMiddleware: PrismMiddleware, Sendable {
     private let store: PrismFeatureFlagStore
     private let contextBuilder: @Sendable (PrismHTTPRequest) -> PrismFlagContext
 
+    /// Creates a feature flag middleware with the given store and context builder.
     public init(
         store: PrismFeatureFlagStore,
         contextBuilder: @escaping @Sendable (PrismHTTPRequest) -> PrismFlagContext = { _ in PrismFlagContext() }
@@ -234,6 +286,7 @@ public struct PrismFeatureFlagMiddleware: PrismMiddleware, Sendable {
         self.contextBuilder = contextBuilder
     }
 
+    /// Evaluates flags and attaches enabled flag names to the request's userInfo.
     public func handle(_ request: PrismHTTPRequest, next: @escaping PrismRouteHandler) async throws -> PrismHTTPResponse {
         var req = request
         let context = contextBuilder(request)
@@ -251,7 +304,10 @@ public struct PrismFeatureFlagMiddleware: PrismMiddleware, Sendable {
 
 // MARK: - Errors
 
+/// Errors related to feature flag operations.
 public enum PrismFeatureFlagError: Error, Sendable {
+    /// The JSON data format is invalid.
     case invalidFormat
+    /// No flag was found with the given name.
     case flagNotFound(String)
 }

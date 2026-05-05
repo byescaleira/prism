@@ -139,32 +139,42 @@ public actor PrismDatabase {
 
 /// A value that can be stored in or retrieved from SQLite.
 public enum PrismDatabaseValue: Sendable, Equatable {
+    /// A SQL NULL value.
     case null
+    /// An integer value.
     case int(Int)
+    /// A floating-point value.
     case double(Double)
+    /// A text string value.
     case text(String)
+    /// A binary data value.
     case blob(Data)
 
+    /// Returns the value as an Int, or nil if not an integer.
     public var intValue: Int? {
         if case .int(let v) = self { return v }
         return nil
     }
 
+    /// Returns the value as a Double, or nil if not a double.
     public var doubleValue: Double? {
         if case .double(let v) = self { return v }
         return nil
     }
 
+    /// Returns the value as a String, or nil if not text.
     public var textValue: String? {
         if case .text(let v) = self { return v }
         return nil
     }
 
+    /// Returns the value as Data, or nil if not a blob.
     public var blobValue: Data? {
         if case .blob(let v) = self { return v }
         return nil
     }
 
+    /// Returns whether this value is NULL.
     public var isNull: Bool {
         if case .null = self { return true }
         return false
@@ -173,25 +183,37 @@ public enum PrismDatabaseValue: Sendable, Equatable {
 
 /// A single row returned from a database query.
 public struct PrismRow: Sendable {
+    /// The column-name-to-value mapping for this row.
     public let values: [String: PrismDatabaseValue]
 
+    /// Returns the value for the given column, or `.null` if the column is not present.
     public subscript(_ column: String) -> PrismDatabaseValue {
         values[column] ?? .null
     }
 
+    /// Returns the integer value for the given column.
     public func int(_ column: String) -> Int? { values[column]?.intValue }
+    /// Returns the double value for the given column.
     public func double(_ column: String) -> Double? { values[column]?.doubleValue }
+    /// Returns the text value for the given column.
     public func text(_ column: String) -> String? { values[column]?.textValue }
+    /// Returns the blob value for the given column.
     public func blob(_ column: String) -> Data? { values[column]?.blobValue }
 }
 
 /// Database errors.
 public enum PrismDatabaseError: Error, Sendable {
+    /// The database connection could not be opened.
     case connectionFailed(String)
+    /// A prepared statement could not be compiled.
     case prepareFailed(String)
+    /// Statement execution failed.
     case executionFailed(String)
+    /// A migration could not be applied or rolled back.
     case migrationFailed(String)
+    /// The requested model row was not found.
     case modelNotFound
+    /// Row data could not be decoded into the target type.
     case decodingFailed(String)
 }
 #endif

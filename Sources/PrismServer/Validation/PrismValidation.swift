@@ -5,6 +5,7 @@ public struct PrismValidationRule: Sendable {
     private let name: String
     private let check: @Sendable (String?) -> String?
 
+    /// Creates a new `PrismValidationRule` with the specified configuration.
     public init(name: String, check: @escaping @Sendable (String?) -> String?) {
         self.name = name
         self.check = check
@@ -119,6 +120,7 @@ public struct PrismValidationRule: Sendable {
 public struct PrismValidator: Sendable {
     private var fieldRules: [(String, [PrismValidationRule])]
 
+    /// Creates a new `PrismValidator`.
     public init() {
         self.fieldRules = []
     }

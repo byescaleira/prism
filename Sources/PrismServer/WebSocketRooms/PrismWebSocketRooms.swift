@@ -2,9 +2,11 @@ import Foundation
 
 /// A named room/channel that groups WebSocket connections.
 public actor PrismRoom {
+    /// The room's unique name identifier.
     public nonisolated let name: String
     private var connections: [String: PrismWebSocketConnection] = [:]
 
+    /// Creates a new `PrismRoom` with the specified configuration.
     public init(name: String) {
         self.name = name
     }
@@ -69,6 +71,7 @@ public actor PrismRoom {
 public actor PrismRoomManager {
     private var roomMap: [String: PrismRoom] = [:]
 
+    /// Creates a new `PrismRoomManager` with the specified configuration.
     public init() {}
 
     /// Gets or creates a room by name.
@@ -123,6 +126,7 @@ public actor PrismRoomManager {
 public actor PrismPresence {
     private var presenceMap: [String: [String: [String: String]]] = [:]
 
+    /// Creates a new `PrismPresence` with the specified configuration.
     public init() {}
 
     /// Tracks a connection in a room with metadata.

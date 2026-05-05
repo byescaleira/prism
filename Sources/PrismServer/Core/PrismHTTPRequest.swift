@@ -21,6 +21,7 @@ public struct PrismHTTPRequest: Sendable {
     /// User-defined storage for passing data through middleware.
     public var userInfo: [String: String]
 
+    /// Creates an HTTP request with the given method, URI, version, headers, body, and parameters.
     public init(
         method: PrismHTTPMethod,
         uri: String,

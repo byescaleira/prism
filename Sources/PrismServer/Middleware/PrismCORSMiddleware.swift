@@ -15,6 +15,7 @@ public struct PrismCORSMiddleware: PrismMiddleware {
     /// Max age in seconds for preflight cache.
     public let maxAge: Int
 
+    /// Creates a new `PrismCORSMiddleware` with the specified configuration.
     public init(
         allowedOrigins: [String] = ["*"],
         allowedMethods: [PrismHTTPMethod] = [.GET, .POST, .PUT, .PATCH, .DELETE, .OPTIONS],
@@ -31,6 +32,7 @@ public struct PrismCORSMiddleware: PrismMiddleware {
         self.maxAge = maxAge
     }
 
+    /// Handles the request and returns a response.
     public func handle(_ request: PrismHTTPRequest, next: @escaping PrismRouteHandler) async throws -> PrismHTTPResponse {
         if request.method == .OPTIONS {
             var response = PrismHTTPResponse(status: .noContent)

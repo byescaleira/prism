@@ -8,6 +8,7 @@ public struct PrismGraphQLMiddleware: PrismMiddleware, Sendable {
     private let executor: PrismGraphQLExecutor
     private let parser: PrismGraphQLParser
 
+    /// Creates a GraphQL middleware serving the given schema at the specified path.
     public init(schema: PrismGraphQLSchema, path: String = "/graphql", context: (any Sendable)? = nil) {
         self.schema = schema
         self.path = path
@@ -16,6 +17,7 @@ public struct PrismGraphQLMiddleware: PrismMiddleware, Sendable {
         self.parser = PrismGraphQLParser()
     }
 
+    /// Routes GraphQL requests to the executor and returns JSON results.
     public func handle(_ request: PrismHTTPRequest, next: @escaping PrismRouteHandler) async throws -> PrismHTTPResponse {
         guard request.path == path else {
             return try await next(request)
@@ -100,11 +102,13 @@ public struct PrismGraphQLPlayground: PrismMiddleware, Sendable {
     private let path: String
     private let graphqlEndpoint: String
 
+    /// Creates a GraphQL playground middleware serving the UI at the given path.
     public init(path: String = "/graphql/playground", endpoint: String = "/graphql") {
         self.path = path
         self.graphqlEndpoint = endpoint
     }
 
+    /// Serves the GraphiQL playground HTML page for GET requests at the configured path.
     public func handle(_ request: PrismHTTPRequest, next: @escaping PrismRouteHandler) async throws -> PrismHTTPResponse {
         guard request.path == path && request.method == .GET else {
             return try await next(request)

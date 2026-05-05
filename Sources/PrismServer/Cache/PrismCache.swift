@@ -7,6 +7,7 @@ public actor PrismCache<Key: Hashable & Sendable, Value: Sendable> {
     private let maxEntries: Int
     private let defaultTTL: TimeInterval
 
+    /// Creates a new `PrismCache` with the specified configuration.
     public init(maxEntries: Int = 1000, defaultTTL: TimeInterval = 300) {
         self.maxEntries = maxEntries
         self.defaultTTL = defaultTTL

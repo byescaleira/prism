@@ -37,9 +37,14 @@ extension PrismHTTPRequest {
 
 /// Errors during content parsing.
 public enum PrismContentError: Error, Sendable {
+    /// The request body is empty.
     case emptyBody
+    /// Body decoding failed with the given reason.
     case decodingFailed(String)
+    /// The request's content type is not supported.
     case unsupportedContentType(String)
+    /// The multipart boundary marker is missing from Content-Type.
     case multipartBoundaryMissing
+    /// Multipart body parsing failed.
     case multipartParsingFailed
 }

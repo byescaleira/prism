@@ -2,11 +2,16 @@ import Foundation
 
 /// A Server-Sent Event.
 public struct PrismSSEvent: Sendable {
+    /// The id.
     public let id: String?
+    /// The event.
     public let event: String?
+    /// The data.
     public let data: String
+    /// The retry.
     public let retry: Int?
 
+    /// Creates a new `PrismSSEvent` with the specified configuration.
     public init(data: String, id: String? = nil, event: String? = nil, retry: Int? = nil) {
         self.data = data
         self.id = id
@@ -30,11 +35,14 @@ public struct PrismSSEvent: Sendable {
 
 /// A single SSE client connection.
 public actor PrismSSEConnection {
+    /// The id.
     public let id: String
     private var connected = true
     private var continuation: AsyncStream<PrismSSEvent>.Continuation?
+    /// The stream.
     public let stream: AsyncStream<PrismSSEvent>
 
+    /// Creates a new `PrismSSEConnection` with the specified configuration.
     public init(id: String = UUID().uuidString) {
         self.id = id
         var cont: AsyncStream<PrismSSEvent>.Continuation?
@@ -63,6 +71,7 @@ public actor PrismSSEConnection {
 public actor PrismSSEManager {
     private var connections: [String: PrismSSEConnection] = [:]
 
+    /// Creates a new `PrismSSEManager` with the specified configuration.
     public init() {}
 
     /// Creates and registers a new SSE connection.
@@ -105,11 +114,13 @@ public struct PrismSSEMiddleware: PrismMiddleware, Sendable {
     private let manager: PrismSSEManager
     private let path: String
 
+    /// Creates a new `PrismSSEMiddleware` with the specified configuration.
     public init(manager: PrismSSEManager, path: String = "/events") {
         self.manager = manager
         self.path = path
     }
 
+    /// Handles the request and returns a response.
     public func handle(_ request: PrismHTTPRequest, next: @escaping PrismRouteHandler) async throws -> PrismHTTPResponse {
         guard request.path == path && request.method == .GET else {
             return try await next(request)

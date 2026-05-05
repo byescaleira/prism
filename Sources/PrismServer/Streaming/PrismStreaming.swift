@@ -5,6 +5,7 @@ public actor PrismStreamWriter {
     private var chunks: [Data] = []
     private var ended = false
 
+    /// Creates a new `PrismStreamWriter` with the specified configuration.
     public init() {}
 
     /// Writes a data chunk in chunked transfer encoding format.

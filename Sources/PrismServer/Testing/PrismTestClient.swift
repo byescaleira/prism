@@ -4,6 +4,7 @@ import Foundation
 public struct PrismTestClient: Sendable {
     private let router: PrismRouter
 
+    /// Creates a new `PrismTestClient` with the specified configuration.
     public init(router: PrismRouter) {
         self.router = router
     }
@@ -58,29 +59,35 @@ public final class PrismTestClientBuilder: Sendable {
     private let _routes: LockedTestBox<[PrismRoute]>
     private let _middlewares: LockedTestBox<[any PrismMiddleware]>
 
+    /// Creates a new `PrismTestClientBuilder`.
     public init() {
         self._routes = LockedTestBox([])
         self._middlewares = LockedTestBox([])
     }
 
+    /// Registers a route handler for the given method and pattern.
     public func route(_ method: PrismHTTPMethod, _ pattern: String, handler: @escaping PrismRouteHandler) -> PrismTestClientBuilder {
         _routes.mutate { $0.append(PrismRoute(method: method, pattern: pattern, handler: handler)) }
         return self
     }
 
+    /// Registers a GET route handler for the given pattern.
     public func get(_ pattern: String, handler: @escaping PrismRouteHandler) -> PrismTestClientBuilder {
         route(.GET, pattern, handler: handler)
     }
 
+    /// Sends a POST request.
     public func post(_ pattern: String, handler: @escaping PrismRouteHandler) -> PrismTestClientBuilder {
         route(.POST, pattern, handler: handler)
     }
 
+    /// Adds a middleware to the test client pipeline.
     public func use(_ middleware: any PrismMiddleware) -> PrismTestClientBuilder {
         _middlewares.mutate { $0.append(middleware) }
         return self
     }
 
+    /// Builds the test client with all registered routes and middleware.
     public func build() -> PrismTestClient {
         let router = PrismRouter(routes: _routes.value, middlewares: _middlewares.value, groups: [])
         return PrismTestClient(router: router)

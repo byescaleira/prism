@@ -11,6 +11,7 @@ public struct PrismUploadedFile: Sendable {
     /// Path to the temporary file on disk.
     public let tempPath: String
 
+    /// Creates a new `PrismUploadedFile` with the specified configuration.
     public init(filename: String, contentType: String, size: Int, tempPath: String) {
         self.filename = filename
         self.contentType = contentType
@@ -47,6 +48,7 @@ public struct PrismUploadConfig: Sendable {
     /// Directory for temporary files.
     public let tempDirectory: String
 
+    /// Creates a new `PrismUploadConfig` with the specified configuration.
     public init(
         maxFileSize: Int = 10_485_760,
         maxTotalSize: Int = 52_428_800,
@@ -72,6 +74,7 @@ public enum PrismUploadError: Error, Sendable {
 public struct PrismUploadProcessor: Sendable {
     private let config: PrismUploadConfig
 
+    /// Creates a new `PrismUploadProcessor` with the specified configuration.
     public init(config: PrismUploadConfig = PrismUploadConfig()) {
         self.config = config
     }

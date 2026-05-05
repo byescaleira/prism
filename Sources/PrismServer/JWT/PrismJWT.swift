@@ -2,32 +2,47 @@
 import Foundation
 import CryptoKit
 
+/// Supported JWT signing algorithms.
 public enum PrismJWTAlgorithm: String, Sendable, Codable {
     case hs256 = "HS256"
     case hs384 = "HS384"
     case hs512 = "HS512"
 }
 
+/// The header portion of a JSON Web Token containing algorithm and type.
 public struct PrismJWTHeader: Sendable, Codable {
+    /// The alg.
     public let alg: String
+    /// The typ.
     public let typ: String
 
+    /// Creates a new `PrismJWTHeader` with the specified configuration.
     public init(algorithm: PrismJWTAlgorithm, typ: String = "JWT") {
         self.alg = algorithm.rawValue
         self.typ = typ
     }
 }
 
+/// Standard and custom claims payload of a JSON Web Token.
 public struct PrismJWTClaims: Sendable, Codable, Equatable {
+    /// The iss.
     public var iss: String?
+    /// The sub.
     public var sub: String?
+    /// The aud.
     public var aud: String?
+    /// The exp.
     public var exp: Double?
+    /// The nbf.
     public var nbf: Double?
+    /// The iat.
     public var iat: Double?
+    /// The jti.
     public var jti: String?
+    /// The custom fields.
     public var customFields: [String: String]?
 
+    /// Creates a new `PrismJWTClaims` with the specified configuration.
     public init(
         iss: String? = nil,
         sub: String? = nil,
@@ -48,23 +63,31 @@ public struct PrismJWTClaims: Sendable, Codable, Equatable {
         self.customFields = customFields
     }
 
+    /// The expiration date.
     public var expirationDate: Date? {
         exp.map { Date(timeIntervalSince1970: $0) }
     }
 
+    /// The not before date.
     public var notBeforeDate: Date? {
         nbf.map { Date(timeIntervalSince1970: $0) }
     }
 
+    /// The issued at date.
     public var issuedAtDate: Date? {
         iat.map { Date(timeIntervalSince1970: $0) }
     }
 }
 
+/// A parsed JSON Web Token with header, claims, and signature.
 public struct PrismJWTToken: Sendable {
+    /// The header.
     public let header: PrismJWTHeader
+    /// The claims.
     public let claims: PrismJWTClaims
+    /// The signature.
     public let signature: Data
+    /// The compact.
     public let compact: String
 
     init(header: PrismJWTHeader, claims: PrismJWTClaims, signature: Data, compact: String) {
@@ -75,6 +98,7 @@ public struct PrismJWTToken: Sendable {
     }
 }
 
+/// Errors related to JWT operations.
 public enum PrismJWTError: Error, Sendable, Equatable {
     case invalidToken
     case expired
@@ -84,20 +108,24 @@ public enum PrismJWTError: Error, Sendable, Equatable {
     case encodingFailed
 }
 
+/// Signs and verifies JSON Web Tokens using HMAC-SHA256.
 public struct PrismJWTSigner: Sendable {
     private let key: SymmetricKey
     private let algorithm: PrismJWTAlgorithm
 
+    /// Creates a new `PrismJWTSigner` with the specified configuration.
     public init(secret: String, algorithm: PrismJWTAlgorithm = .hs256) {
         self.key = SymmetricKey(data: Data(secret.utf8))
         self.algorithm = algorithm
     }
 
+    /// Creates a new `PrismJWTSigner` with the specified configuration.
     public init(key: SymmetricKey, algorithm: PrismJWTAlgorithm = .hs256) {
         self.key = key
         self.algorithm = algorithm
     }
 
+    /// Signs the claims and returns a compact JWT string.
     public func sign(_ claims: PrismJWTClaims) throws -> String {
         let header = PrismJWTHeader(algorithm: algorithm)
 
@@ -119,6 +147,7 @@ public struct PrismJWTSigner: Sendable {
         return "\(signingInput).\(signatureB64)"
     }
 
+    /// Verifies the token signature and claims validity, returning the decoded claims.
     public func verify(_ token: String) throws -> PrismJWTClaims {
         let parts = token.split(separator: ".", omittingEmptySubsequences: false)
         guard parts.count == 3 else { throw PrismJWTError.invalidToken }
@@ -169,6 +198,7 @@ public struct PrismJWTSigner: Sendable {
         return claims
     }
 
+    /// Decodes a JWT token without verifying its signature.
     public func decode(_ token: String) throws -> PrismJWTToken {
         let parts = token.split(separator: ".", omittingEmptySubsequences: false)
         guard parts.count == 3 else { throw PrismJWTError.invalidToken }
@@ -215,11 +245,13 @@ public struct PrismJWTSigner: Sendable {
     }
 }
 
+/// Middleware that validates JWT bearer tokens on incoming requests.
 public struct PrismJWTMiddleware: PrismMiddleware {
     private let signer: PrismJWTSigner
     private let headerName: String
     private let scheme: String
 
+    /// Creates a new `PrismJWTMiddleware` with the specified configuration.
     public init(
         signer: PrismJWTSigner,
         headerName: String = "Authorization",
@@ -230,6 +262,7 @@ public struct PrismJWTMiddleware: PrismMiddleware {
         self.scheme = scheme
     }
 
+    /// Handles the request and returns a response.
     public func handle(_ request: PrismHTTPRequest, next: @escaping PrismRouteHandler) async throws -> PrismHTTPResponse {
         guard let authHeader = request.headers.value(for: headerName) else {
             return PrismHTTPResponse(status: .unauthorized, body: .text("Missing authorization header"))

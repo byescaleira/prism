@@ -2,17 +2,22 @@ import Foundation
 
 // MARK: - Pluralization
 
+/// Unicode CLDR plural categories for locale-aware pluralization.
 public enum PrismPluralCategory: String, Sendable {
     case zero, one, two, few, many, other
 }
 
+/// A pluralization rule mapping a count range to a translation key suffix.
 public struct PrismPluralRule: Sendable {
+    /// The categories.
     public let categories: [PrismPluralCategory: String]
 
+    /// Creates a new `PrismPluralRule` with the specified configuration.
     public init(_ categories: [PrismPluralCategory: String]) {
         self.categories = categories
     }
 
+    /// Resolves the requested service.
     public func resolve(count: Int) -> String? {
         if count == 0, let zero = categories[.zero] { return zero }
         if count == 1, let one = categories[.one] { return one }
@@ -25,12 +30,15 @@ public struct PrismPluralRule: Sendable {
 
 // MARK: - Translation Store
 
+/// Storage backend for Translation data.
 public actor PrismTranslationStore {
     private var translations: [String: [String: String]] = [:]
     private var plurals: [String: [String: PrismPluralRule]] = [:]
 
+    /// Creates a new `PrismTranslationStore` with the specified configuration.
     public init() {}
 
+    /// Loads data from the source.
     public func load(locale: String, translations dict: [String: String]) {
         var current = translations[locale] ?? [:]
         for (key, value) in dict {
@@ -39,6 +47,7 @@ public actor PrismTranslationStore {
         translations[locale] = current
     }
 
+    /// Loads j s o n.
     public func loadJSON(locale: String, data: Data) throws {
         guard let dict = try JSONSerialization.jsonObject(with: data) as? [String: Any] else {
             throw PrismI18nError.invalidFormat
@@ -47,11 +56,13 @@ public actor PrismTranslationStore {
         load(locale: locale, translations: flat)
     }
 
+    /// Loads j s o n file.
     public func loadJSONFile(locale: String, path: String) throws {
         let data = try Data(contentsOf: URL(fileURLWithPath: path))
         try loadJSON(locale: locale, data: data)
     }
 
+    /// Loads directory.
     public func loadDirectory(_ path: String) throws {
         let fm = FileManager.default
         guard let files = try? fm.contentsOfDirectory(atPath: path) else { return }
@@ -63,12 +74,14 @@ public actor PrismTranslationStore {
         }
     }
 
+    /// Adds plural.
     public func addPlural(locale: String, key: String, rule: PrismPluralRule) {
         var locPlurals = plurals[locale] ?? [:]
         locPlurals[key] = rule
         plurals[locale] = locPlurals
     }
 
+    /// Translates the key for the given locale.
     public func translate(
         key: String,
         locale: String,
@@ -84,6 +97,7 @@ public actor PrismTranslationStore {
         return key
     }
 
+    /// Translates the key for the given locale.
     public func translatePlural(
         key: String,
         count: Int,
@@ -102,14 +116,17 @@ public actor PrismTranslationStore {
         return translate(key: key, locale: locale, fallbacks: fallbacks, params: params)
     }
 
+    /// Returns whether the condition `hasTranslation` is met.
     public func hasTranslation(key: String, locale: String) -> Bool {
         translations[locale]?[key] != nil
     }
 
+    /// Returns all registered locale identifiers sorted alphabetically.
     public func availableLocales() -> [String] {
         Array(translations.keys).sorted()
     }
 
+    /// Returns all translation keys for the specified locale.
     public func allKeys(for locale: String) -> [String] {
         Array(translations[locale]?.keys ?? [String: String]().keys).sorted()
     }
@@ -141,9 +158,12 @@ public actor PrismTranslationStore {
 
 // MARK: - Locale Detection
 
+/// Detects the preferred locale from request Accept-Language headers.
 public struct PrismLocaleDetector: Sendable {
+    /// Creates a new `PrismLocaleDetector` with the specified configuration.
     public init() {}
 
+    /// Detects the appropriate value from the request.
     public func detect(from request: PrismHTTPRequest, supportedLocales: [String], defaultLocale: String) -> String {
         guard let acceptLanguage = request.headers.value(for: "Accept-Language") else {
             return defaultLocale
@@ -157,6 +177,7 @@ public struct PrismLocaleDetector: Sendable {
         return defaultLocale
     }
 
+    /// Parses an Accept-Language header into locale-quality pairs.
     public func parseAcceptLanguage(_ header: String) -> [(String, Double)] {
         var result: [(String, Double)] = []
         let parts = header.split(separator: ",")
@@ -179,17 +200,20 @@ public struct PrismLocaleDetector: Sendable {
 
 // MARK: - I18n Middleware
 
+/// Middleware that detects the client locale and injects it into the request.
 public struct PrismI18nMiddleware: PrismMiddleware, Sendable {
     private let supportedLocales: [String]
     private let defaultLocale: String
     private let detector: PrismLocaleDetector
 
+    /// Creates a new `PrismI18nMiddleware` with the specified configuration.
     public init(supportedLocales: [String], defaultLocale: String = "en") {
         self.supportedLocales = supportedLocales
         self.defaultLocale = defaultLocale
         self.detector = PrismLocaleDetector()
     }
 
+    /// Handles the request and returns a response.
     public func handle(_ request: PrismHTTPRequest, next: @escaping PrismRouteHandler) async throws -> PrismHTTPResponse {
         var req = request
         let locale = detector.detect(from: request, supportedLocales: supportedLocales, defaultLocale: defaultLocale)
@@ -202,6 +226,7 @@ public struct PrismI18nMiddleware: PrismMiddleware, Sendable {
 
 // MARK: - Errors
 
+/// Errors related to I18n operations.
 public enum PrismI18nError: Error, Sendable {
     case invalidFormat
     case fileNotFound(String)

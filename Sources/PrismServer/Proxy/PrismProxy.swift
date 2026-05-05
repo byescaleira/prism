@@ -1,14 +1,23 @@
 import Foundation
 
+/// Configuration options for Proxy.
 public struct PrismProxyConfig: Sendable {
+    /// The upstream.
     public let upstream: String
+    /// The path rewrite.
     public let pathRewrite: [String: String]
+    /// The timeout.
     public let timeout: TimeInterval
+    /// The forward headers.
     public let forwardHeaders: Bool
+    /// The preserve host.
     public let preserveHost: Bool
+    /// The additional headers.
     public let additionalHeaders: [String: String]
+    /// The strip prefix.
     public let stripPrefix: String?
 
+    /// Creates a new `PrismProxyConfig` with the specified configuration.
     public init(
         upstream: String,
         pathRewrite: [String: String] = [:],
@@ -28,11 +37,13 @@ public struct PrismProxyConfig: Sendable {
     }
 }
 
+/// Middleware that forwards requests to an upstream server.
 public struct PrismProxyMiddleware: PrismMiddleware {
     private let config: PrismProxyConfig
     private let pathPrefix: String
     private let session: URLSession
 
+    /// Creates a new `PrismProxyMiddleware` with the specified configuration.
     public init(pathPrefix: String = "/", config: PrismProxyConfig) {
         self.pathPrefix = pathPrefix
         self.config = config
@@ -41,6 +52,7 @@ public struct PrismProxyMiddleware: PrismMiddleware {
         self.session = URLSession(configuration: sessionConfig)
     }
 
+    /// Handles the request and returns a response.
     public func handle(_ request: PrismHTTPRequest, next: @escaping PrismRouteHandler) async throws -> PrismHTTPResponse {
         guard request.path.hasPrefix(pathPrefix) else {
             return try await next(request)

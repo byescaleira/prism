@@ -2,21 +2,31 @@ import Foundation
 
 /// An HTTP cookie with security attributes.
 public struct PrismCookie: Sendable, Equatable {
+    /// The name.
     public let name: String
+    /// The value.
     public let value: String
+    /// The path.
     public var path: String
+    /// The domain.
     public var domain: String?
+    /// The max age.
     public var maxAge: Int?
+    /// The secure.
     public var secure: Bool
+    /// The http only.
     public var httpOnly: Bool
+    /// The same site.
     public var sameSite: SameSite
 
+    /// The SameSite cookie attribute controlling cross-site request behavior.
     public enum SameSite: String, Sendable {
         case strict = "Strict"
         case lax = "Lax"
         case none = "None"
     }
 
+    /// Creates a new `SameSite` with the specified configuration.
     public init(
         name: String,
         value: String,

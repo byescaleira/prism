@@ -14,6 +14,7 @@ public struct PrismHTTP2Configuration: Sendable {
     /// Maximum frame size in bytes.
     public let maxFrameSize: Int
 
+    /// Creates a new `PrismHTTP2Configuration` with the specified configuration.
     public init(
         maxConcurrentStreams: Int = 100,
         initialWindowSize: Int = 65535,

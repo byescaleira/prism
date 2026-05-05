@@ -11,6 +11,7 @@ public struct PrismQueryBuilder: Sendable {
     private var limitValue: Int?
     private var offsetValue: Int?
 
+    /// Creates a query builder targeting the given table on the specified database.
     public init(database: PrismDatabase, table: String) {
         self.db = database
         self.table = table

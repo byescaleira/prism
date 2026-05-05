@@ -2,13 +2,19 @@ import Foundation
 
 /// Sendable wrapper for JSON dictionary values crossing actor boundaries.
 public struct PrismJSONObject: @unchecked Sendable {
+    /// The raw.
     public let raw: [String: Any]
+    /// Creates a new `PrismJSONObject` with the specified configuration.
     public init(_ raw: [String: Any]) { self.raw = raw }
 
+    /// Returns the raw value for the given key.
     public subscript(key: String) -> Any? { raw[key] }
 
+    /// Returns the string value for the given key, if present.
     public func string(_ key: String) -> String? { raw[key] as? String }
+    /// Returns the dictionary value for the given key, if present.
     public func dict(_ key: String) -> [String: Any]? { raw[key] as? [String: Any] }
+    /// Returns the string dictionary value for the given key, if present.
     public func stringDict(_ key: String) -> [String: String]? { raw[key] as? [String: String] }
 }
 
@@ -22,6 +28,7 @@ public actor PrismMCPServer {
     private var prompts: [String: RegisteredPrompt] = [:]
     private var initialized = false
 
+    /// Creates a new `PrismMCPServer` with the specified configuration.
     public init(name: String = "PrismMCPServer", version: String = "1.0.0") {
         self.serverName = name
         self.serverVersion = version

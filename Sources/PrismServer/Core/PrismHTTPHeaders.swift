@@ -2,6 +2,7 @@ import Foundation
 
 /// Case-insensitive HTTP header storage preserving original casing.
 public struct PrismHTTPHeaders: Sendable, Equatable {
+    /// Compares two header collections for equality by name and value.
     public static func == (lhs: PrismHTTPHeaders, rhs: PrismHTTPHeaders) -> Bool {
         guard lhs.storage.count == rhs.storage.count else { return false }
         for (l, r) in zip(lhs.storage, rhs.storage) {
@@ -12,6 +13,7 @@ public struct PrismHTTPHeaders: Sendable, Equatable {
 
     private var storage: [(name: String, value: String)]
 
+    /// Creates an HTTP headers collection from an array of name-value tuples.
     public init(_ headers: [(String, String)] = []) {
         self.storage = headers.map { (name: $0.0, value: $0.1) }
     }
@@ -53,21 +55,38 @@ public struct PrismHTTPHeaders: Sendable, Equatable {
 
     // MARK: - Common Header Names
 
+    /// The Content-Type header name.
     public static let contentType = "Content-Type"
+    /// The Content-Length header name.
     public static let contentLength = "Content-Length"
+    /// The Host header name.
     public static let host = "Host"
+    /// The Connection header name.
     public static let connection = "Connection"
+    /// The Authorization header name.
     public static let authorization = "Authorization"
+    /// The Accept header name.
     public static let accept = "Accept"
+    /// The User-Agent header name.
     public static let userAgent = "User-Agent"
+    /// The Cache-Control header name.
     public static let cacheControl = "Cache-Control"
+    /// The ETag header name.
     public static let eTag = "ETag"
+    /// The If-None-Match header name.
     public static let ifNoneMatch = "If-None-Match"
+    /// The Transfer-Encoding header name.
     public static let transferEncoding = "Transfer-Encoding"
+    /// The Upgrade header name.
     public static let upgrade = "Upgrade"
+    /// The Location header name.
     public static let location = "Location"
+    /// The Server header name.
     public static let server = "Server"
+    /// The Date header name.
     public static let date = "Date"
+    /// The Set-Cookie header name.
     public static let setCookie = "Set-Cookie"
+    /// The Cookie header name.
     public static let cookie = "Cookie"
 }

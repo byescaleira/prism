@@ -4,6 +4,7 @@ import Foundation
 public struct PrismConfig: Sendable {
     private let values: [String: String]
 
+    /// Creates a configuration with the given key-value pairs.
     public init(values: [String: String] = [:]) {
         self.values = values
     }
@@ -144,6 +145,8 @@ public struct PrismConfig: Sendable {
 
 /// Configuration errors.
 public enum PrismConfigError: Error, Sendable {
+    /// A required configuration key was not found.
     case missingKey(String)
+    /// A configuration value could not be parsed into the expected type.
     case invalidValue(String, String)
 }

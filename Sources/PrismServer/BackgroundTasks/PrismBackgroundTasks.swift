@@ -2,8 +2,11 @@ import Foundation
 
 /// Metadata for a running background task.
 public struct PrismBackgroundTask: Sendable {
+    /// The unique identifier for this task.
     public let id: String
+    /// The human-readable name of this task.
     public let name: String
+    /// The time when this task was started.
     public let startedAt: Date
 }
 
@@ -12,6 +15,7 @@ public actor PrismBackgroundTaskManager {
     private var tasks: [String: Task<Void, Never>] = [:]
     private var metadata: [String: PrismBackgroundTask] = [:]
 
+    /// Creates a new background task manager.
     public init() {}
 
     /// Runs a fire-and-forget task, tracked by the manager.
@@ -89,6 +93,7 @@ public actor PrismBackgroundTaskManager {
 public actor PrismTaskGroup {
     private var tasks: [Task<Void, Never>] = []
 
+    /// Creates a new task group.
     public init() {}
 
     /// Adds a task to the group.

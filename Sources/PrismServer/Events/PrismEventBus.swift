@@ -7,6 +7,7 @@ public protocol PrismEvent: Sendable {
 }
 
 extension PrismEvent {
+    /// Default event name derived from the type name.
     public static var name: String { String(describing: Self.self) }
 }
 
@@ -15,6 +16,7 @@ public actor PrismEventBus {
     private var listeners: [String: [EventListener]] = [:]
     private var nextID: Int = 0
 
+    /// Creates an event bus.
     public init() {}
 
     /// Subscribes to an event type. Returns a listener ID for unsubscription.
@@ -93,22 +95,31 @@ private struct EventListener: Sendable {
 
 /// Emitted when the server starts.
 public struct PrismServerStarted: PrismEvent {
+    /// The port the server started on.
     public let port: UInt16
+    /// The host the server is bound to.
     public let host: String
+    /// Creates a server started event.
     public init(port: UInt16, host: String) { self.port = port; self.host = host }
 }
 
 /// Emitted when the server stops.
 public struct PrismServerStopped: PrismEvent {
+    /// Creates a server stopped event.
     public init() {}
 }
 
 /// Emitted for each completed request.
 public struct PrismRequestCompleted: PrismEvent {
+    /// The HTTP method of the request.
     public let method: String
+    /// The request path.
     public let path: String
+    /// The response status code.
     public let statusCode: Int
+    /// The time taken to process the request.
     public let duration: Duration
+    /// Creates a request completed event.
     public init(method: String, path: String, statusCode: Int, duration: Duration) {
         self.method = method
         self.path = path
@@ -119,8 +130,11 @@ public struct PrismRequestCompleted: PrismEvent {
 
 /// Emitted when an unhandled error occurs.
 public struct PrismServerError: PrismEvent {
+    /// The error description.
     public let error: String
+    /// The request path where the error occurred, if applicable.
     public let path: String?
+    /// Creates a server error event.
     public init(error: String, path: String? = nil) {
         self.error = error
         self.path = path

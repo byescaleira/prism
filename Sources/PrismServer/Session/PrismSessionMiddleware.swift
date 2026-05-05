@@ -10,6 +10,7 @@ public struct PrismSessionMiddleware: PrismMiddleware {
     private let ttl: TimeInterval
     private let secret: String
 
+    /// Creates a new `PrismSessionMiddleware` with the specified configuration.
     public init(
         store: any PrismSessionStore = PrismMemorySessionStore(),
         cookieName: String = "prism_session",
@@ -22,6 +23,7 @@ public struct PrismSessionMiddleware: PrismMiddleware {
         self.secret = secret
     }
 
+    /// Handles the request and returns a response.
     public func handle(_ request: PrismHTTPRequest, next: @escaping PrismRouteHandler) async throws -> PrismHTTPResponse {
         let sessionID: String
         var isNew = false

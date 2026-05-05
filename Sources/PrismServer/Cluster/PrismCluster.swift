@@ -2,10 +2,14 @@ import Foundation
 
 /// Configuration for cluster/worker mode.
 public struct PrismClusterConfig: Sendable {
+    /// The number of worker processes to spawn.
     public let workerCount: Int
+    /// Whether crashed workers should be automatically restarted.
     public let restartOnCrash: Bool
+    /// Maximum time to wait for workers to shut down gracefully.
     public let shutdownTimeout: Duration
 
+    /// Creates a cluster configuration with the specified parameters.
     public init(
         workerCount: Int = ProcessInfo.processInfo.activeProcessorCount,
         restartOnCrash: Bool = true,
@@ -19,18 +23,26 @@ public struct PrismClusterConfig: Sendable {
 
 /// Status of a worker process.
 public enum PrismWorkerStatus: String, Sendable {
+    /// The worker is running normally.
     case running
+    /// The worker has been stopped gracefully.
     case stopped
+    /// The worker exited with a non-zero status.
     case crashed
 }
 
 /// Information about a worker process.
 public struct PrismWorkerInfo: Sendable {
+    /// The system process identifier.
     public let pid: Int32
+    /// The logical worker index.
     public let workerID: Int
+    /// The time when the worker was spawned.
     public let startedAt: Date
+    /// The current status of the worker.
     public var status: PrismWorkerStatus
 
+    /// Creates worker info with the given PID, index, start time, and status.
     public init(pid: Int32, workerID: Int, startedAt: Date = Date(), status: PrismWorkerStatus = .running) {
         self.pid = pid
         self.workerID = workerID
@@ -48,6 +60,7 @@ public actor PrismClusterManager {
     private var executable: String = ""
     private var arguments: [String] = []
 
+    /// Creates a cluster manager with the given configuration.
     public init(config: PrismClusterConfig = PrismClusterConfig()) {
         self.config = config
     }
@@ -163,9 +176,12 @@ public enum PrismCluster {
 
 /// Cluster mode enum for explicit branching.
 public enum PrismClusterMode: Sendable, Equatable {
+    /// This process is the primary/manager process.
     case primary
+    /// This process is a worker with the given ID.
     case worker(id: Int)
 
+    /// Detects the current cluster mode from environment variables.
     public static var current: PrismClusterMode {
         if let id = PrismCluster.workerID {
             return .worker(id: id)

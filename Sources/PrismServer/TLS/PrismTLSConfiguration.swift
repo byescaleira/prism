@@ -15,6 +15,7 @@ public struct PrismTLSConfiguration: Sendable {
     /// The max-age value for HSTS in seconds.
     public let hstsMaxAge: Int
 
+    /// Creates a new `PrismTLSConfiguration` with the specified configuration.
     public init(
         identityPath: String? = nil,
         passphrase: String? = nil,
@@ -93,12 +94,14 @@ public struct PrismHSTSMiddleware: PrismMiddleware {
     private let includeSubDomains: Bool
     private let preload: Bool
 
+    /// Creates a new `PrismHSTSMiddleware` with the specified configuration.
     public init(maxAge: Int = 31536000, includeSubDomains: Bool = true, preload: Bool = false) {
         self.maxAge = maxAge
         self.includeSubDomains = includeSubDomains
         self.preload = preload
     }
 
+    /// Handles the request and returns a response.
     public func handle(_ request: PrismHTTPRequest, next: @escaping PrismRouteHandler) async throws -> PrismHTTPResponse {
         var response = try await next(request)
 
@@ -114,8 +117,10 @@ public struct PrismHSTSMiddleware: PrismMiddleware {
 /// Middleware that adds common security headers.
 public struct PrismSecurityHeadersMiddleware: PrismMiddleware {
 
+    /// Creates a new `PrismSecurityHeadersMiddleware` with the specified configuration.
     public init() {}
 
+    /// Handles the request and returns a response.
     public func handle(_ request: PrismHTTPRequest, next: @escaping PrismRouteHandler) async throws -> PrismHTTPResponse {
         var response = try await next(request)
         response.headers.set(name: "X-Content-Type-Options", value: "nosniff")

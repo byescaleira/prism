@@ -4,6 +4,7 @@ import SQLite3
 
 // MARK: - Seeder Protocol
 
+/// SeederProtocol protocol.
 public protocol PrismSeederProtocol: Sendable {
     var name: String { get }
     func run(_ db: PrismDatabase) async throws
@@ -11,11 +12,16 @@ public protocol PrismSeederProtocol: Sendable {
 
 // MARK: - Seeder Record
 
+/// Tracks which seeders have been applied and when.
 public struct PrismSeederRecord: Sendable {
+    /// The id.
     public let id: Int
+    /// The name.
     public let name: String
+    /// The ran at.
     public let ranAt: String
 
+    /// Creates a new `PrismSeederRecord` with the specified configuration.
     public init(id: Int, name: String, ranAt: String) {
         self.id = id
         self.name = name
@@ -25,19 +31,23 @@ public struct PrismSeederRecord: Sendable {
 
 // MARK: - Seeder Runner
 
+/// Manages database seeder registration and execution.
 public actor PrismSeederRunner {
     private let db: PrismDatabase
     private var seeders: [any PrismSeederProtocol] = []
     private var initialized = false
 
+    /// Creates a new `PrismSeederRunner` with the specified configuration.
     public init(database: PrismDatabase) {
         self.db = database
     }
 
+    /// Registers a new entry.
     public func register(_ seeder: any PrismSeederProtocol) {
         seeders.append(seeder)
     }
 
+    /// Registers all provided seeders in order.
     public func registerAll(_ items: [any PrismSeederProtocol]) {
         seeders.append(contentsOf: items)
     }
@@ -54,6 +64,7 @@ public actor PrismSeederRunner {
         initialized = true
     }
 
+    /// Runs all registered seeders that have not yet been applied.
     public func seed() async throws -> [String] {
         try await ensureTable()
         let ran = try await ranNames()
@@ -73,6 +84,7 @@ public actor PrismSeederRunner {
         return seeded
     }
 
+    /// Runs only the seeder with the specified name.
     public func seedSpecific(_ names: [String]) async throws -> [String] {
         try await ensureTable()
         let ran = try await ranNames()
@@ -93,6 +105,7 @@ public actor PrismSeederRunner {
         return seeded
     }
 
+    /// Resets to the initial state.
     public func reset(tables: [String]) async throws -> [String] {
         try await ensureTable()
         for table in tables {
@@ -103,6 +116,7 @@ public actor PrismSeederRunner {
         return try await seed()
     }
 
+    /// Returns the status of each registered seeder showing whether it has been applied.
     public func status() async throws -> [(name: String, ran: Bool, ranAt: String?)] {
         try await ensureTable()
         let records = try await ranRecords()
@@ -119,6 +133,7 @@ public actor PrismSeederRunner {
         }
     }
 
+    /// Returns the number of seeders that have not yet been run.
     public func pendingCount() async throws -> Int {
         try await ensureTable()
         let ran = try await ranNames()
@@ -145,6 +160,7 @@ public actor PrismSeederRunner {
 
 // MARK: - Errors
 
+/// Errors related to Seeder operations.
 public enum PrismSeederError: Error, Sendable {
     case seederNotFound(String)
     case resetFailed(String)

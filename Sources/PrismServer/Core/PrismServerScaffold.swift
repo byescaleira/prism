@@ -3,6 +3,7 @@ import Foundation
 /// Generates project scaffolding files for a new PrismServer project.
 public struct PrismServerScaffold: Sendable {
 
+    /// Creates a scaffold generator.
     public init() {}
 
     /// Returns the Package.swift content for a new server project.

@@ -12,6 +12,7 @@ public struct PrismMigration: Sendable {
     /// SQL statements to revert the migration.
     public let down: String
 
+    /// Creates a migration with the given version, name, and SQL statements.
     public init(version: Int, name: String, up: String, down: String = "") {
         self.version = version
         self.name = name
@@ -25,6 +26,7 @@ public struct PrismMigrator: Sendable {
     private let db: PrismDatabase
     private let migrations: [PrismMigration]
 
+    /// Creates a migrator for the given database and set of migrations.
     public init(database: PrismDatabase, migrations: [PrismMigration]) {
         self.db = database
         self.migrations = migrations.sorted { $0.version < $1.version }

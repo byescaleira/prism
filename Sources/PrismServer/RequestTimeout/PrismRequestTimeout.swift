@@ -1,10 +1,15 @@
 import Foundation
 
+/// Configuration options for RequestTimeout.
 public struct PrismRequestTimeoutConfig: Sendable {
+    /// The default timeout.
     public let defaultTimeout: Duration
+    /// The timeout by path.
     public let timeoutByPath: [String: Duration]
+    /// The timeout by method.
     public let timeoutByMethod: [PrismHTTPMethod: Duration]
 
+    /// Creates a new `PrismRequestTimeoutConfig` with the specified configuration.
     public init(
         defaultTimeout: Duration = .seconds(30),
         timeoutByPath: [String: Duration] = [:],
@@ -16,17 +21,21 @@ public struct PrismRequestTimeoutConfig: Sendable {
     }
 }
 
+/// Middleware that enforces a maximum duration for request handling.
 public struct PrismRequestTimeoutMiddleware: PrismMiddleware {
     private let config: PrismRequestTimeoutConfig
 
+    /// Creates a new `PrismRequestTimeoutMiddleware` with the specified configuration.
     public init(config: PrismRequestTimeoutConfig = PrismRequestTimeoutConfig()) {
         self.config = config
     }
 
+    /// Creates a new `PrismRequestTimeoutMiddleware` with the specified configuration.
     public init(timeout: Duration) {
         self.config = PrismRequestTimeoutConfig(defaultTimeout: timeout)
     }
 
+    /// Handles the request and returns a response.
     public func handle(_ request: PrismHTTPRequest, next: @escaping PrismRouteHandler) async throws -> PrismHTTPResponse {
         let timeout = resolveTimeout(for: request)
 
@@ -81,6 +90,7 @@ public struct PrismRequestTimeoutMiddleware: PrismMiddleware {
     }
 }
 
+/// Errors related to Timeout operations.
 public enum PrismTimeoutError: Error, Sendable {
     case requestTimedOut(timeout: Duration)
 }

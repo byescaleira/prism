@@ -2,15 +2,20 @@ import Foundation
 
 // MARK: - Email Types
 
+/// An email address with an optional display name.
 public struct PrismEmailAddress: Sendable, Equatable {
+    /// The email.
     public let email: String
+    /// The name.
     public let name: String?
 
+    /// Creates a new `PrismEmailAddress` with the specified configuration.
     public init(_ email: String, name: String? = nil) {
         self.email = email
         self.name = name
     }
 
+    /// The formatted.
     public var formatted: String {
         if let name {
             return "\(name) <\(email)>"
@@ -19,11 +24,16 @@ public struct PrismEmailAddress: Sendable, Equatable {
     }
 }
 
+/// A file attachment for an email with filename, MIME type, and binary data.
 public struct PrismEmailAttachment: Sendable {
+    /// The filename.
     public let filename: String
+    /// The mime type.
     public let mimeType: String
+    /// The data.
     public let data: Data
 
+    /// Creates a new `PrismEmailAttachment` with the specified configuration.
     public init(filename: String, mimeType: String, data: Data) {
         self.filename = filename
         self.mimeType = mimeType
@@ -31,18 +41,30 @@ public struct PrismEmailAttachment: Sendable {
     }
 }
 
+/// A fully composed email with sender, recipients, subject, body, and attachments.
 public struct PrismEmail: Sendable {
+    /// The from.
     public let from: PrismEmailAddress
+    /// The to.
     public let to: [PrismEmailAddress]
+    /// The cc.
     public let cc: [PrismEmailAddress]
+    /// The bcc.
     public let bcc: [PrismEmailAddress]
+    /// The subject.
     public let subject: String
+    /// The text body.
     public let textBody: String?
+    /// The html body.
     public let htmlBody: String?
+    /// The attachments.
     public let attachments: [PrismEmailAttachment]
+    /// The reply to.
     public let replyTo: PrismEmailAddress?
+    /// The headers.
     public let headers: [(String, String)]
 
+    /// Creates a new `PrismEmail` with the specified configuration.
     public init(
         from: PrismEmailAddress,
         to: [PrismEmailAddress],
@@ -70,6 +92,7 @@ public struct PrismEmail: Sendable {
 
 // MARK: - Email Builder
 
+/// Builder for constructing Email instances.
 public struct PrismEmailBuilder: Sendable {
     private var from: PrismEmailAddress?
     private var to: [PrismEmailAddress] = []
@@ -82,68 +105,80 @@ public struct PrismEmailBuilder: Sendable {
     private var replyTo: PrismEmailAddress?
     private var headers: [(String, String)] = []
 
+    /// Creates a new `PrismEmailBuilder` with the specified configuration.
     public init() {}
 
+    /// Sets the sender email address.
     public func from(_ email: String, name: String? = nil) -> PrismEmailBuilder {
         var copy = self
         copy.from = PrismEmailAddress(email, name: name)
         return copy
     }
 
+    /// Adds a recipient email address.
     public func to(_ email: String, name: String? = nil) -> PrismEmailBuilder {
         var copy = self
         copy.to.append(PrismEmailAddress(email, name: name))
         return copy
     }
 
+    /// Adds a carbon copy recipient.
     public func cc(_ email: String, name: String? = nil) -> PrismEmailBuilder {
         var copy = self
         copy.cc.append(PrismEmailAddress(email, name: name))
         return copy
     }
 
+    /// Adds a blind carbon copy recipient.
     public func bcc(_ email: String, name: String? = nil) -> PrismEmailBuilder {
         var copy = self
         copy.bcc.append(PrismEmailAddress(email, name: name))
         return copy
     }
 
+    /// Sets the email subject line.
     public func subject(_ subject: String) -> PrismEmailBuilder {
         var copy = self
         copy.subject = subject
         return copy
     }
 
+    /// Sets the plain-text email body.
     public func text(_ body: String) -> PrismEmailBuilder {
         var copy = self
         copy.textBody = body
         return copy
     }
 
+    /// Sets the HTML email body.
     public func html(_ body: String) -> PrismEmailBuilder {
         var copy = self
         copy.htmlBody = body
         return copy
     }
 
+    /// Attaches a file with the given filename, MIME type, and data.
     public func attach(filename: String, mimeType: String, data: Data) -> PrismEmailBuilder {
         var copy = self
         copy.attachments.append(PrismEmailAttachment(filename: filename, mimeType: mimeType, data: data))
         return copy
     }
 
+    /// Sets the reply-to address.
     public func replyTo(_ email: String, name: String? = nil) -> PrismEmailBuilder {
         var copy = self
         copy.replyTo = PrismEmailAddress(email, name: name)
         return copy
     }
 
+    /// Adds a custom header to the email.
     public func header(_ name: String, _ value: String) -> PrismEmailBuilder {
         var copy = self
         copy.headers.append((name, value))
         return copy
     }
 
+    /// Validates and builds the configured email.
     public func build() throws -> PrismEmail {
         guard let from else { throw PrismMailerError.missingFrom }
         guard !to.isEmpty else { throw PrismMailerError.missingRecipients }
@@ -160,11 +195,13 @@ public struct PrismEmailBuilder: Sendable {
 
 // MARK: - MIME Builder
 
+/// Builder for constructing MIME instances.
 public struct PrismMIMEBuilder: Sendable {
     private static func generateBoundary() -> String {
         "PrismBoundary-\(UUID().uuidString)"
     }
 
+    /// Builds a complete MIME message string from the given email.
     public static func buildMessage(_ email: PrismEmail) -> String {
         var message = ""
 
@@ -273,14 +310,22 @@ public struct PrismMIMEBuilder: Sendable {
 
 // MARK: - SMTP Configuration
 
+/// Configuration options for SMTP.
 public struct PrismSMTPConfig: Sendable {
+    /// The host.
     public let host: String
+    /// The port.
     public let port: Int
+    /// The username.
     public let username: String?
+    /// The password.
     public let password: String?
+    /// The use t l s.
     public let useTLS: Bool
+    /// The connection timeout.
     public let connectionTimeout: TimeInterval
 
+    /// Creates a new `PrismSMTPConfig` with the specified configuration.
     public init(
         host: String,
         port: Int = 587,
@@ -300,6 +345,7 @@ public struct PrismSMTPConfig: Sendable {
 
 // MARK: - SMTP Auth
 
+/// Authentication methods supported by the SMTP client.
 public enum PrismSMTPAuthMethod: String, Sendable {
     case plain = "PLAIN"
     case login = "LOGIN"
@@ -307,15 +353,18 @@ public enum PrismSMTPAuthMethod: String, Sendable {
 
 // MARK: - Mailer Actor
 
+/// SMTP-based email delivery service.
 public actor PrismMailerService {
     private let config: PrismSMTPConfig
     private let authMethod: PrismSMTPAuthMethod
 
+    /// Creates a new `PrismMailerService` with the specified configuration.
     public init(config: PrismSMTPConfig, authMethod: PrismSMTPAuthMethod = .plain) {
         self.config = config
         self.authMethod = authMethod
     }
 
+    /// Generates the SMTP command sequence for sending the email.
     public func buildSMTPCommands(for email: PrismEmail) -> [String] {
         var commands: [String] = []
         commands.append("EHLO \(config.host)")
@@ -347,6 +396,7 @@ public actor PrismMailerService {
         return commands
     }
 
+    /// Validates an email address format and returns whether it is valid.
     public func validateEmail(_ email: PrismEmail) -> [String] {
         var errors: [String] = []
         if email.to.isEmpty { errors.append("No recipients") }
@@ -373,6 +423,7 @@ public actor PrismMailerService {
 
 // MARK: - Errors
 
+/// Errors related to Mailer operations.
 public enum PrismMailerError: Error, Sendable {
     case missingFrom
     case missingRecipients

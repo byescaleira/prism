@@ -2,14 +2,18 @@ import Foundation
 
 /// Result of executing a GraphQL operation.
 public struct PrismGraphQLResult: @unchecked Sendable {
+    /// The result data, if the operation succeeded.
     public let data: [String: Any]?
+    /// The errors encountered during execution, if any.
     public let errors: [PrismGraphQLError]?
 
+    /// Creates a GraphQL result with optional data and errors.
     public init(data: [String: Any]?, errors: [PrismGraphQLError]?) {
         self.data = data
         self.errors = errors.flatMap { $0.isEmpty ? nil : $0 }
     }
 
+    /// Serializes this result to JSON data.
     public func toJSON() -> Data {
         var dict: [String: Any] = [:]
         if let data { dict["data"] = sanitize(data) }
@@ -42,10 +46,14 @@ public struct PrismGraphQLResult: @unchecked Sendable {
 
 /// A single GraphQL error.
 public struct PrismGraphQLError: Sendable {
+    /// The error message.
     public let message: String
+    /// The field path where the error occurred.
     public let path: [String]?
+    /// The source locations in the query where the error originated.
     public let locations: [PrismGraphQLSourceLocation]?
 
+    /// Creates a GraphQL error with the given message, path, and locations.
     public init(message: String, path: [String]? = nil, locations: [PrismGraphQLSourceLocation]? = nil) {
         self.message = message
         self.path = path
@@ -64,14 +72,18 @@ public struct PrismGraphQLError: Sendable {
 
 /// Source location in a GraphQL document.
 public struct PrismGraphQLSourceLocation: Sendable {
+    /// The line number in the source document.
     public let line: Int
+    /// The column number in the source document.
     public let column: Int
 }
 
 /// Executes parsed GraphQL documents against a schema.
 public struct PrismGraphQLExecutor: Sendable {
+    /// Creates a GraphQL executor.
     public init() {}
 
+    /// Executes a parsed GraphQL document against the given schema.
     public func execute(
         document: PrismGraphQLDocument,
         schema: PrismGraphQLSchema,

@@ -15,10 +15,14 @@ public enum PrismWebSocketOpcode: UInt8, Sendable {
 
 /// A parsed WebSocket frame.
 public struct PrismWebSocketFrame: Sendable {
+    /// The fin.
     public let fin: Bool
+    /// The opcode.
     public let opcode: PrismWebSocketOpcode
+    /// The payload.
     public let payload: Data
 
+    /// Creates a new `PrismWebSocketFrame` with the specified configuration.
     public init(fin: Bool = true, opcode: PrismWebSocketOpcode, payload: Data) {
         self.fin = fin
         self.opcode = opcode
@@ -82,6 +86,7 @@ public struct PrismWebSocketFrame: Sendable {
 /// Parser for incoming WebSocket frames.
 public struct PrismWebSocketParser: Sendable {
 
+    /// Creates a new `PrismWebSocketParser` with the specified configuration.
     public init() {}
 
     /// Attempts to parse a WebSocket frame from data. Returns the frame and bytes consumed.
@@ -198,6 +203,7 @@ public actor PrismWebSocketConnection {
     /// A unique identifier for this connection.
     public nonisolated let id: String
 
+    /// Creates a new `PrismWebSocketConnection` with the specified configuration.
     public init(id: String = UUID().uuidString, sendFrame: @escaping @Sendable (PrismWebSocketFrame) async -> Void) {
         self.id = id
         self.sendFrame = sendFrame

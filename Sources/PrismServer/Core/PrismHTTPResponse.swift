@@ -9,6 +9,7 @@ public struct PrismHTTPResponse: Sendable {
     /// The response body.
     public var body: PrismHTTPBody
 
+    /// Creates an HTTP response with the given status, headers, and body.
     public init(
         status: PrismHTTPStatus = .ok,
         headers: PrismHTTPHeaders = PrismHTTPHeaders(),
@@ -93,8 +94,11 @@ public struct PrismHTTPResponse: Sendable {
 
 /// Represents the body of an HTTP response.
 public enum PrismHTTPBody: Sendable {
+    /// An empty body with no content.
     case empty
+    /// A body containing raw binary data.
     case data(Data)
+    /// A body containing a UTF-8 text string.
     case text(String)
 
     /// The raw bytes of the body.

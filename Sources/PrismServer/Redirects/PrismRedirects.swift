@@ -1,12 +1,19 @@
 import Foundation
 
+/// A URL redirect rule mapping a source path to a destination.
 public struct PrismRedirectRule: Sendable {
+    /// The source.
     public let source: String
+    /// The destination.
     public let destination: String
+    /// The status code.
     public let statusCode: Int
+    /// The preserve query string.
     public let preserveQueryString: Bool
+    /// The is regex.
     public let isRegex: Bool
 
+    /// Creates a new `PrismRedirectRule` with the specified configuration.
     public init(
         source: String,
         destination: String,
@@ -21,18 +28,22 @@ public struct PrismRedirectRule: Sendable {
         self.isRegex = isRegex
     }
 
+    /// Creates a 301 permanent redirect rule.
     public static func permanent(from source: String, to destination: String, preserveQuery: Bool = true) -> PrismRedirectRule {
         PrismRedirectRule(source: source, destination: destination, statusCode: 301, preserveQueryString: preserveQuery)
     }
 
+    /// Creates a 302 temporary redirect rule.
     public static func temporary(from source: String, to destination: String, preserveQuery: Bool = true) -> PrismRedirectRule {
         PrismRedirectRule(source: source, destination: destination, statusCode: 302, preserveQueryString: preserveQuery)
     }
 
+    /// Creates a 307 temporary redirect rule that preserves the query string.
     public static func seeOther(from source: String, to destination: String) -> PrismRedirectRule {
         PrismRedirectRule(source: source, destination: destination, statusCode: 307, preserveQueryString: true)
     }
 
+    /// Creates a regex-based redirect rule.
     public static func pattern(from regex: String, to destination: String, statusCode: Int = 301) -> PrismRedirectRule {
         PrismRedirectRule(source: regex, destination: destination, statusCode: statusCode, preserveQueryString: true, isRegex: true)
     }
@@ -92,15 +103,18 @@ public struct PrismRedirectRule: Sendable {
     }
 }
 
+/// Middleware that applies URL redirect rules to incoming requests.
 public struct PrismRedirectMiddleware: PrismMiddleware {
     private let rules: [PrismRedirectRule]
     private let trailingSlashAction: PrismTrailingSlashAction
 
+    /// Creates a new `PrismRedirectMiddleware` with the specified configuration.
     public init(rules: [PrismRedirectRule], trailingSlashAction: PrismTrailingSlashAction = .none) {
         self.rules = rules
         self.trailingSlashAction = trailingSlashAction
     }
 
+    /// Handles the request and returns a response.
     public func handle(_ request: PrismHTTPRequest, next: @escaping PrismRouteHandler) async throws -> PrismHTTPResponse {
         let path = request.path
 
@@ -172,6 +186,7 @@ public struct PrismRedirectMiddleware: PrismMiddleware {
     }
 }
 
+/// Actions for normalizing trailing slashes in request paths.
 public enum PrismTrailingSlashAction: Sendable {
     case none
     case add

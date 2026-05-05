@@ -5,16 +5,22 @@ public struct PrismHTTPParser: Sendable {
 
     /// Errors that can occur during HTTP parsing.
     public enum ParserError: Error, Sendable {
+        /// The data does not contain a complete HTTP request.
         case incompleteRequest
+        /// The request line is malformed.
         case invalidRequestLine
+        /// The HTTP method is not recognized.
         case invalidMethod
+        /// A header line is malformed.
         case invalidHeader
+        /// The request body exceeds the maximum allowed size.
         case bodyTooLarge
     }
 
     /// Maximum allowed body size in bytes. Default 10 MB.
     public let maxBodySize: Int
 
+    /// Creates an HTTP parser with the given maximum body size.
     public init(maxBodySize: Int = 10_485_760) {
         self.maxBodySize = maxBodySize
     }

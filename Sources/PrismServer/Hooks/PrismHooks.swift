@@ -15,6 +15,7 @@ public actor PrismHookRegistry {
     private var responseHooks: [PrismResponseHook] = []
     private var errorHooks: [PrismErrorHook] = []
 
+    /// Creates a new `PrismHookRegistry` with the specified configuration.
     public init() {}
 
     /// Registers a hook that runs before request routing.
@@ -74,10 +75,12 @@ public actor PrismHookRegistry {
 public struct PrismHooksMiddleware: PrismMiddleware, Sendable {
     private let registry: PrismHookRegistry
 
+    /// Creates a new `PrismHooksMiddleware` with the specified configuration.
     public init(registry: PrismHookRegistry) {
         self.registry = registry
     }
 
+    /// Handles the request and returns a response.
     public func handle(_ request: PrismHTTPRequest, next: @escaping PrismRouteHandler) async throws -> PrismHTTPResponse {
         do {
             let modifiedRequest = try await registry.runRequestHooks(request)

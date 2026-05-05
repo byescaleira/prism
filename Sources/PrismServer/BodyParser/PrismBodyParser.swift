@@ -2,11 +2,16 @@ import Foundation
 
 /// A parsed XML node.
 public struct PrismXMLNode: Sendable {
+    /// The element tag name.
     public let name: String
+    /// The element's XML attributes.
     public let attributes: [String: String]
+    /// The text content of this node.
     public var text: String?
+    /// The child nodes nested within this element.
     public var children: [PrismXMLNode]
 
+    /// Creates an XML node with the given tag name, attributes, text, and children.
     public init(name: String, attributes: [String: String] = [:], text: String? = nil, children: [PrismXMLNode] = []) {
         self.name = name
         self.attributes = attributes
@@ -27,6 +32,7 @@ public struct PrismXMLNode: Sendable {
 
 /// Simple XML parser using Foundation's XMLParser.
 public enum PrismXMLParserUtil {
+    /// Parses raw XML data into a tree of nodes.
     public static func parse(_ data: Data) -> PrismXMLNode? {
         let parser = XMLParser(data: data)
         let delegate = XMLParserDelegateImpl()
@@ -136,8 +142,10 @@ public enum PrismNestedFormParser {
 
 /// Middleware that auto-detects and parses request bodies.
 public struct PrismBodyParserMiddleware: PrismMiddleware, Sendable {
+    /// Creates a new body parser middleware.
     public init() {}
 
+    /// Detects the content type and annotates the request with the parsed body type.
     public func handle(_ request: PrismHTTPRequest, next: @escaping PrismRouteHandler) async throws -> PrismHTTPResponse {
         var req = request
         let contentType = req.headers.value(for: "Content-Type")?.lowercased() ?? ""

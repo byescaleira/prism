@@ -7,6 +7,7 @@ public struct PrismStaticFileMiddleware: PrismMiddleware {
     private let enableETag: Bool
     private let enableRangeRequests: Bool
 
+    /// Creates a new `PrismStaticFileMiddleware` with the specified configuration.
     public init(
         rootDirectory: String,
         indexFile: String = "index.html",
@@ -19,6 +20,7 @@ public struct PrismStaticFileMiddleware: PrismMiddleware {
         self.enableRangeRequests = enableRangeRequests
     }
 
+    /// Handles the request and returns a response.
     public func handle(_ request: PrismHTTPRequest, next: @escaping PrismRouteHandler) async throws -> PrismHTTPResponse {
         guard request.method == .GET || request.method == .HEAD else {
             return try await next(request)

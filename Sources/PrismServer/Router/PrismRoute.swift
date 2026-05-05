@@ -14,6 +14,7 @@ public struct PrismRoute: Sendable {
     /// The handler function.
     public let handler: PrismRouteHandler
 
+    /// Creates a new `PrismRoute` with the specified configuration.
     public init(method: PrismHTTPMethod, pattern: String, handler: @escaping PrismRouteHandler) {
         self.method = method
         self.pattern = pattern

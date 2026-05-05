@@ -10,11 +10,16 @@ public enum PrismRelationType: Sendable {
 
 /// Describes a relationship between two database tables.
 public struct PrismRelation: Sendable {
+    /// The type.
     public let type: PrismRelationType
+    /// The local key.
     public let localKey: String
+    /// The foreign key.
     public let foreignKey: String
+    /// The related table.
     public let relatedTable: String
 
+    /// Creates a new `PrismRelation` with the specified configuration.
     public init(type: PrismRelationType, localKey: String, foreignKey: String, relatedTable: String) {
         self.type = type
         self.localKey = localKey
@@ -22,14 +27,17 @@ public struct PrismRelation: Sendable {
         self.relatedTable = relatedTable
     }
 
+    /// Returns whether the condition `hasMany` is met.
     public static func hasMany(_ table: String, foreignKey: String, localKey: String = "id") -> PrismRelation {
         PrismRelation(type: .hasMany, localKey: localKey, foreignKey: foreignKey, relatedTable: table)
     }
 
+    /// Returns whether the condition `hasOne` is met.
     public static func hasOne(_ table: String, foreignKey: String, localKey: String = "id") -> PrismRelation {
         PrismRelation(type: .hasOne, localKey: localKey, foreignKey: foreignKey, relatedTable: table)
     }
 
+    /// Defines an inverse belongs-to relationship to the specified table.
     public static func belongsTo(_ table: String, foreignKey: String, localKey: String = "id") -> PrismRelation {
         PrismRelation(type: .belongsTo, localKey: foreignKey, foreignKey: localKey, relatedTable: table)
     }
@@ -41,6 +49,7 @@ public protocol PrismRelatable: PrismModel {
 }
 
 extension PrismRelatable {
+    /// The default `relations` value.
     public static var relations: [String: PrismRelation] { [:] }
 }
 

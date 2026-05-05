@@ -22,6 +22,7 @@ public actor PrismHTTPServer {
     private let tlsConfig: PrismTLSConfiguration?
     #endif
 
+    /// Creates an HTTP server bound to the given host and port.
     public init(
         host: String = "0.0.0.0",
         port: UInt16 = 8080,
@@ -342,26 +343,32 @@ public final class PrismRouteGroupBuilder: Sendable {
         self._subgroups = LockedBox([])
     }
 
+    /// Registers a GET route within this group.
     public func get(_ pattern: String, handler: @escaping PrismRouteHandler) {
         _routes.mutate { $0.append(PrismRoute(method: .GET, pattern: pattern, handler: handler)) }
     }
 
+    /// Registers a POST route within this group.
     public func post(_ pattern: String, handler: @escaping PrismRouteHandler) {
         _routes.mutate { $0.append(PrismRoute(method: .POST, pattern: pattern, handler: handler)) }
     }
 
+    /// Registers a PUT route within this group.
     public func put(_ pattern: String, handler: @escaping PrismRouteHandler) {
         _routes.mutate { $0.append(PrismRoute(method: .PUT, pattern: pattern, handler: handler)) }
     }
 
+    /// Registers a PATCH route within this group.
     public func patch(_ pattern: String, handler: @escaping PrismRouteHandler) {
         _routes.mutate { $0.append(PrismRoute(method: .PATCH, pattern: pattern, handler: handler)) }
     }
 
+    /// Registers a DELETE route within this group.
     public func delete(_ pattern: String, handler: @escaping PrismRouteHandler) {
         _routes.mutate { $0.append(PrismRoute(method: .DELETE, pattern: pattern, handler: handler)) }
     }
 
+    /// Creates a nested sub-group with an additional prefix and optional middleware.
     public func group(_ subPrefix: String, middlewares: [any PrismMiddleware] = [], configure: (PrismRouteGroupBuilder) -> Void) {
         let builder = PrismRouteGroupBuilder(prefix: subPrefix, middlewares: middlewares)
         configure(builder)

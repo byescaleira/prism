@@ -9,6 +9,7 @@ public struct PrismAuthMiddleware: PrismMiddleware {
     private let headerName: String
     private let scheme: String
 
+    /// Creates a new `PrismAuthMiddleware` with the specified configuration.
     public init(
         headerName: String = "Authorization",
         scheme: String = "Bearer",
@@ -19,6 +20,7 @@ public struct PrismAuthMiddleware: PrismMiddleware {
         self.validator = validator
     }
 
+    /// Handles the request and returns a response.
     public func handle(_ request: PrismHTTPRequest, next: @escaping PrismRouteHandler) async throws -> PrismHTTPResponse {
         guard let authHeader = request.headers.value(for: headerName) else {
             return PrismHTTPResponse(status: .unauthorized, body: .text("Missing authorization header"))

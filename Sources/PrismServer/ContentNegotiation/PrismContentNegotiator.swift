@@ -2,10 +2,14 @@ import Foundation
 
 /// A parsed media type from the Accept header.
 public struct PrismMediaType: Sendable, Equatable {
+    /// The primary type component (e.g., "application").
     public let type: String
+    /// The subtype component (e.g., "json").
     public let subtype: String
+    /// The quality factor from 0.0 to 1.0.
     public let quality: Double
 
+    /// Creates a media type with the given type, subtype, and quality factor.
     public init(type: String, subtype: String, quality: Double = 1.0) {
         self.type = type
         self.subtype = subtype
@@ -54,11 +58,17 @@ public struct PrismMediaType: Sendable, Equatable {
 
 /// Supported response formats.
 public enum PrismResponseFormat: Sendable, Equatable {
+    /// JSON format (application/json).
     case json
+    /// XML format (application/xml).
     case xml
+    /// HTML format (text/html).
     case html
+    /// CSV format (text/csv).
     case csv
+    /// Plain text format (text/plain).
     case text
+    /// A custom MIME type.
     case custom(String)
 
     /// The MIME type for this format.
@@ -81,6 +91,7 @@ public enum PrismResponseFormat: Sendable, Equatable {
 
 /// Negotiates the best response format from an Accept header.
 public struct PrismContentNegotiator: Sendable {
+    /// Creates a content negotiator.
     public init() {}
 
     /// Picks the best format from available options based on the Accept header.
@@ -99,6 +110,7 @@ public struct PrismContentNegotiator: Sendable {
 
 /// Builds a response in the negotiated format.
 public struct PrismNegotiatedResponse: Sendable {
+    /// Creates a negotiated response builder.
     public init() {}
 
     /// Responds with data in the best format based on the request's Accept header.

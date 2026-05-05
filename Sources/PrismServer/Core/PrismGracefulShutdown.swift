@@ -8,6 +8,7 @@ public actor PrismGracefulShutdown {
     private let drainTimeout: Duration
     private var signalSources: [any Sendable] = []
 
+    /// Creates a graceful shutdown manager with the specified drain timeout.
     public init(drainTimeout: Duration = .seconds(30)) {
         self.drainTimeout = drainTimeout
     }
@@ -61,10 +62,12 @@ public actor PrismGracefulShutdown {
 public struct PrismShutdownMiddleware: PrismMiddleware, Sendable {
     private let shutdown: PrismGracefulShutdown
 
+    /// Creates a shutdown middleware that monitors the given shutdown manager.
     public init(shutdown: PrismGracefulShutdown) {
         self.shutdown = shutdown
     }
 
+    /// Rejects incoming requests with 503 Service Unavailable when the server is shutting down.
     public func handle(_ request: PrismHTTPRequest, next: @escaping PrismRouteHandler) async throws -> PrismHTTPResponse {
         if await shutdown.shuttingDown {
             return PrismHTTPResponse(

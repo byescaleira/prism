@@ -2,16 +2,22 @@ import Foundation
 
 /// Errors during cron expression parsing.
 public enum PrismCronError: Error, Sendable {
+    /// The cron expression could not be parsed.
     case invalidExpression(String)
+    /// A specific cron field value is invalid.
     case invalidField(String, String)
 }
 
 /// A parsed cron field supporting *, */N, N, N-M, and N,M,O.
 public struct PrismCronField: Sendable, Equatable {
+    /// The set of integer values matched by this field.
     public let allowedValues: Set<Int>
+    /// The minimum valid value for this field.
     public let min: Int
+    /// The maximum valid value for this field.
     public let max: Int
 
+    /// Parses a cron field expression within the given min/max range.
     public init(expression: String, min: Int, max: Int) throws {
         self.min = min
         self.max = max
@@ -51,6 +57,7 @@ public struct PrismCronField: Sendable, Equatable {
         self.allowedValues = values
     }
 
+    /// Returns whether the given integer is in this field's allowed values.
     public func matches(_ value: Int) -> Bool {
         allowedValues.contains(value)
     }
@@ -58,13 +65,20 @@ public struct PrismCronField: Sendable, Equatable {
 
 /// A parsed 5-field cron expression (minute hour dayOfMonth month dayOfWeek).
 public struct PrismCronExpression: Sendable {
+    /// The minute field (0-59).
     public let minute: PrismCronField
+    /// The hour field (0-23).
     public let hour: PrismCronField
+    /// The day-of-month field (1-31).
     public let dayOfMonth: PrismCronField
+    /// The month field (1-12).
     public let month: PrismCronField
+    /// The day-of-week field (0-6, Sunday=0).
     public let dayOfWeek: PrismCronField
+    /// The original cron expression string.
     public let raw: String
 
+    /// Parses a 5-field cron expression string.
     public init(_ expression: String) throws {
         self.raw = expression
         let fields = expression.split(separator: " ", omittingEmptySubsequences: true).map(String.init)
@@ -110,10 +124,14 @@ public struct PrismCronExpression: Sendable {
 
 /// A named cron job with an expression and handler.
 public struct PrismCronJob: Sendable {
+    /// The human-readable name of the cron job.
     public let name: String
+    /// The cron expression controlling when this job fires.
     public let expression: PrismCronExpression
+    /// The async handler to execute when the job fires.
     public let handler: @Sendable () async throws -> Void
 
+    /// Creates a cron job with the given name, schedule expression, and handler.
     public init(name: String, expression: PrismCronExpression, handler: @escaping @Sendable () async throws -> Void) {
         self.name = name
         self.expression = expression
@@ -127,6 +145,7 @@ public actor PrismCronScheduler {
     private var task: Task<Void, Never>?
     private var running = false
 
+    /// Creates a cron scheduler.
     public init() {}
 
     /// Schedules a job with a cron expression string.

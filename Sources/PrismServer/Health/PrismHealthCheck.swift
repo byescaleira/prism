@@ -9,11 +9,16 @@ public enum PrismHealthStatus: String, Sendable, Codable {
 
 /// Result of a single health check.
 public struct PrismHealthCheckResult: Sendable {
+    /// The name.
     public let name: String
+    /// The status.
     public let status: PrismHealthStatus
+    /// The message.
     public let message: String?
+    /// The duration.
     public let duration: Duration?
 
+    /// Creates a new `PrismHealthCheckResult` with the specified configuration.
     public init(name: String, status: PrismHealthStatus, message: String? = nil, duration: Duration? = nil) {
         self.name = name
         self.status = status
@@ -24,14 +29,17 @@ public struct PrismHealthCheckResult: Sendable {
 
 /// A named health check that verifies a system component.
 public struct PrismHealthCheck: Sendable {
+    /// The name.
     public let name: String
     private let check: @Sendable () async -> PrismHealthCheckResult
 
+    /// Creates a new `PrismHealthCheck` with the specified configuration.
     public init(name: String, check: @escaping @Sendable () async -> PrismHealthCheckResult) {
         self.name = name
         self.check = check
     }
 
+    /// Runs the operation.
     public func run() async -> PrismHealthCheckResult {
         await check()
     }
@@ -41,6 +49,7 @@ public struct PrismHealthCheck: Sendable {
 public actor PrismHealthMonitor {
     private var checks: [PrismHealthCheck] = []
 
+    /// Creates a new `PrismHealthMonitor` with the specified configuration.
     public init() {}
 
     /// Registers a health check.
@@ -88,9 +97,12 @@ public actor PrismHealthMonitor {
 
 /// Aggregate health report.
 public struct PrismHealthReport: Sendable {
+    /// The status.
     public let status: PrismHealthStatus
+    /// The checks.
     public let checks: [PrismHealthCheckResult]
 
+    /// Serializes this object to JSON data.
     public func toJSONData() -> Data {
         var dict: [String: Any] = ["status": status.rawValue]
         dict["checks"] = checks.map { check -> [String: Any] in
@@ -107,11 +119,13 @@ public struct PrismHealthMiddleware: PrismMiddleware, Sendable {
     private let monitor: PrismHealthMonitor
     private let path: String
 
+    /// Creates a new `PrismHealthMiddleware` with the specified configuration.
     public init(monitor: PrismHealthMonitor, path: String = "/health") {
         self.monitor = monitor
         self.path = path
     }
 
+    /// Handles the request and returns a response.
     public func handle(_ request: PrismHTTPRequest, next: @escaping PrismRouteHandler) async throws -> PrismHTTPResponse {
         guard request.path == path && request.method == .GET else {
             return try await next(request)
@@ -136,6 +150,7 @@ public actor PrismMetrics {
     private var totalLatencyNanos: UInt64 = 0
     private var activeRequests: Int = 0
 
+    /// Creates a new `PrismMetrics` with the specified configuration.
     public init() {}
 
     /// Records a completed request.
@@ -186,13 +201,20 @@ public actor PrismMetrics {
 
 /// Immutable snapshot of server metrics.
 public struct PrismMetricsSnapshot: Sendable {
+    /// The request count.
     public let requestCount: Int
+    /// The error count.
     public let errorCount: Int
+    /// The active requests.
     public let activeRequests: Int
+    /// The average latency nanos.
     public let averageLatencyNanos: UInt64
+    /// The status counts.
     public let statusCounts: [Int: Int]
+    /// The top paths.
     public let topPaths: [String: Int]
 
+    /// Serializes this object to JSON data.
     public func toJSONData() -> Data {
         var dict: [String: Any] = [
             "requestCount": requestCount,
@@ -211,11 +233,13 @@ public struct PrismMetricsMiddleware: PrismMiddleware, Sendable {
     private let metrics: PrismMetrics
     private let metricsPath: String
 
+    /// Creates a new `PrismMetricsMiddleware` with the specified configuration.
     public init(metrics: PrismMetrics, path: String = "/metrics") {
         self.metrics = metrics
         self.metricsPath = path
     }
 
+    /// Handles the request and returns a response.
     public func handle(_ request: PrismHTTPRequest, next: @escaping PrismRouteHandler) async throws -> PrismHTTPResponse {
         if request.path == metricsPath && request.method == .GET {
             let snapshot = await metrics.snapshot()

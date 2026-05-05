@@ -2,17 +2,20 @@
 import Foundation
 import CommonCrypto
 
+/// Errors related to PasswordHashing operations.
 public enum PrismPasswordHashingError: Error, Sendable {
     case hashingFailed
     case invalidFormat
     case verificationFailed
 }
 
+/// PasswordHasher protocol.
 public protocol PrismPasswordHasher: Sendable {
     func hash(_ password: String) throws -> String
     func verify(_ password: String, against hash: String) throws -> Bool
 }
 
+/// Hash algorithm variants for PBKDF2 key derivation.
 public enum PrismPBKDF2Algorithm: String, Sendable {
     case sha256 = "pbkdf2-sha256"
     case sha512 = "pbkdf2-sha512"
@@ -25,12 +28,18 @@ public enum PrismPBKDF2Algorithm: String, Sendable {
     }
 }
 
+/// Password hasher using PBKDF2 with SHA-256 key derivation.
 public struct PrismPBKDF2Hasher: PrismPasswordHasher {
+    /// The algorithm.
     public let algorithm: PrismPBKDF2Algorithm
+    /// The iterations.
     public let iterations: Int
+    /// The salt length.
     public let saltLength: Int
+    /// The key length.
     public let keyLength: Int
 
+    /// Creates a new `PrismPBKDF2Hasher` with the specified configuration.
     public init(
         algorithm: PrismPBKDF2Algorithm = .sha256,
         iterations: Int = 600_000,
@@ -43,6 +52,7 @@ public struct PrismPBKDF2Hasher: PrismPasswordHasher {
         self.keyLength = keyLength
     }
 
+    /// Computes a hash of the input.
     public func hash(_ password: String) throws -> String {
         var salt = [UInt8](repeating: 0, count: saltLength)
         for i in 0..<saltLength {
@@ -56,6 +66,7 @@ public struct PrismPBKDF2Hasher: PrismPasswordHasher {
         return "$\(algorithm.rawValue)$\(iterations)$\(saltB64)$\(hashB64)"
     }
 
+    /// Verifies the token signature and claims validity, returning the decoded claims.
     public func verify(_ password: String, against hash: String) throws -> Bool {
         let parts = hash.split(separator: "$", omittingEmptySubsequences: true)
         guard parts.count == 4 else { throw PrismPasswordHashingError.invalidFormat }

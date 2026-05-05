@@ -1,16 +1,26 @@
 import Foundation
 import CryptoKit
 
+/// Configuration for the enhanced static file middleware.
 public struct PrismEnhancedStaticConfig: Sendable {
+    /// The root directory to serve files from.
     public let rootDirectory: String
+    /// The default index file served for directory requests.
     public let indexFile: String
+    /// Whether ETag headers are generated for files.
     public let enableETag: Bool
+    /// Whether byte-range requests are supported.
     public let enableRangeRequests: Bool
+    /// Whether If-None-Match and If-Modified-Since checks are enabled.
     public let enableConditionalRequests: Bool
+    /// The Cache-Control header value for served files.
     public let cacheControl: String
+    /// The max-age directive value in seconds.
     public let maxAge: Int
+    /// Whether ETags are computed from content hashes instead of modification time.
     public let hashBasedETag: Bool
 
+    /// Creates an enhanced static config for the given root directory.
     public init(
         rootDirectory: String,
         indexFile: String = "index.html",
@@ -32,13 +42,16 @@ public struct PrismEnhancedStaticConfig: Sendable {
     }
 }
 
+/// Middleware that serves static files with ETag, range requests, and conditional support.
 public struct PrismEnhancedStaticMiddleware: PrismMiddleware {
     private let config: PrismEnhancedStaticConfig
 
+    /// Creates an enhanced static middleware with the given configuration.
     public init(config: PrismEnhancedStaticConfig) {
         self.config = config
     }
 
+    /// Serves static files for GET/HEAD requests with caching, ETag, and range support.
     public func handle(_ request: PrismHTTPRequest, next: @escaping PrismRouteHandler) async throws -> PrismHTTPResponse {
         guard request.method == .GET || request.method == .HEAD else {
             return try await next(request)

@@ -4,6 +4,7 @@ import Foundation
 public final class PrismMCPStdioTransport: Sendable {
     private let server: PrismMCPServer
 
+    /// Creates a new `PrismMCPStdioTransport` with the specified configuration.
     public init(server: PrismMCPServer) {
         self.server = server
     }
@@ -38,11 +39,13 @@ public struct PrismMCPHTTPTransport: PrismMiddleware, Sendable {
     private let server: PrismMCPServer
     private let basePath: String
 
+    /// Creates a new `PrismMCPHTTPTransport` with the specified configuration.
     public init(server: PrismMCPServer, path: String = "/mcp") {
         self.server = server
         self.basePath = path
     }
 
+    /// Handles the request and returns a response.
     public func handle(_ request: PrismHTTPRequest, next: @escaping PrismRouteHandler) async throws -> PrismHTTPResponse {
         if request.path == basePath && request.method == .POST {
             return await handleJSONRPC(request)

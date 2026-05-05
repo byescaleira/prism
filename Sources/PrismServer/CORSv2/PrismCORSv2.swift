@@ -1,14 +1,23 @@
 import Foundation
 
+/// Configuration for the advanced CORS middleware.
 public struct PrismCORSv2Config: Sendable {
+    /// The origin policy controlling which origins are allowed.
     public let allowedOrigins: PrismCORSOriginPolicy
+    /// The HTTP methods allowed in CORS requests.
     public let allowedMethods: [PrismHTTPMethod]
+    /// The request headers allowed in CORS requests.
     public let allowedHeaders: [String]
+    /// The response headers exposed to the client.
     public let exposedHeaders: [String]
+    /// Whether credentials (cookies, auth headers) are allowed.
     public let allowCredentials: Bool
+    /// The max-age in seconds for preflight cache.
     public let maxAge: Int
+    /// Whether preflight requests should continue to the next handler.
     public let preflightContinue: Bool
 
+    /// Creates a CORS v2 configuration with the specified options.
     public init(
         allowedOrigins: PrismCORSOriginPolicy = .any,
         allowedMethods: [PrismHTTPMethod] = [.GET, .POST, .PUT, .PATCH, .DELETE, .OPTIONS],
@@ -28,13 +37,20 @@ public struct PrismCORSv2Config: Sendable {
     }
 }
 
+/// Policy defining which origins are permitted by CORS.
 public enum PrismCORSOriginPolicy: Sendable {
+    /// Allow all origins with a wildcard.
     case any
+    /// Block all origins.
     case none
+    /// Allow only the listed origins.
     case exact([String])
+    /// Mirror the request origin in the response.
     case reflect
+    /// Use a custom closure to decide if an origin is allowed.
     case custom(@Sendable (String) -> Bool)
 
+    /// Returns whether the given origin is allowed by this policy.
     public func isAllowed(_ origin: String) -> Bool {
         switch self {
         case .any:
@@ -50,6 +66,7 @@ public enum PrismCORSOriginPolicy: Sendable {
         }
     }
 
+    /// Returns the Access-Control-Allow-Origin header value for the given origin.
     public func headerValue(for origin: String) -> String? {
         switch self {
         case .any:
@@ -66,15 +83,18 @@ public enum PrismCORSOriginPolicy: Sendable {
     }
 }
 
+/// Advanced CORS middleware with per-route overrides and preflight handling.
 public struct PrismCORSv2Middleware: PrismMiddleware {
     private let config: PrismCORSv2Config
     private let routeOverrides: [String: PrismCORSv2Config]
 
+    /// Creates a CORS v2 middleware with the given config and optional per-route overrides.
     public init(config: PrismCORSv2Config = PrismCORSv2Config(), routeOverrides: [String: PrismCORSv2Config] = [:]) {
         self.config = config
         self.routeOverrides = routeOverrides
     }
 
+    /// Applies CORS headers and handles preflight OPTIONS requests.
     public func handle(_ request: PrismHTTPRequest, next: @escaping PrismRouteHandler) async throws -> PrismHTTPResponse {
         let activeConfig = resolveConfig(for: request.path)
 

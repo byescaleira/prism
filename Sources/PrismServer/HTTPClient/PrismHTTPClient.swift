@@ -2,12 +2,18 @@ import Foundation
 
 /// Configuration for the HTTP client.
 public struct PrismHTTPClientConfig: Sendable {
+    /// The base u r l.
     public let baseURL: String?
+    /// The default headers.
     public let defaultHeaders: [String: String]
+    /// The timeout.
     public let timeout: TimeInterval
+    /// The retry count.
     public let retryCount: Int
+    /// The retry delay.
     public let retryDelay: Duration
 
+    /// Creates a new `PrismHTTPClientConfig` with the specified configuration.
     public init(
         baseURL: String? = nil,
         defaultHeaders: [String: String] = [:],
@@ -25,12 +31,18 @@ public struct PrismHTTPClientConfig: Sendable {
 
 /// An outbound HTTP request.
 public struct PrismClientRequest: Sendable {
+    /// The url.
     public var url: String
+    /// The method.
     public var method: String
+    /// The headers.
     public var headers: [String: String]
+    /// The body.
     public var body: Data?
+    /// The timeout.
     public var timeout: TimeInterval?
 
+    /// Creates a new `PrismClientRequest` with the specified configuration.
     public init(url: String, method: String = "GET", headers: [String: String] = [:], body: Data? = nil, timeout: TimeInterval? = nil) {
         self.url = url
         self.method = method
@@ -42,20 +54,26 @@ public struct PrismClientRequest: Sendable {
 
 /// An HTTP response from the client.
 public struct PrismClientResponse: Sendable {
+    /// The status code.
     public let statusCode: Int
+    /// The headers.
     public let headers: [String: String]
+    /// The body.
     public let body: Data?
 
+    /// Creates a new `PrismClientResponse` with the specified configuration.
     public init(statusCode: Int, headers: [String: String], body: Data?) {
         self.statusCode = statusCode
         self.headers = headers
         self.body = body
     }
 
+    /// The text.
     public var text: String? {
         body.flatMap { String(data: $0, encoding: .utf8) }
     }
 
+    /// Decodes the response body as JSON into the specified type.
     public func json<T: Decodable>(_ type: T.Type = T.self, decoder: JSONDecoder = JSONDecoder()) throws -> T {
         guard let body else { throw PrismHTTPClientError.requestFailed("No response body") }
         return try decoder.decode(type, from: body)
@@ -73,6 +91,7 @@ public enum PrismHTTPClientError: Error, Sendable {
 public struct PrismHTTPClient: Sendable {
     private let config: PrismHTTPClientConfig
 
+    /// Creates a new `PrismHTTPClient` with the specified configuration.
     public init(config: PrismHTTPClientConfig = PrismHTTPClientConfig()) {
         self.config = config
     }
@@ -141,22 +160,27 @@ public struct PrismHTTPClient: Sendable {
 
     // MARK: - Convenience Methods
 
+    /// Retrieves the value asynchronously.
     public func get(_ url: String, headers: [String: String] = [:]) async throws -> PrismClientResponse {
         try await request(PrismClientRequest(url: url, method: "GET", headers: headers))
     }
 
+    /// Sends a POST request.
     public func post(_ url: String, body: Data? = nil, headers: [String: String] = [:]) async throws -> PrismClientResponse {
         try await request(PrismClientRequest(url: url, method: "POST", headers: headers, body: body))
     }
 
+    /// Sends a PUT request.
     public func put(_ url: String, body: Data? = nil, headers: [String: String] = [:]) async throws -> PrismClientResponse {
         try await request(PrismClientRequest(url: url, method: "PUT", headers: headers, body: body))
     }
 
+    /// Sends a PATCH request.
     public func patch(_ url: String, body: Data? = nil, headers: [String: String] = [:]) async throws -> PrismClientResponse {
         try await request(PrismClientRequest(url: url, method: "PATCH", headers: headers, body: body))
     }
 
+    /// Deletes the specified resource.
     public func delete(_ url: String, headers: [String: String] = [:]) async throws -> PrismClientResponse {
         try await request(PrismClientRequest(url: url, method: "DELETE", headers: headers))
     }

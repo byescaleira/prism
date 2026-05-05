@@ -4,6 +4,7 @@ import SQLite3
 
 // MARK: - Job Status
 
+/// Lifecycle states for a persistent queue job.
 public enum PrismJobStatus: String, Sendable {
     case pending
     case processing
@@ -14,12 +15,14 @@ public enum PrismJobStatus: String, Sendable {
 
 // MARK: - Job Priority
 
+/// Priority levels that determine job processing order.
 public enum PrismJobPriority: Int, Sendable, Comparable {
     case low = 0
     case normal = 5
     case high = 10
     case critical = 20
 
+    /// Compares two job priorities by their raw value.
     public static func < (lhs: PrismJobPriority, rhs: PrismJobPriority) -> Bool {
         lhs.rawValue < rhs.rawValue
     }
@@ -27,19 +30,32 @@ public enum PrismJobPriority: Int, Sendable, Comparable {
 
 // MARK: - Persistent Job
 
+/// A job stored in the persistent queue with status and retry metadata.
 public struct PrismPersistentJob: Sendable {
+    /// The id.
     public let id: String
+    /// The queue.
     public let queue: String
+    /// The payload.
     public let payload: String
+    /// The status.
     public let status: PrismJobStatus
+    /// The priority.
     public let priority: PrismJobPriority
+    /// The attempts.
     public let attempts: Int
+    /// The max attempts.
     public let maxAttempts: Int
+    /// The last error.
     public let lastError: String?
+    /// The created at.
     public let createdAt: String
+    /// The updated at.
     public let updatedAt: String
+    /// The scheduled at.
     public let scheduledAt: String?
 
+    /// Creates a new `PrismPersistentJob` with the specified configuration.
     public init(
         id: String = UUID().uuidString,
         queue: String = "default",
@@ -69,17 +85,25 @@ public struct PrismPersistentJob: Sendable {
 
 // MARK: - Job Handler
 
+/// Type alias for `PrismJobHandler`.
 public typealias PrismJobHandler = @Sendable (PrismPersistentJob) async throws -> Void
 
 // MARK: - Queue Configuration
 
+/// Configuration options for Queue.
 public struct PrismQueueConfig: Sendable {
+    /// The max attempts.
     public let maxAttempts: Int
+    /// The retry base delay.
     public let retryBaseDelay: TimeInterval
+    /// The retry max delay.
     public let retryMaxDelay: TimeInterval
+    /// The poll interval.
     public let pollInterval: TimeInterval
+    /// The batch size.
     public let batchSize: Int
 
+    /// Creates a new `PrismQueueConfig` with the specified configuration.
     public init(
         maxAttempts: Int = 3,
         retryBaseDelay: TimeInterval = 5,
@@ -97,11 +121,13 @@ public struct PrismQueueConfig: Sendable {
 
 // MARK: - Persistent Queue
 
+/// Storage backend for PersistentQueue data.
 public actor PrismPersistentQueueStore {
     private let db: PrismDatabase
     private let config: PrismQueueConfig
     private var initialized = false
 
+    /// Creates a new `PrismPersistentQueueStore` with the specified configuration.
     public init(database: PrismDatabase, config: PrismQueueConfig = PrismQueueConfig()) {
         self.db = database
         self.config = config
@@ -135,6 +161,7 @@ public actor PrismPersistentQueueStore {
         initialized = true
     }
 
+    /// Adds a job to the persistent queue and returns its identifier.
     public func enqueue(
         queue: String = "default",
         payload: String,
@@ -156,6 +183,7 @@ public actor PrismPersistentQueueStore {
         return id
     }
 
+    /// Fetches and marks pending jobs as processing, up to the batch size limit.
     public func dequeue(queue: String = "default", limit: Int? = nil) async throws -> [PrismPersistentJob] {
         try await ensureTable()
         let batchSize = limit ?? config.batchSize
@@ -185,6 +213,7 @@ public actor PrismPersistentQueueStore {
         return jobs
     }
 
+    /// Marks a job as completed by its identifier.
     public func complete(_ jobId: String) async throws {
         try await ensureTable()
         try await db.execute("""
@@ -192,6 +221,7 @@ public actor PrismPersistentQueueStore {
         """, parameters: [.text(jobId)])
     }
 
+    /// Records a job failure, rescheduling with backoff or moving to dead letter.
     public func fail(_ jobId: String, error: String) async throws {
         try await ensureTable()
         let rows = try await db.query(
@@ -217,6 +247,7 @@ public actor PrismPersistentQueueStore {
         }
     }
 
+    /// Resets a failed job to pending status for immediate retry.
     public func retry(_ jobId: String) async throws {
         try await ensureTable()
         try await db.execute("""
@@ -225,6 +256,7 @@ public actor PrismPersistentQueueStore {
         """, parameters: [.text(jobId)])
     }
 
+    /// Retrieves a single job by its identifier.
     public func getJob(_ jobId: String) async throws -> PrismPersistentJob? {
         try await ensureTable()
         let rows = try await db.query(
@@ -234,6 +266,7 @@ public actor PrismPersistentQueueStore {
         return rows.first.flatMap(jobFromRow)
     }
 
+    /// Returns all jobs in the dead letter queue for the given queue name.
     public func deadLetterJobs(queue: String = "default") async throws -> [PrismPersistentJob] {
         try await ensureTable()
         let rows = try await db.query(
@@ -243,6 +276,7 @@ public actor PrismPersistentQueueStore {
         return rows.compactMap(jobFromRow)
     }
 
+    /// Deletes completed jobs older than the specified number of days.
     public func purgeCompleted(olderThanDays: Int = 7) async throws -> Int {
         try await ensureTable()
         return try await db.execute("""
@@ -251,6 +285,7 @@ public actor PrismPersistentQueueStore {
         """)
     }
 
+    /// Returns a status-to-count mapping for the given queue.
     public func stats(queue: String = "default") async throws -> [String: Int] {
         try await ensureTable()
         let rows = try await db.query("""
@@ -267,6 +302,7 @@ public actor PrismPersistentQueueStore {
         return result
     }
 
+    /// Returns the number of pending jobs in the given queue.
     public func pendingCount(queue: String = "default") async throws -> Int {
         try await ensureTable()
         let rows = try await db.query(
@@ -317,6 +353,7 @@ public actor PrismPersistentQueueStore {
 
 // MARK: - Queue Worker
 
+/// Processes jobs from a persistent queue using registered handlers.
 public actor PrismQueueWorker {
     private let store: PrismPersistentQueueStore
     private let queue: String
@@ -324,19 +361,23 @@ public actor PrismQueueWorker {
     private var defaultHandler: PrismJobHandler?
     private var running = false
 
+    /// Creates a new `PrismQueueWorker` with the specified configuration.
     public init(store: PrismPersistentQueueStore, queue: String = "default") {
         self.store = store
         self.queue = queue
     }
 
+    /// Registers a handler closure for a specific job type.
     public func registerHandler(for type: String, handler: @escaping PrismJobHandler) {
         handlers[type] = handler
     }
 
+    /// Sets the fallback handler used when no type-specific handler matches.
     public func setDefaultHandler(_ handler: @escaping PrismJobHandler) {
         defaultHandler = handler
     }
 
+    /// Dequeues and processes the next available job, returning the count processed.
     public func processNext() async throws -> Int {
         let jobs = try await store.dequeue(queue: queue, limit: 1)
         for job in jobs {

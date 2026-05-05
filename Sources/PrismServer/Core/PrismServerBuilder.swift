@@ -31,6 +31,7 @@ public struct PrismServerBuilder: Sendable {
     private let tlsConfig: PrismTLSConfiguration?
     private let logLevel: PrismLogLevel
 
+    /// Creates a server builder with the given host, port, TLS config, and log level.
     public init(
         host: String = "0.0.0.0",
         port: UInt16 = 8080,

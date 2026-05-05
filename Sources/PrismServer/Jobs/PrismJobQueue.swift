@@ -9,6 +9,7 @@ public protocol PrismJob: Sendable {
 }
 
 extension PrismJob {
+    /// The default `name` value.
     public static var name: String { String(describing: Self.self) }
 }
 
@@ -23,6 +24,7 @@ public struct PrismJobSchedule: Sendable {
     /// Delay between retries (exponential backoff applied).
     public let retryDelay: TimeInterval
 
+    /// Creates a new `PrismJobSchedule` with the specified configuration.
     public init(
         initialDelay: TimeInterval = 0,
         repeatInterval: TimeInterval? = nil,
@@ -54,6 +56,7 @@ public actor PrismJobQueue {
     private var runningTasks: [String: Task<Void, Never>] = [:]
     private var isRunning = false
 
+    /// Creates a new `PrismJobQueue` with the specified configuration.
     public init() {}
 
     /// Enqueues a job with the given schedule.
@@ -119,6 +122,7 @@ public actor PrismJobQueue {
 public actor PrismScheduler {
     private let queue: PrismJobQueue
 
+    /// Creates a new `PrismScheduler` with the specified configuration.
     public init(queue: PrismJobQueue = PrismJobQueue()) {
         self.queue = queue
     }

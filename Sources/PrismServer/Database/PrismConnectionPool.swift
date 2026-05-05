@@ -9,6 +9,7 @@ public actor PrismConnectionPool {
     private let path: String
     private var waiters: [CheckedContinuation<PrismDatabase, any Error>] = []
 
+    /// Creates a connection pool backed by the SQLite database at the given path.
     public init(path: String, maxConnections: Int = 5) throws {
         self.path = path
         self.maxConnections = maxConnections

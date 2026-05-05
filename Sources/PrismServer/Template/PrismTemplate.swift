@@ -11,6 +11,7 @@ import Foundation
 public struct PrismTemplate: Sendable {
     private let source: String
 
+    /// Creates a new `PrismTemplate` with the specified configuration.
     public init(_ source: String) {
         self.source = source
     }
@@ -153,16 +154,20 @@ public struct PrismTemplateContext: Sendable {
     /// Named partial templates for inclusion.
     public var partials: [String: String] = [:]
 
+    /// Creates a new `PrismTemplateContext` with the specified configuration.
     public init() {}
 
+    /// Sets a string value for the given template variable key.
     public mutating func set(_ key: String, to value: String) {
         values[key] = value
     }
 
+    /// Sets an array of strings for the given template loop key.
     public mutating func set(_ key: String, to items: [String]) {
         arrays[key] = items
     }
 
+    /// Registers a named partial template for inclusion during rendering.
     public mutating func setPartial(_ name: String, content: String) {
         partials[name] = content
     }

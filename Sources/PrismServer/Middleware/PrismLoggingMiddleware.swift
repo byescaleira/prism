@@ -5,10 +5,12 @@ import PrismFoundation
 public struct PrismLoggingMiddleware: PrismMiddleware {
     private let logger: PrismStructuredLogger
 
+    /// Creates a new `PrismLoggingMiddleware` with the specified configuration.
     public init(logger: PrismStructuredLogger = PrismStructuredLogger(destinations: [PrismConsoleLogDestination()])) {
         self.logger = logger
     }
 
+    /// Handles the request and returns a response.
     public func handle(_ request: PrismHTTPRequest, next: @escaping PrismRouteHandler) async throws -> PrismHTTPResponse {
         let start = ContinuousClock.now
 

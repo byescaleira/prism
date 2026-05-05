@@ -2,14 +2,19 @@ import Foundation
 
 /// Lifetime of a registered service.
 public enum PrismServiceLifetime: Sendable {
+    /// A single shared instance for the container's lifetime.
     case singleton
+    /// A new instance is created for each resolution.
     case transient
+    /// A single instance per request scope.
     case scoped
 }
 
 /// Errors during service resolution.
 public enum PrismServiceError: Error, Sendable {
+    /// No service was registered for the requested type.
     case notRegistered(String)
+    /// The service factory returned an incompatible type.
     case resolutionFailed(String)
 }
 
@@ -18,6 +23,7 @@ public actor PrismContainer {
     private var registrations: [String: ServiceRegistration] = [:]
     private var singletons: [String: Any] = [:]
 
+    /// Creates an empty dependency injection container.
     public init() {}
 
     /// Registers a service factory with a given lifetime.

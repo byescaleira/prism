@@ -10,10 +10,12 @@ public protocol PrismModel: Codable, Sendable {
 }
 
 extension PrismModel {
+    /// Default table name derived from the type name lowercased with "s" suffix.
     public static var tableName: String {
         String(describing: Self.self).lowercased() + "s"
     }
 
+    /// Default primary key column name.
     public static var primaryKey: String { "id" }
 }
 

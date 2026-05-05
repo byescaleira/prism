@@ -14,6 +14,7 @@ public struct PrismResponseCacheMiddleware: PrismMiddleware {
     private let ttl: TimeInterval
     private let cachePredicate: @Sendable (PrismHTTPRequest) -> Bool
 
+    /// Creates a response cache middleware with configurable size, TTL, and predicate.
     public init(
         maxEntries: Int = 500,
         ttl: TimeInterval = 60,
@@ -24,6 +25,7 @@ public struct PrismResponseCacheMiddleware: PrismMiddleware {
         self.cachePredicate = cachePredicate
     }
 
+    /// Serves cached responses for matching requests or caches new ones.
     public func handle(_ request: PrismHTTPRequest, next: @escaping PrismRouteHandler) async throws -> PrismHTTPResponse {
         guard cachePredicate(request) else {
             return try await next(request)
