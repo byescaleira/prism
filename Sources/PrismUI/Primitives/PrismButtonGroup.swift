@@ -31,6 +31,7 @@ public struct PrismButtonGroup<Content: View>: View {
             content
         }
         .frame(maxWidth: .infinity, alignment: Alignment(horizontal: alignment, vertical: .center))
+        .accessibilityElement(children: .contain)
     }
 }
 
@@ -85,5 +86,6 @@ public struct PrismSegmentedButtons: View {
         }
         .padding(SpacingToken.xxs.rawValue)
         .background(theme.color(.surfaceSecondary), in: Capsule())
+        .accessibilityElement(children: .contain)
     }
 }

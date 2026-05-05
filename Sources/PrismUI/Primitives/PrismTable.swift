@@ -30,6 +30,7 @@ public struct PrismTable<Value: Identifiable, Content: View>: View {
     public var body: some View {
         content(data)
             .foregroundStyle(theme.color(.onBackground))
+            .accessibilityElement(children: .contain)
     }
 }
 #endif

@@ -31,6 +31,7 @@ public struct PrismGroupBox<Label: View, Content: View>: View {
                 .foregroundStyle(theme.color(.onBackground))
         }
         .backgroundStyle(theme.color(.surfaceSecondary))
+        .accessibilityElement(children: .combine)
     }
 }
 

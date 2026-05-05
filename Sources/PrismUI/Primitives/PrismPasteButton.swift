@@ -32,11 +32,15 @@ public struct PrismPasteButton: View {
             action(strings)
         }
         .tint(theme.color(.interactive))
+        .accessibilityLabel(title)
+        .accessibilityAddTraits(.isButton)
         #else
         Button(title) {
             action([])
         }
         .foregroundStyle(theme.color(.interactive))
+        .accessibilityLabel(title)
+        .accessibilityAddTraits(.isButton)
         #endif
     }
 }

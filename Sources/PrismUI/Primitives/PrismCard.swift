@@ -28,5 +28,6 @@ public struct PrismCard<Content: View>: View {
             .padding(SpacingToken.lg.rawValue)
             .background(theme.color(surface), in: radius.shape)
             .prismElevation(elevation)
+            .accessibilityElement(children: .combine)
     }
 }

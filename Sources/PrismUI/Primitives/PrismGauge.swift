@@ -38,6 +38,14 @@ public struct PrismGauge<CurrentValueLabel: View>: View {
             currentValueLabel
         }
         .tint(gaugeColor)
+        .accessibilityLabel(label)
+        .accessibilityValue(Text(normalizedPercentage))
+    }
+
+    private var normalizedPercentage: String {
+        let normalized = (value - bounds.lowerBound) / (bounds.upperBound - bounds.lowerBound)
+        let clamped = min(max(normalized, 0), 1)
+        return "\(Int(clamped * 100))%"
     }
 
     private var gaugeColor: Color {
