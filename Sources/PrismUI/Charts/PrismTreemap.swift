@@ -28,10 +28,12 @@ public struct PrismTreemapItem: Sendable, Identifiable, Hashable {
         self.children = children
     }
 
+    /// Compares two treemap items by their unique identifiers.
     public static func == (lhs: PrismTreemapItem, rhs: PrismTreemapItem) -> Bool {
         lhs.id == rhs.id
     }
 
+    /// Hashes the treemap item using its unique identifier.
     public func hash(into hasher: inout Hasher) {
         hasher.combine(id)
     }
@@ -56,9 +58,10 @@ public struct PrismTreemap: View {
     }
 
     private var currentItems: [PrismTreemapItem] {
-        breadcrumb.last?.children.isEmpty == false ? breadcrumb.last!.children : (breadcrumb.isEmpty ? rootItems : [])
+        if let last = breadcrumb.last, !last.children.isEmpty { last.children } else if breadcrumb.isEmpty { rootItems } else { [] }
     }
 
+    /// The treemap view body with breadcrumb navigation and squarified layout.
     public var body: some View {
         VStack(alignment: .leading, spacing: SpacingToken.sm.rawValue) {
             if !breadcrumb.isEmpty {
