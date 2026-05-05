@@ -32,6 +32,13 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 - **Secure Storage**: `PrismSecureStore` — high-level encrypt + keychain with preset configurations (default, biometric, high-security)
 - **Permission Monitor**: `PrismPermissionMonitor` — AsyncStream of permission status changes
 - 85 tests across 15 suites for PrismSecurity
+- **Certificate Pinning**: `PrismCertificatePin`, `PrismPinningValidator`, `PrismCertificatePinningDelegate` — SHA-256 public key pinning with strict/reportOnly/TOFU policies
+- **Data Integrity**: `PrismIntegrityChecker` — jailbreak, debugger, simulator, reverse engineering detection; `PrismDataSeal` — HMAC-SHA256 tamper-evident sealing; `PrismFileIntegrity` — SHA-256 file verification
+- **Secure Transport**: `PrismKeyAgreement` — P256 ECDH + HKDF; `PrismSecureEnvelope` — encrypt-then-sign with ephemeral keys (forward secrecy); `PrismSecureChannel` — bidirectional encrypted channel
+- **Security Audit Log**: `PrismSecurityAuditLog` — hash-chain append-only log with tamper verification; `PrismAuditExporter` — JSON/summary export
+- **Token Manager**: `PrismTokenManager` — actor-based JWT lifecycle with concurrent refresh; `PrismAccessToken` — JWT decode; `PrismTokenInterceptor` — auto-inject Bearer tokens
+- **Privacy Guard**: `PrismRedactor` — regex PII detection (email/phone/SSN/credit card/IP); `PrismScreenProtection` — SwiftUI modifier; `PrismClipboardGuard` — auto-clearing clipboard; `PrismPrivacyGuard` — unified facade
+- 101 additional tests across 19 suites for PrismSecurity Phase 2 (186 total)
 
 ### Changed
 

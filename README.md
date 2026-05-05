@@ -12,7 +12,7 @@
 
 A modular Swift package for building Apple-platform apps and servers — foundation, networking, architecture, adaptive UI, media, on-device intelligence, gamification, security, device capabilities, and a native HTTP server.
 
-> **2642+ tests** · **11 modules** · **Swift 6.3 strict concurrency** · **DocC on every public API**
+> **2740+ tests** · **11 modules** · **Swift 6.3 strict concurrency** · **DocC on every public API**
 
 ---
 
@@ -28,7 +28,8 @@ A modular Swift package for building Apple-platform apps and servers — foundat
 │              (PrismFoundation + PrismIntelligence)              │
 ├─────────────────────────────────────────────────────────────────┤
 │                      PrismSecurity                              │  ← security
-│     (Permissions, Biometrics, Keychain, Encryption, Enclave)    │
+│   Permissions · Biometrics · Keychain · Encryption · Pinning    │
+│   Integrity · Secure Transport · Audit Log · Token · Privacy    │
 ├─────────────────────────────────────────────────────────────────┤
 │                      PrismServer                                │  ← server
 ├─────────────────────────────────────────────────────────────────┤
@@ -49,7 +50,7 @@ A modular Swift package for building Apple-platform apps and servers — foundat
 | `PrismCapabilities` | Apple capability wrappers — StoreKit, HealthKit, CloudKit, Camera, Bluetooth, Location, Motion, NFC, GameKit, Biometrics, and more |
 | `PrismServer` | Native Swift HTTP server — routing, middleware, WebSocket, GraphQL, MCP, jobs, caching, auth |
 | `PrismGamification` | Duolingo-style gamification — challenges, streaks, badges, leaderboards, analytics, AI-powered messages via Apple Intelligence |
-| `PrismSecurity` | Unified permissions, Face ID/Touch ID, Keychain, AES-GCM/ChaChaPoly encryption, Secure Enclave, secure storage |
+| `PrismSecurity` | Permissions, Face ID/Touch ID, Keychain, AES-GCM/ChaChaPoly, Secure Enclave, certificate pinning, data integrity, ECDH secure transport, audit log, JWT/OAuth2 token manager, PII redaction, screen protection |
 | `Prism` | Umbrella — `import Prism` gives you everything |
 
 ---
@@ -126,35 +127,46 @@ let message = await intelligence.messageWithFallback(
 
 ## PrismSecurity
 
-Unified security layer — permissions, biometrics, keychain, encryption, and secure storage.
+Full security stack — from permissions to encrypted transport, audit logging, and PII protection.
 
 ```swift
 import PrismSecurity
 
-// Permissions — unified API for all system permissions
+// Permissions + Biometrics + Keychain + Encryption + Secure Store
 let permissions = PrismPermissionClient()
 let status = try await permissions.request(.camera)
-let statuses = try await permissions.request([.camera, .microphone, .photoLibrary])
 
-// Biometric auth — one-line Face ID / Touch ID
 let biometric = PrismBiometricAuth()
 try await biometric.authenticate(reason: "Access your vault")
 
-// Keychain — typed, access-controlled storage
-let keychain = PrismKeychain()
-try keychain.save(string: "sk-secret", for: PrismKeychainItem(id: "apiKey"))
-let key = try keychain.loadString(for: PrismKeychainItem(id: "apiKey"))
-
-// Encryption — AES-GCM or ChaChaPoly
-let encryptor = PrismEncryptor()
-let symmetricKey = encryptor.generateKey()
-let encrypted = try encryptor.encrypt(Data("secret".utf8), using: symmetricKey)
-let decrypted = try encryptor.decrypt(encrypted, using: symmetricKey)
-
-// Secure Store — encrypt + keychain in one call
 let store = PrismSecureStore(configuration: .biometricProtected)
 try store.save(credentials, forKey: "userCredentials")
-let loaded = try store.load(Credentials.self, forKey: "userCredentials")
+
+// Certificate Pinning
+let pin = PrismCertificatePin(host: "api.example.com", publicKeyHash: "sha256/...")
+let validator = PrismPinningValidator(pins: [pin])
+let delegate = PrismCertificatePinningDelegate(validator: validator)
+
+// Secure Transport — ECDH key agreement + encrypted channel
+let alice = PrismSecureChannel()
+let bob = PrismSecureChannel()
+try alice.establish(with: bob.publicKeyData)
+let encrypted = try alice.encrypt(Data("Hello".utf8))
+
+// JWT Token Manager — auto-refresh, actor-based
+let tokenManager = PrismTokenManager()
+await tokenManager.store(PrismTokenPair(accessToken: jwt, refreshToken: refresh))
+let validToken = try await tokenManager.validAccessToken { try await refreshToken() }
+
+// Security Audit Log — hash-chain tamper detection
+let auditLog = PrismSecurityAuditLog()
+auditLog.record(PrismSecurityEvent(kind: .biometricSuccess, detail: "Face ID"))
+assert(auditLog.verifyIntegrity())
+
+// Privacy Guard — PII redaction + screen protection
+let guard = PrismPrivacyGuard()
+let safe = guard.redact("Email: john@example.com")  // "Email: j***@***.***"
+SensitiveView().prismScreenProtection()  // auto-hides on background
 ```
 
 ---
@@ -276,7 +288,7 @@ make docs-serve      # DocC + local server at :8000
 
 | Check | Status |
 |-------|--------|
-| Tests | 2642+ across 215+ suites |
+| Tests | 2740+ across 250+ suites |
 | Modules | 11 independent, composable modules |
 | Concurrency | Strict — `Sendable`, `@MainActor`, actor isolation |
 | Formatting | `swift-format` enforced in CI |

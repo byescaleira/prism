@@ -20,9 +20,27 @@ This file helps track what's landing between versions.
 - `PrismKeyDerivation` — HKDF and password-based key derivation
 - `PrismSecureStore` — high-level encrypt + keychain storage with one API call
 - 85 new tests for security (15 suites)
+- `PrismCertificatePin` + `PrismPinningValidator` — SHA-256 public key pinning with strict/report/TOFU policies
+- `PrismCertificatePinningDelegate` — drop-in URLSession delegate for TLS certificate validation
+- `PrismIntegrityChecker` — jailbreak, debugger, simulator, reverse engineering detection
+- `PrismDataSeal` — HMAC-SHA256 tamper-evident data sealing for Codable values
+- `PrismFileIntegrity` — SHA-256 file hash verification via Keychain
+- `PrismKeyAgreement` — P256 ECDH key exchange with HKDF-SHA256 derivation
+- `PrismSecureEnvelope` — encrypt-then-sign with ephemeral keys (forward secrecy)
+- `PrismSecureChannel` — bidirectional encrypted channel (AES-GCM/ChaChaPoly)
+- `PrismSecurityAuditLog` — hash-chain append-only audit log with integrity verification
+- `PrismAuditExporter` — JSON/summary export for audit compliance
+- `PrismTokenManager` — actor-based JWT token lifecycle with concurrent refresh handling
+- `PrismTokenInterceptor` — auto-inject Bearer tokens into URLRequest
+- `PrismRedactor` — regex PII detection (email, phone, SSN, credit card, IP) with mask/remove/hash styles
+- `PrismScreenProtection` — SwiftUI modifier to hide content on background/screenshot
+- `PrismClipboardGuard` — auto-clearing clipboard for sensitive data
+- `PrismPrivacyGuard` — unified privacy facade (redact, classify, protect fields)
+- 101 new tests for Phase 2 security features (19 suites)
 
 ## Changed
-- README updated with all 11 modules including PrismServer, PrismGamification, and PrismSecurity
+- README updated with all 11 modules including PrismServer, PrismGamification, and PrismSecurity Phase 2
+- PrismSecurity expanded from 5 to 11 subsystems (permissions, biometrics, keychain, encryption, secure enclave, cert pinning, integrity, secure transport, audit log, token manager, privacy guard)
 - Mintlify navigation restructured for equal module coverage (removed Server/Client tab bias)
 - PrismGamification depends on PrismIntelligence for AI integration
 - Prism umbrella re-exports PrismSecurity

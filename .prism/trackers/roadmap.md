@@ -10,6 +10,7 @@
 | PrismGamification module | ✅ DONE | Challenges, streaks, badges, leaderboards, analytics, AI messages |
 | PrismGamification + PrismIntelligence integration | ✅ DONE | Apple Intelligence for personalized gamification messages |
 | PrismSecurity module | ✅ DONE | Permissions, biometrics, keychain, encryption, secure enclave, secure store |
+| PrismSecurity Phase 2 | ✅ DONE | Cert pinning, integrity, secure transport, audit log, token manager, privacy guard |
 
 ## Phase 2 — Distribution & Adoption 🔲 NOT STARTED
 | Task | Status | Notes |

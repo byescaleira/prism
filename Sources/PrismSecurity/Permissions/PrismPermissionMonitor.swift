@@ -34,7 +34,8 @@
                     while !Task.isCancelled {
                         try? await Task.sleep(for: .seconds(self.interval))
                         let current = await self.currentStatuses()
-                        for permission in await self.permissions {
+                        let perms = await self.permissions
+                        for permission in perms {
                             let old = previous[permission]
                             let new = current[permission]
                             if old != new, let old, let new {
