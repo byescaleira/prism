@@ -5,9 +5,16 @@ This file helps track what's landing between versions.
 
 ## Added
 - `.prism/` project intelligence directory with rules, skills, trackers, patterns, templates
+- `PrismGamification` module — challenges, streaks, badges, leaderboards, analytics, notifications
+- `PrismGamificationIntelligence` — Apple Intelligence integration for personalized gamification messages
+- `PrismGamificationPromptBuilder` — context-aware prompt generation for 7 message kinds
+- `PrismGamificationFallbacks` — static fallback messages when AI unavailable
+- 200 new tests for gamification (30 suites)
 
 ## Changed
-- (none yet)
+- README updated with all 10 modules including PrismServer and PrismGamification
+- Mintlify navigation restructured for equal module coverage (removed Server/Client tab bias)
+- PrismGamification depends on PrismIntelligence for AI integration
 
 ## Fixed
 - (none yet)
@@ -18,4 +25,4 @@ This file helps track what's landing between versions.
 ---
 
 **Target version**: v4.5.0 (or v5.0.0 if breaking)
-**Last updated**: 2026-05-04
+**Last updated**: 2026-05-05

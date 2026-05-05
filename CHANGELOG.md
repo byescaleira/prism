@@ -7,11 +7,28 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 
 ## [Unreleased]
 
+### Added
+
+- **New Module**: `PrismGamification` — Duolingo-style gamification system with SwiftData persistence and CloudKit sync
+- **Challenges**: `PrismChallenge` protocol — define challenges as enums with title, type (counter/milestone), goal, points, category
+- **Streaks**: Daily streak tracking with `recordStreakActivity`, automatic streak break detection, longest streak records
+- **Badges**: `PrismBadge` protocol with 5 tiers (bronze→diamond), auto-evaluation via `evaluateBadges` for challenge/points/streak conditions
+- **Leaderboards**: Multi-period (daily/weekly/monthly/allTime) scored leaderboards with rank computation
+- **Gamification Analytics**: Event recording, aggregated snapshots, completion rates, average durations
+- **Notifications**: `PrismNotificationScheduling` protocol with streak and challenge reminders
+- **AI-Powered Messages**: `PrismGamificationIntelligence` — Apple Intelligence integration for personalized challenge celebrations, streak motivation, badge congratulations, leaderboard commentary
+- **Prompt Builder**: `PrismGamificationPromptBuilder` — context-aware prompt generation for 7 message kinds
+- **Fallback Messages**: `PrismGamificationFallbacks` — static messages when AI is unavailable
+- **Batch Generation**: `generateMessages` for multiple gamification events
+- **Auto-Fallback**: `messageWithFallback` — AI when available, static otherwise
+
 ### Changed
 
 - Removed redundant `as? String` casts in PrismServer tracing and versioning
 - Replaced force unwrap with safe binding in `PrismTreemap.currentItems`
 - Increased timing tolerance in PrismScheduler test to fix flaky CI
+- Updated README with all 10 modules, PrismGamification and PrismServer sections
+- Restructured Mintlify navigation for equal module coverage
 
 ### Refactored
 
@@ -35,7 +52,8 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 - Added tests for PrismCapabilities Bluetooth, Motion, and Camera types
 - Added tests for PrismArchitecture disk and UserDefaults persistence
 - Added PrismVideo downloader status tests and edge cases
-- Total test count: 2207 → 2357 (+150 tests)
+- Added PrismGamification test suites: challenges, streaks, badges, leaderboards, analytics, notifications, AI integration
+- Total test count: 2357 → 2557 (+200 tests, 30 new suites)
 
 ## [4.4.0] - 2026-04-28
 

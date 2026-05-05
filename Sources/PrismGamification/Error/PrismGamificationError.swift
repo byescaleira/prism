@@ -12,6 +12,12 @@ public enum PrismGamificationError: Error, Sendable, Equatable {
     case invalidOperation(String)
     /// Streak identifier not found.
     case streakNotFound(String)
+    /// Badge identifier not found.
+    case badgeNotFound(String)
+    /// Badge already unlocked.
+    case badgeAlreadyUnlocked(String)
+    /// Leaderboard entry not found.
+    case leaderboardEntryNotFound(String)
 }
 
 extension PrismGamificationError: LocalizedError {
@@ -28,6 +34,12 @@ extension PrismGamificationError: LocalizedError {
             "Invalid operation: \(message)"
         case .streakNotFound(let id):
             "Streak not found: \(id)"
+        case .badgeNotFound(let id):
+            "Badge not found: \(id)"
+        case .badgeAlreadyUnlocked(let id):
+            "Badge already unlocked: \(id)"
+        case .leaderboardEntryNotFound(let id):
+            "Leaderboard entry not found: \(id)"
         }
     }
 }

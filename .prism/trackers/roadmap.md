@@ -7,6 +7,8 @@
 | Example app: ServerApp (PrismServer REST API) | ⬜ TODO | Validates server module end-to-end |
 | PrismPreview catalog expansion | ⬜ TODO | Interactive component showcase |
 | API ergonomics review (from dogfooding) | ⬜ TODO | Fix pain points found during Examples |
+| PrismGamification module | ✅ DONE | Challenges, streaks, badges, leaderboards, analytics, AI messages |
+| PrismGamification + PrismIntelligence integration | ✅ DONE | Apple Intelligence for personalized gamification messages |
 
 ## Phase 2 — Distribution & Adoption 🔲 NOT STARTED
 | Task | Status | Notes |
@@ -42,6 +44,6 @@
 
 ---
 
-**Last updated**: 2026-05-04
+**Last updated**: 2026-05-05
 **Current version**: v4.4.0
 **Active phase**: 1

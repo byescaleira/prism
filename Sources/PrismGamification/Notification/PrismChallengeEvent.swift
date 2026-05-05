@@ -12,4 +12,8 @@ public enum PrismChallengeEvent: Sendable {
     case streakBroken(streakID: String, previousStreak: Int)
     /// New longest streak record.
     case newStreakRecord(streakID: String, longestStreak: Int)
+    /// Badge unlocked.
+    case badgeUnlocked(badgeID: String, tier: String)
+    /// Leaderboard score updated.
+    case leaderboardUpdated(userID: String, newRank: Int)
 }

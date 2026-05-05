@@ -16,6 +16,9 @@
             let schema = Schema([
                 PrismChallengeProgress.self,
                 PrismStreakRecord.self,
+                PrismBadgeProgress.self,
+                PrismLeaderboardRecord.self,
+                PrismAnalyticsRecord.self,
             ])
 
             let configuration: ModelConfiguration

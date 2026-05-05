@@ -28,11 +28,11 @@
   "tabs": [
     {
       "name": "Server",
-      "url": "docs/core"
+      "url": "docs/server"
     },
     {
       "name": "Client",
-      "url": "docs/architecture"
+      "url": "docs/client"
     }
   ],
   "anchors": [
@@ -57,115 +57,22 @@
       ]
     },
     {
-      "group": "Core",
+      "group": "Foundation",
       "pages": [
-        "docs/core/server",
-        "docs/core/routing",
-        "docs/core/request",
-        "docs/core/response",
-        "docs/core/middleware",
-        "docs/core/error-handling"
+        "docs/foundation/protocols",
+        "docs/foundation/utilities",
+        "docs/foundation/observability",
+        "docs/foundation/resources"
       ]
     },
     {
-      "group": "Middleware",
+      "group": "Network Client",
       "pages": [
-        "docs/middleware/cors",
-        "docs/middleware/logging",
-        "docs/middleware/auth",
-        "docs/middleware/rate-limiting",
-        "docs/middleware/compression",
-        "docs/middleware/rate-limiting-v2",
-        "docs/middleware/hooks"
-      ]
-    },
-    {
-      "group": "Database",
-      "pages": [
-        "docs/database/overview",
-        "docs/database/queries",
-        "docs/database/models",
-        "docs/database/migrations",
-        "docs/database/connection-pool",
-        "docs/database/relationships"
-      ]
-    },
-    {
-      "group": "Real-Time",
-      "pages": [
-        "docs/realtime/websocket",
-        "docs/realtime/websocket-rooms",
-        "docs/realtime/sse",
-        "docs/realtime/events"
-      ]
-    },
-    {
-      "group": "Content",
-      "pages": [
-        "docs/content/json",
-        "docs/content/multipart",
-        "docs/content/file-upload",
-        "docs/content/body-parser",
-        "docs/content/content-negotiation",
-        "docs/content/streaming",
-        "docs/content/templates"
-      ]
-    },
-    {
-      "group": "Security",
-      "pages": [
-        "docs/security/tls",
-        "docs/security/sessions",
-        "docs/security/validation"
-      ]
-    },
-    {
-      "group": "GraphQL",
-      "pages": [
-        "docs/graphql/schema",
-        "docs/graphql/queries",
-        "docs/graphql/mutations",
-        "docs/graphql/playground"
-      ]
-    },
-    {
-      "group": "MCP",
-      "pages": [
-        "docs/mcp/overview",
-        "docs/mcp/tools",
-        "docs/mcp/resources",
-        "docs/mcp/transports"
-      ]
-    },
-    {
-      "group": "Infrastructure",
-      "pages": [
-        "docs/infrastructure/config",
-        "docs/infrastructure/health",
-        "docs/infrastructure/metrics",
-        "docs/infrastructure/cron",
-        "docs/infrastructure/background-tasks",
-        "docs/infrastructure/graceful-shutdown",
-        "docs/infrastructure/cluster"
-      ]
-    },
-    {
-      "group": "Advanced",
-      "pages": [
-        "docs/advanced/dependency-injection",
-        "docs/advanced/tracing",
-        "docs/advanced/versioning",
-        "docs/advanced/http-client",
-        "docs/advanced/openapi",
-        "docs/advanced/cache"
-      ]
-    },
-    {
-      "group": "Testing",
-      "pages": [
-        "docs/testing/test-client",
-        "docs/testing/request-builder",
-        "docs/testing/assertions"
+        "docs/network/client",
+        "docs/network/endpoints",
+        "docs/network/cache-retry",
+        "docs/network/advanced-network",
+        "docs/network/websocket-client"
       ]
     },
     {
@@ -191,31 +98,23 @@
       ]
     },
     {
-      "group": "Network Client",
-      "pages": [
-        "docs/network/client",
-        "docs/network/endpoints",
-        "docs/network/cache-retry",
-        "docs/network/advanced-network",
-        "docs/network/websocket-client"
-      ]
-    },
-    {
-      "group": "Foundation",
-      "pages": [
-        "docs/foundation/protocols",
-        "docs/foundation/utilities",
-        "docs/foundation/observability",
-        "docs/foundation/resources"
-      ]
-    },
-    {
       "group": "Intelligence",
       "pages": [
         "docs/intelligence/overview",
         "docs/intelligence/training",
         "docs/intelligence/apple-intelligence",
         "docs/intelligence/nlp-rag"
+      ]
+    },
+    {
+      "group": "Gamification",
+      "pages": [
+        "docs/gamification/overview",
+        "docs/gamification/challenges",
+        "docs/gamification/streaks-badges",
+        "docs/gamification/leaderboards",
+        "docs/gamification/analytics",
+        "docs/gamification/ai-messages"
       ]
     },
     {
@@ -233,6 +132,113 @@
       "group": "Video",
       "pages": [
         "docs/video/overview"
+      ]
+    },
+    {
+      "group": "Server — Core",
+      "pages": [
+        "docs/server/server",
+        "docs/server/routing",
+        "docs/server/request",
+        "docs/server/response",
+        "docs/server/middleware",
+        "docs/server/error-handling"
+      ]
+    },
+    {
+      "group": "Server — Middleware",
+      "pages": [
+        "docs/server/cors",
+        "docs/server/logging",
+        "docs/server/auth",
+        "docs/server/rate-limiting",
+        "docs/server/compression",
+        "docs/server/rate-limiting-v2",
+        "docs/server/hooks"
+      ]
+    },
+    {
+      "group": "Server — Database",
+      "pages": [
+        "docs/server/database-overview",
+        "docs/server/queries",
+        "docs/server/models",
+        "docs/server/migrations",
+        "docs/server/connection-pool",
+        "docs/server/relationships"
+      ]
+    },
+    {
+      "group": "Server — Real-Time",
+      "pages": [
+        "docs/server/websocket",
+        "docs/server/websocket-rooms",
+        "docs/server/sse",
+        "docs/server/events"
+      ]
+    },
+    {
+      "group": "Server — Content",
+      "pages": [
+        "docs/server/json",
+        "docs/server/multipart",
+        "docs/server/file-upload",
+        "docs/server/body-parser",
+        "docs/server/content-negotiation",
+        "docs/server/streaming",
+        "docs/server/templates"
+      ]
+    },
+    {
+      "group": "Server — Security",
+      "pages": [
+        "docs/server/tls",
+        "docs/server/sessions",
+        "docs/server/validation"
+      ]
+    },
+    {
+      "group": "Server — GraphQL & MCP",
+      "pages": [
+        "docs/server/graphql-schema",
+        "docs/server/graphql-queries",
+        "docs/server/graphql-mutations",
+        "docs/server/graphql-playground",
+        "docs/server/mcp-overview",
+        "docs/server/mcp-tools",
+        "docs/server/mcp-resources",
+        "docs/server/mcp-transports"
+      ]
+    },
+    {
+      "group": "Server — Infrastructure",
+      "pages": [
+        "docs/server/config",
+        "docs/server/health",
+        "docs/server/metrics",
+        "docs/server/cron",
+        "docs/server/background-tasks",
+        "docs/server/graceful-shutdown",
+        "docs/server/cluster"
+      ]
+    },
+    {
+      "group": "Server — Advanced",
+      "pages": [
+        "docs/server/dependency-injection",
+        "docs/server/tracing",
+        "docs/server/versioning",
+        "docs/server/http-client",
+        "docs/server/openapi",
+        "docs/server/cache"
+      ]
+    },
+    {
+      "group": "Server — Testing",
+      "pages": [
+        "docs/server/test-client",
+        "docs/server/request-builder",
+        "docs/server/assertions"
       ]
     }
   ],

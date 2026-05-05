@@ -160,8 +160,33 @@
             let errors: [PrismGamificationError] = [
                 .challengeNotFound("a"), .challengeAlreadyCompleted("b"),
                 .persistenceFailed("c"), .invalidOperation("d"), .streakNotFound("e"),
+                .badgeNotFound("f"), .badgeAlreadyUnlocked("g"), .leaderboardEntryNotFound("h"),
             ]
             for e in errors { #expect(!e.localizedDescription.isEmpty) }
+        }
+
+        @Test("badge errors")
+        func badgeErrs() {
+            #expect(PrismGamificationError.badgeNotFound("x").localizedDescription.contains("x"))
+            #expect(PrismGamificationError.badgeAlreadyUnlocked("y").localizedDescription.contains("y"))
+        }
+
+        @Test("leaderboard error")
+        func lbErr() {
+            #expect(PrismGamificationError.leaderboardEntryNotFound("z").localizedDescription.contains("z"))
+        }
+
+        @Test("new errors equatable")
+        func newEq() {
+            #expect(PrismGamificationError.badgeNotFound("x") == .badgeNotFound("x"))
+            #expect(PrismGamificationError.badgeAlreadyUnlocked("x") == .badgeAlreadyUnlocked("x"))
+            #expect(PrismGamificationError.leaderboardEntryNotFound("x") == .leaderboardEntryNotFound("x"))
+        }
+
+        @Test("cross-type not equal")
+        func crossNeq() {
+            #expect(PrismGamificationError.badgeNotFound("x") != .badgeAlreadyUnlocked("x"))
+            #expect(PrismGamificationError.badgeNotFound("x") != .challengeNotFound("x"))
         }
     }
 
@@ -218,6 +243,26 @@
             {
                 #expect(id == "d")
                 #expect(l == 30)
+            } else { #expect(Bool(false)) }
+        }
+
+        @Test("badgeUnlocked")
+        func badge() {
+            if case .badgeUnlocked(let id, let tier) = PrismChallengeEvent.badgeUnlocked(
+                badgeID: "starter", tier: "bronze")
+            {
+                #expect(id == "starter")
+                #expect(tier == "bronze")
+            } else { #expect(Bool(false)) }
+        }
+
+        @Test("leaderboardUpdated")
+        func lb() {
+            if case .leaderboardUpdated(let uid, let rank) = PrismChallengeEvent.leaderboardUpdated(
+                userID: "u1", newRank: 3)
+            {
+                #expect(uid == "u1")
+                #expect(rank == 3)
             } else { #expect(Bool(false)) }
         }
     }

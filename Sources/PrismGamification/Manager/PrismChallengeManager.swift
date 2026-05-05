@@ -27,7 +27,7 @@
         public nonisolated let modelContainer: ModelContainer
         /// Stream of challenge events for UI observation.
         public nonisolated let events: AsyncStream<PrismChallengeEvent>
-        private nonisolated let eventContinuation: AsyncStream<PrismChallengeEvent>.Continuation
+        nonisolated let eventContinuation: AsyncStream<PrismChallengeEvent>.Continuation
 
         /// Creates a challenge manager backed by the given ModelContainer.
         public init(container: ModelContainer) {

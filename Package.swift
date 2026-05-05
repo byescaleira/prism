@@ -128,7 +128,7 @@ let package = Package(
         ),
         .target(
             name: "PrismGamification",
-            dependencies: ["PrismFoundation"],
+            dependencies: ["PrismFoundation", "PrismIntelligence"],
             swiftSettings: swiftSettings
         ),
         .target(
@@ -183,7 +183,7 @@ let package = Package(
         ),
         .testTarget(
             name: "PrismGamificationTests",
-            dependencies: ["PrismGamification"],
+            dependencies: ["PrismGamification", "PrismIntelligence"],
         ),
     ],
     swiftLanguageModes: [.v6],

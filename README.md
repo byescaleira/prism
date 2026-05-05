@@ -10,35 +10,42 @@
 
 # Prism
 
-A modular Swift package for building Apple-platform apps — shared foundation, networking, architecture, adaptive UI, media, and on-device intelligence.
+A modular Swift package for building Apple-platform apps and servers — foundation, networking, architecture, adaptive UI, media, on-device intelligence, gamification, device capabilities, and a native HTTP server.
 
-> **1188 tests** · **212 suites** · **8 modules** · **Swift 6.3 strict concurrency** · **DocC on every public API**
+> **2557+ tests** · **10 modules** · **Swift 6.3 strict concurrency** · **DocC on every public API**
 
 ---
 
 ## Architecture
 
 ```
-┌─────────────────────────────────────────────────┐
-│                    Prism                        │  ← umbrella re-export
-├──────────┬──────────┬───────────┬───────────────┤
-│ PrismUI  │PrismVideo│PrismIntel.│PrismArchitect.│  ← feature modules
-├──────────┴──────────┴───────────┴───────────────┤
-│                PrismNetwork                     │  ← transport layer
-├─────────────────────────────────────────────────┤
-│               PrismFoundation                   │  ← zero-dep core
-└─────────────────────────────────────────────────┘
+┌──────────────────────────────────────────────────────────────────┐
+│                           Prism                                 │  ← umbrella
+├──────────┬──────────┬────────────┬───────────┬──────────────────┤
+│ PrismUI  │PrismVideo│PrismIntel. │PrismArch. │PrismCapabilities │  ← client
+├──────────┴──────────┴────────────┴───────────┴──────────────────┤
+│                    PrismGamification                            │  ← gamification
+│              (PrismFoundation + PrismIntelligence)              │
+├─────────────────────────────────────────────────────────────────┤
+│                      PrismServer                                │  ← server
+├─────────────────────────────────────────────────────────────────┤
+│                     PrismNetwork                                │  ← transport
+├─────────────────────────────────────────────────────────────────┤
+│                    PrismFoundation                               │  ← zero-dep core
+└─────────────────────────────────────────────────────────────────┘
 ```
 
 | Module | Role |
 |--------|------|
 | `PrismFoundation` | Entities, logging, analytics, locale, resources, defaults, formatting |
-| `PrismNetwork` | HTTP client, socket transport, endpoints, caching, FIX protocol |
-| `PrismArchitecture` | Router, store, reducer, middleware — unidirectional data flow |
+| `PrismNetwork` | HTTP client, socket transport, endpoints, caching, retry, offline queue, GraphQL |
+| `PrismArchitecture` | Store, reducer, middleware, router — unidirectional data flow with time-travel |
 | `PrismUI` | Token-driven design system — 80+ components, 4 themes, Apple HIG |
 | `PrismVideo` | Video download helpers and media entities |
-| `PrismIntelligence` | CreateML training, CoreML inference, Apple Intelligence, remote LLM |
-| `PrismCapabilities` | Apple Developer Program capability wrappers — StoreKit, HealthKit, CloudKit, Apple Pay, CallKit, CoreBluetooth, NFC, Camera, GameKit, Location, Motion, Biometrics, App Intents, Nearby Interaction, MultipeerConnectivity |
+| `PrismIntelligence` | CreateML training, CoreML inference, Apple Intelligence, remote LLM, RAG, NLP, vision |
+| `PrismCapabilities` | Apple capability wrappers — StoreKit, HealthKit, CloudKit, Camera, Bluetooth, Location, Motion, NFC, GameKit, Biometrics, and more |
+| `PrismServer` | Native Swift HTTP server — routing, middleware, WebSocket, GraphQL, MCP, jobs, caching, auth |
+| `PrismGamification` | Duolingo-style gamification — challenges, streaks, badges, leaderboards, analytics, AI-powered messages via Apple Intelligence |
 | `Prism` | Umbrella — `import Prism` gives you everything |
 
 ---
@@ -53,20 +60,90 @@ dependencies: [
 ```
 
 ```swift
-import Prism          // everything
-import PrismUI        // just design system
-import PrismNetwork   // just networking
+import Prism              // everything
+import PrismUI            // design system
+import PrismNetwork       // networking
+import PrismServer        // HTTP server
+import PrismGamification  // gamification
+import PrismIntelligence  // AI + ML
 ```
 
 **Requires:** Swift 6.3 · Xcode 16.4+ · iOS 26 · macOS 26 · tvOS 26 · watchOS 26 · visionOS 26
 
 ---
 
+## PrismGamification
+
+Duolingo-style gamification with SwiftData persistence and CloudKit sync.
+
+```swift
+// Define challenges as an enum
+enum AppChallenge: String, PrismChallenge, CaseIterable {
+    case firstLogin, tenWorkouts
+
+    var title: String { ... }
+    var type: PrismChallengeType { ... }
+    var goal: Int { ... }
+    var points: Int { ... }
+}
+
+// Register and track
+let manager = PrismChallengeManager(container: container)
+try await manager.register(AppChallenge.self)
+try await manager.increment(AppChallenge.tenWorkouts)
+try await manager.complete(AppChallenge.firstLogin)
+
+// Streaks
+try await manager.recordStreakActivity("daily")
+let streak = try await manager.currentStreak("daily")
+
+// Badges with auto-evaluation
+try await manager.registerBadges(AppBadge.self)
+let unlocked = try await manager.evaluateBadges(AppBadge.self, currentPoints: 100)
+
+// Leaderboards
+try await manager.submitScore(userID: "u1", displayName: "Alice", score: 500, period: .weekly)
+let board = try await manager.leaderboard(period: .weekly)
+
+// AI-powered messages via Apple Intelligence
+let intelligence = PrismGamificationIntelligence()
+let message = await intelligence.messageWithFallback(
+    kind: .challengeCompleted,
+    context: PrismGamificationContext(
+        entityID: "tenWorkouts",
+        challengeTitle: "Ten Workouts",
+        points: 50
+    )
+)
+```
+
+---
+
+## PrismServer
+
+Native Swift HTTP server with zero external dependencies.
+
+```swift
+let server = PrismHTTPServer(host: "0.0.0.0", port: 8080)
+
+server.get("/hello") { req in
+    PrismHTTPResponse(status: .ok, body: "Hello, Prism!")
+}
+
+server.use(PrismCORS())
+server.use(PrismRateLimit(maxRequests: 100, window: 60))
+server.use(PrismJWT(secret: "your-secret"))
+
+try await server.start()
+```
+
+Features: routing, middleware, WebSocket, SSE, GraphQL, MCP, jobs, caching, sessions, templates, OpenAPI, rate limiting, distributed tracing, dependency injection, clustering.
+
+---
+
 ## PrismUI Design System
 
 ### Tokens
-
-Six semantic token types drive every visual decision:
 
 | Token | Purpose | Values |
 |-------|---------|--------|
@@ -87,15 +164,11 @@ Six semantic token types drive every visual decision:
 | `BrandTheme` | Configurable primary/secondary/accent |
 
 ```swift
-// Apply theme
 ContentView()
     .prismTheme(DefaultTheme())
-
-// Custom brand
-let theme = BrandTheme(primary: .indigo, secondary: .mint, accent: .orange)
 ```
 
-### Components (60+)
+### Components (80+)
 
 **Primitives:** Button, Icon, AsyncImage, TextField, Card, Tag, Chip, Divider, LoadingState, ProgressBar, Avatar
 
@@ -103,38 +176,31 @@ let theme = BrandTheme(primary: .indigo, secondary: .mint, accent: .orange)
 
 **Forms:** Toggle, Picker, Slider, SecureField, DatePicker, SegmentedControl, Stepper, TextArea, Rating, PinField, ColorWell
 
-**Lists:** Row, DisclosureRow, List, Badge, SwipeActions
+**Charts:** Bar, Line, Donut, Heatmap, Treemap, Radar, Sparkline, Funnel, Candlestick
 
-**Layout:** AdaptiveStack, Grid, Section, Scaffold, Spacer
+**Chat:** ChatBubble, MessageList, TypingIndicator, ReactionPicker, ThreadView, ReadReceipts
 
-**Navigation:** NavigationView, TabView, Sheet
+**Dashboard:** KPICard, StatGrid, ActivityFeed, Timeline, ComparisonTable
 
-### Usage
+---
+
+## PrismIntelligence
 
 ```swift
-// Themed button with async action
-PrismButton("Sign In", variant: .filled) {
-    await viewModel.signIn()
-}
+// Apple Intelligence (on-device)
+let client = PrismIntelligenceClient.apple()
+let response = try await client.generate("Summarize this article.")
 
-// Validated text field
-PrismTextField("Email", text: $email, validation: .pattern(
-    "[A-Z0-9a-z._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}",
-    "Enter a valid email"
-))
+// Train from any Codable
+let training = PrismCodableTrainingData(data: houses)
+let result = await training.trainRegressor(
+    id: "price", name: "House Price", target: \.price
+)
 
-// Semantic modifiers
-Text("Welcome")
-    .prismFont(.title)
-    .prismColor(.onBackground)
-    .prismPadding(.lg)
-    .prismSurface(.surfaceSecondary, radius: .lg)
-
-// Auto-dismissing toast
-.prismToast(isPresented: $showToast, "Saved!", icon: "checkmark", style: .success)
-
-// Avatar with status
-PrismAvatar(initials: "JD", size: .large, status: .online)
+// Remote LLM
+let remote = PrismIntelligenceClient.remote(
+    endpoint: url, token: "sk-...", model: "gpt-4"
+)
 ```
 
 ---
@@ -148,39 +214,6 @@ let store = PrismStore(
 )
 
 store.send(.loadData)
-```
-
-## Analytics
-
-```swift
-ContentView()
-    .prismAnalytics(FirebaseAnalytics())
-
-// Track screen views
-ContentView()
-    .prismTrackScreen("Home")
-```
-
-## Intelligence
-
-```swift
-// Train from any Codable
-let training = PrismCodableTrainingData(data: houses)
-let result = await training.trainRegressor(
-    id: "price", name: "House Price", target: \.price
-)
-
-// Predict
-let client = try await PrismIntelligenceClient.local(modelID: "price")
-let prediction = try await client.regress(
-    features: ["rooms": .int(3), "area": .double(120)]
-)
-
-// Remote LLM
-let remote = PrismIntelligenceClient.remote(
-    endpoint: url, token: "sk-...", model: "gpt-4"
-)
-let answer = try await remote.generate("Summarize this document.")
 ```
 
 ---
@@ -203,14 +236,14 @@ make docs-serve      # DocC + local server at :8000
 
 | Check | Status |
 |-------|--------|
-| Tests | 275+ across 44 suites |
+| Tests | 2557+ across 200+ suites |
+| Modules | 10 independent, composable modules |
 | Concurrency | Strict — `Sendable`, `@MainActor`, actor isolation |
 | Formatting | `swift-format` enforced in CI |
-| Docs | DocC with guides: Getting Started, Tokens, Components, Theming |
+| Docs | DocC with guides on every public API |
 | Themes | 4 built-in + custom theme protocol |
 | Accessibility | VoiceOver, Dynamic Type, contrast ratios, reduce motion |
-| Snapshot Testing | Built-in `PrismSnapshotTest` for visual regression |
-| WCAG | Contrast ratio validation (AA/AAA) via `PrismAccessibilityTest` |
+| WCAG | Contrast ratio validation (AA/AAA) |
 
 ---
 
@@ -221,5 +254,5 @@ make docs-serve      # DocC + local server at :8000
 ---
 
 <p align="center">
-  <sub>swift · swiftui · ios · macos · swift-package-manager · clean-architecture · design-system · coreml · accessibility · localization · analytics</sub>
+  <sub>swift · swiftui · ios · macos · swift-package-manager · clean-architecture · design-system · coreml · gamification · server · apple-intelligence · accessibility · localization · analytics</sub>
 </p>

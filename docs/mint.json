@@ -28,11 +28,11 @@
   "tabs": [
     {
       "name": "Server",
-      "url": "core"
+      "url": "server"
     },
     {
       "name": "Client",
-      "url": "architecture"
+      "url": "client"
     }
   ],
   "anchors": [
@@ -57,115 +57,22 @@
       ]
     },
     {
-      "group": "Core",
+      "group": "Foundation",
       "pages": [
-        "core/server",
-        "core/routing",
-        "core/request",
-        "core/response",
-        "core/middleware",
-        "core/error-handling"
+        "foundation/protocols",
+        "foundation/utilities",
+        "foundation/observability",
+        "foundation/resources"
       ]
     },
     {
-      "group": "Middleware",
+      "group": "Network Client",
       "pages": [
-        "middleware/cors",
-        "middleware/logging",
-        "middleware/auth",
-        "middleware/rate-limiting",
-        "middleware/compression",
-        "middleware/rate-limiting-v2",
-        "middleware/hooks"
-      ]
-    },
-    {
-      "group": "Database",
-      "pages": [
-        "database/overview",
-        "database/queries",
-        "database/models",
-        "database/migrations",
-        "database/connection-pool",
-        "database/relationships"
-      ]
-    },
-    {
-      "group": "Real-Time",
-      "pages": [
-        "realtime/websocket",
-        "realtime/websocket-rooms",
-        "realtime/sse",
-        "realtime/events"
-      ]
-    },
-    {
-      "group": "Content",
-      "pages": [
-        "content/json",
-        "content/multipart",
-        "content/file-upload",
-        "content/body-parser",
-        "content/content-negotiation",
-        "content/streaming",
-        "content/templates"
-      ]
-    },
-    {
-      "group": "Security",
-      "pages": [
-        "security/tls",
-        "security/sessions",
-        "security/validation"
-      ]
-    },
-    {
-      "group": "GraphQL",
-      "pages": [
-        "graphql/schema",
-        "graphql/queries",
-        "graphql/mutations",
-        "graphql/playground"
-      ]
-    },
-    {
-      "group": "MCP",
-      "pages": [
-        "mcp/overview",
-        "mcp/tools",
-        "mcp/resources",
-        "mcp/transports"
-      ]
-    },
-    {
-      "group": "Infrastructure",
-      "pages": [
-        "infrastructure/config",
-        "infrastructure/health",
-        "infrastructure/metrics",
-        "infrastructure/cron",
-        "infrastructure/background-tasks",
-        "infrastructure/graceful-shutdown",
-        "infrastructure/cluster"
-      ]
-    },
-    {
-      "group": "Advanced",
-      "pages": [
-        "advanced/dependency-injection",
-        "advanced/tracing",
-        "advanced/versioning",
-        "advanced/http-client",
-        "advanced/openapi",
-        "advanced/cache"
-      ]
-    },
-    {
-      "group": "Testing",
-      "pages": [
-        "testing/test-client",
-        "testing/request-builder",
-        "testing/assertions"
+        "network/client",
+        "network/endpoints",
+        "network/cache-retry",
+        "network/advanced-network",
+        "network/websocket-client"
       ]
     },
     {
@@ -191,31 +98,23 @@
       ]
     },
     {
-      "group": "Network Client",
-      "pages": [
-        "network/client",
-        "network/endpoints",
-        "network/cache-retry",
-        "network/advanced-network",
-        "network/websocket-client"
-      ]
-    },
-    {
-      "group": "Foundation",
-      "pages": [
-        "foundation/protocols",
-        "foundation/utilities",
-        "foundation/observability",
-        "foundation/resources"
-      ]
-    },
-    {
       "group": "Intelligence",
       "pages": [
         "intelligence/overview",
         "intelligence/training",
         "intelligence/apple-intelligence",
         "intelligence/nlp-rag"
+      ]
+    },
+    {
+      "group": "Gamification",
+      "pages": [
+        "gamification/overview",
+        "gamification/challenges",
+        "gamification/streaks-badges",
+        "gamification/leaderboards",
+        "gamification/analytics",
+        "gamification/ai-messages"
       ]
     },
     {
@@ -233,6 +132,113 @@
       "group": "Video",
       "pages": [
         "video/overview"
+      ]
+    },
+    {
+      "group": "Server — Core",
+      "pages": [
+        "server/server",
+        "server/routing",
+        "server/request",
+        "server/response",
+        "server/middleware",
+        "server/error-handling"
+      ]
+    },
+    {
+      "group": "Server — Middleware",
+      "pages": [
+        "server/cors",
+        "server/logging",
+        "server/auth",
+        "server/rate-limiting",
+        "server/compression",
+        "server/rate-limiting-v2",
+        "server/hooks"
+      ]
+    },
+    {
+      "group": "Server — Database",
+      "pages": [
+        "server/database-overview",
+        "server/queries",
+        "server/models",
+        "server/migrations",
+        "server/connection-pool",
+        "server/relationships"
+      ]
+    },
+    {
+      "group": "Server — Real-Time",
+      "pages": [
+        "server/websocket",
+        "server/websocket-rooms",
+        "server/sse",
+        "server/events"
+      ]
+    },
+    {
+      "group": "Server — Content",
+      "pages": [
+        "server/json",
+        "server/multipart",
+        "server/file-upload",
+        "server/body-parser",
+        "server/content-negotiation",
+        "server/streaming",
+        "server/templates"
+      ]
+    },
+    {
+      "group": "Server — Security",
+      "pages": [
+        "server/tls",
+        "server/sessions",
+        "server/validation"
+      ]
+    },
+    {
+      "group": "Server — GraphQL & MCP",
+      "pages": [
+        "server/graphql-schema",
+        "server/graphql-queries",
+        "server/graphql-mutations",
+        "server/graphql-playground",
+        "server/mcp-overview",
+        "server/mcp-tools",
+        "server/mcp-resources",
+        "server/mcp-transports"
+      ]
+    },
+    {
+      "group": "Server — Infrastructure",
+      "pages": [
+        "server/config",
+        "server/health",
+        "server/metrics",
+        "server/cron",
+        "server/background-tasks",
+        "server/graceful-shutdown",
+        "server/cluster"
+      ]
+    },
+    {
+      "group": "Server — Advanced",
+      "pages": [
+        "server/dependency-injection",
+        "server/tracing",
+        "server/versioning",
+        "server/http-client",
+        "server/openapi",
+        "server/cache"
+      ]
+    },
+    {
+      "group": "Server — Testing",
+      "pages": [
+        "server/test-client",
+        "server/request-builder",
+        "server/assertions"
       ]
     }
   ],
