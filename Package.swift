@@ -55,6 +55,10 @@ let package = Package(
             name: "PrismGamification",
             targets: ["PrismGamification"],
         ),
+        .library(
+            name: "PrismSecurity",
+            targets: ["PrismSecurity"],
+        ),
     ],
     dependencies: [
         .package(url: "https://github.com/swiftlang/swift-docc-plugin", from: "1.4.3")
@@ -71,6 +75,7 @@ let package = Package(
                 "PrismIntelligence",
                 "PrismCapabilities",
                 "PrismGamification",
+                "PrismSecurity",
             ],
             swiftSettings: swiftSettings
         ),
@@ -132,6 +137,11 @@ let package = Package(
             swiftSettings: swiftSettings
         ),
         .target(
+            name: "PrismSecurity",
+            dependencies: ["PrismFoundation"],
+            swiftSettings: swiftSettings
+        ),
+        .target(
             name: "PrismPreview",
             dependencies: ["Prism"],
             swiftSettings: swiftSettings
@@ -184,6 +194,10 @@ let package = Package(
         .testTarget(
             name: "PrismGamificationTests",
             dependencies: ["PrismGamification", "PrismIntelligence"],
+        ),
+        .testTarget(
+            name: "PrismSecurityTests",
+            dependencies: ["PrismSecurity"],
         ),
     ],
     swiftLanguageModes: [.v6],

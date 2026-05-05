@@ -10,11 +10,22 @@ This file helps track what's landing between versions.
 - `PrismGamificationPromptBuilder` — context-aware prompt generation for 7 message kinds
 - `PrismGamificationFallbacks` — static fallback messages when AI unavailable
 - 200 new tests for gamification (30 suites)
+- `PrismSecurity` module — unified permissions, biometric auth, keychain, encryption, secure enclave, secure store
+- `PrismPermissionClient` — unified API for 16 system permissions (camera, photos, contacts, etc.)
+- `PrismBiometricAuth` — simplified Face ID / Touch ID / Optic ID authentication
+- `PrismKeychain` — full CRUD keychain wrapper with access control and Codable support
+- `PrismSecureEnclave` — P256 key generation and signing via Secure Enclave
+- `PrismEncryptor` — AES-GCM and ChaChaPoly symmetric encryption via CryptoKit
+- `PrismHasher` — SHA256/384/512 hashing and HMAC authentication
+- `PrismKeyDerivation` — HKDF and password-based key derivation
+- `PrismSecureStore` — high-level encrypt + keychain storage with one API call
+- 85 new tests for security (15 suites)
 
 ## Changed
-- README updated with all 10 modules including PrismServer and PrismGamification
+- README updated with all 11 modules including PrismServer, PrismGamification, and PrismSecurity
 - Mintlify navigation restructured for equal module coverage (removed Server/Client tab bias)
 - PrismGamification depends on PrismIntelligence for AI integration
+- Prism umbrella re-exports PrismSecurity
 
 ## Fixed
 - (none yet)

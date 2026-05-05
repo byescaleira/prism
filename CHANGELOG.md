@@ -21,13 +21,24 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 - **Fallback Messages**: `PrismGamificationFallbacks` — static messages when AI is unavailable
 - **Batch Generation**: `generateMessages` for multiple gamification events
 - **Auto-Fallback**: `messageWithFallback` — AI when available, static otherwise
+- **New Module**: `PrismSecurity` — unified security layer for Apple platforms
+- **Permissions**: `PrismPermissionClient` — unified API for 16 system permissions with request/check/monitor
+- **Biometric Auth**: `PrismBiometricAuth` — simplified Face ID / Touch ID / Optic ID with result-based API
+- **Keychain**: `PrismKeychain` — full CRUD wrapper with access control, Codable support, and iCloud sync option
+- **Secure Enclave**: `PrismSecureEnclave` — P256 key generation, signing, and verification via hardware
+- **Encryption**: `PrismEncryptor` — AES-GCM and ChaChaPoly symmetric encryption via CryptoKit
+- **Hashing**: `PrismHasher` — SHA256/384/512 hashing and HMAC authentication/verification
+- **Key Derivation**: `PrismKeyDerivation` — HKDF and password-based key derivation with salt generation
+- **Secure Storage**: `PrismSecureStore` — high-level encrypt + keychain with preset configurations (default, biometric, high-security)
+- **Permission Monitor**: `PrismPermissionMonitor` — AsyncStream of permission status changes
+- 85 tests across 15 suites for PrismSecurity
 
 ### Changed
 
 - Removed redundant `as? String` casts in PrismServer tracing and versioning
 - Replaced force unwrap with safe binding in `PrismTreemap.currentItems`
 - Increased timing tolerance in PrismScheduler test to fix flaky CI
-- Updated README with all 10 modules, PrismGamification and PrismServer sections
+- Updated README with all 11 modules, PrismGamification, PrismSecurity, and PrismServer sections
 - Restructured Mintlify navigation for equal module coverage
 
 ### Refactored

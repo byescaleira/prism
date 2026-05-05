@@ -9,7 +9,7 @@
 ## Dependency Graph (enforced by `--explicit-target-dependency-import-check error`)
 ```
 Layer 0: PrismFoundation (zero deps)
-Layer 1: PrismNetwork, PrismArchitecture, PrismVideo, PrismIntelligence, PrismCapabilities, PrismServer
+Layer 1: PrismNetwork, PrismArchitecture, PrismVideo, PrismIntelligence, PrismCapabilities, PrismSecurity, PrismServer
 Layer 2: PrismUI (→ Foundation + Architecture)
 Layer 3: Prism umbrella (→ all client modules)
 ```

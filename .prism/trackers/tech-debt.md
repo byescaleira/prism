@@ -10,13 +10,13 @@
 | TD-004 | DocC | PrismServer + PrismCapabilities missing from docs.yml workflow | MEDIUM | 2026-05-04 |
 | TD-005 | CI | Coverage extraction fragile (depends on profdata path heuristic) | LOW | 2026-05-04 |
 | TD-006 | PrismGamification | SwiftData `@section` attribute bug forces short test suite names (≤12 chars) | LOW | 2026-05-05 |
-| TD-007 | Mintlify | Gamification docs pages not yet written (navigation entries added) | MEDIUM | 2026-05-05 |
+| TD-008 | Mintlify | PrismSecurity docs pages not yet written | MEDIUM | 2026-05-05 |
 
 ## Resolved Debt
 
 | ID | Module | Description | Resolved | How |
 |----|--------|-------------|----------|-----|
-| — | — | — | — | — |
+| TD-007 | Mintlify | Gamification docs pages written | 2026-05-05 | 6 Mintlify pages committed |
 
 ---
 

@@ -10,9 +10,9 @@
 
 # Prism
 
-A modular Swift package for building Apple-platform apps and servers — foundation, networking, architecture, adaptive UI, media, on-device intelligence, gamification, device capabilities, and a native HTTP server.
+A modular Swift package for building Apple-platform apps and servers — foundation, networking, architecture, adaptive UI, media, on-device intelligence, gamification, security, device capabilities, and a native HTTP server.
 
-> **2557+ tests** · **10 modules** · **Swift 6.3 strict concurrency** · **DocC on every public API**
+> **2642+ tests** · **11 modules** · **Swift 6.3 strict concurrency** · **DocC on every public API**
 
 ---
 
@@ -26,6 +26,9 @@ A modular Swift package for building Apple-platform apps and servers — foundat
 ├──────────┴──────────┴────────────┴───────────┴──────────────────┤
 │                    PrismGamification                            │  ← gamification
 │              (PrismFoundation + PrismIntelligence)              │
+├─────────────────────────────────────────────────────────────────┤
+│                      PrismSecurity                              │  ← security
+│     (Permissions, Biometrics, Keychain, Encryption, Enclave)    │
 ├─────────────────────────────────────────────────────────────────┤
 │                      PrismServer                                │  ← server
 ├─────────────────────────────────────────────────────────────────┤
@@ -46,6 +49,7 @@ A modular Swift package for building Apple-platform apps and servers — foundat
 | `PrismCapabilities` | Apple capability wrappers — StoreKit, HealthKit, CloudKit, Camera, Bluetooth, Location, Motion, NFC, GameKit, Biometrics, and more |
 | `PrismServer` | Native Swift HTTP server — routing, middleware, WebSocket, GraphQL, MCP, jobs, caching, auth |
 | `PrismGamification` | Duolingo-style gamification — challenges, streaks, badges, leaderboards, analytics, AI-powered messages via Apple Intelligence |
+| `PrismSecurity` | Unified permissions, Face ID/Touch ID, Keychain, AES-GCM/ChaChaPoly encryption, Secure Enclave, secure storage |
 | `Prism` | Umbrella — `import Prism` gives you everything |
 
 ---
@@ -65,6 +69,7 @@ import PrismUI            // design system
 import PrismNetwork       // networking
 import PrismServer        // HTTP server
 import PrismGamification  // gamification
+import PrismSecurity      // auth, encryption, keychain
 import PrismIntelligence  // AI + ML
 ```
 
@@ -115,6 +120,41 @@ let message = await intelligence.messageWithFallback(
         points: 50
     )
 )
+```
+
+---
+
+## PrismSecurity
+
+Unified security layer — permissions, biometrics, keychain, encryption, and secure storage.
+
+```swift
+import PrismSecurity
+
+// Permissions — unified API for all system permissions
+let permissions = PrismPermissionClient()
+let status = try await permissions.request(.camera)
+let statuses = try await permissions.request([.camera, .microphone, .photoLibrary])
+
+// Biometric auth — one-line Face ID / Touch ID
+let biometric = PrismBiometricAuth()
+try await biometric.authenticate(reason: "Access your vault")
+
+// Keychain — typed, access-controlled storage
+let keychain = PrismKeychain()
+try keychain.save(string: "sk-secret", for: PrismKeychainItem(id: "apiKey"))
+let key = try keychain.loadString(for: PrismKeychainItem(id: "apiKey"))
+
+// Encryption — AES-GCM or ChaChaPoly
+let encryptor = PrismEncryptor()
+let symmetricKey = encryptor.generateKey()
+let encrypted = try encryptor.encrypt(Data("secret".utf8), using: symmetricKey)
+let decrypted = try encryptor.decrypt(encrypted, using: symmetricKey)
+
+// Secure Store — encrypt + keychain in one call
+let store = PrismSecureStore(configuration: .biometricProtected)
+try store.save(credentials, forKey: "userCredentials")
+let loaded = try store.load(Credentials.self, forKey: "userCredentials")
 ```
 
 ---
@@ -236,8 +276,8 @@ make docs-serve      # DocC + local server at :8000
 
 | Check | Status |
 |-------|--------|
-| Tests | 2557+ across 200+ suites |
-| Modules | 10 independent, composable modules |
+| Tests | 2642+ across 215+ suites |
+| Modules | 11 independent, composable modules |
 | Concurrency | Strict — `Sendable`, `@MainActor`, actor isolation |
 | Formatting | `swift-format` enforced in CI |
 | Docs | DocC with guides on every public API |
@@ -254,5 +294,5 @@ make docs-serve      # DocC + local server at :8000
 ---
 
 <p align="center">
-  <sub>swift · swiftui · ios · macos · swift-package-manager · clean-architecture · design-system · coreml · gamification · server · apple-intelligence · accessibility · localization · analytics</sub>
+  <sub>swift · swiftui · ios · macos · swift-package-manager · clean-architecture · design-system · coreml · gamification · security · keychain · faceid · encryption · server · apple-intelligence · accessibility · localization · analytics</sub>
 </p>

@@ -9,6 +9,7 @@
 | API ergonomics review (from dogfooding) | ⬜ TODO | Fix pain points found during Examples |
 | PrismGamification module | ✅ DONE | Challenges, streaks, badges, leaderboards, analytics, AI messages |
 | PrismGamification + PrismIntelligence integration | ✅ DONE | Apple Intelligence for personalized gamification messages |
+| PrismSecurity module | ✅ DONE | Permissions, biometrics, keychain, encryption, secure enclave, secure store |
 
 ## Phase 2 — Distribution & Adoption 🔲 NOT STARTED
 | Task | Status | Notes |
