@@ -31,12 +31,19 @@ public protocol PrismNetworkEndpoint: PrismLogger, Sendable {
 }
 
 extension PrismNetworkEndpoint {
+    /// Defaults to `.https`.
     public var scheme: PrismNetworkScheme { .https }
+    /// Defaults to `.get`.
     public var method: PrismNetworkMethod { .get }
+    /// Defaults to `nil` (no query parameters).
     public var queryItems: [URLQueryItem]? { nil }
+    /// Defaults to an empty dictionary.
     public var headers: [String: String] { [:] }
+    /// Defaults to `nil` (no request body).
     public var body: (any Encodable)? { nil }
+    /// Defaults to `nil` (uses the system default timeout).
     public var timeoutInterval: TimeInterval? { nil }
+    /// Defaults to `nil` (no caching).
     public var cacheInterval: TimeInterval? { nil }
 
     /// The fully constructed URL derived from `scheme`, `host`, `path`, and `queryItems`.

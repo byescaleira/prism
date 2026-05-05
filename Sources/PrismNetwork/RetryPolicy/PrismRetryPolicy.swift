@@ -35,10 +35,12 @@ public struct PrismExponentialBackoff: PrismRetryPolicy, Sendable {
         self.maxAttempts = maxAttempts
     }
 
+    /// Returns whether the request should be retried based on the current attempt count.
     public func shouldRetry(for error: Error, attempt: Int) -> Bool {
         attempt < maxAttempts
     }
 
+    /// Returns the exponential backoff delay with random jitter for the given attempt.
     public func delay(for attempt: Int) -> Duration {
         let exponentialSeconds = baseDelay.timeInterval * pow(2.0, Double(attempt))
         let jitter = Double.random(in: 0...0.5)
@@ -64,10 +66,12 @@ public struct PrismLinearRetry: PrismRetryPolicy, Sendable {
         self.maxAttempts = maxAttempts
     }
 
+    /// Returns whether the request should be retried based on the current attempt count.
     public func shouldRetry(for error: Error, attempt: Int) -> Bool {
         attempt < maxAttempts
     }
 
+    /// Returns the fixed delay duration regardless of attempt number.
     public func delay(for attempt: Int) -> Duration {
         fixedDelay
     }
