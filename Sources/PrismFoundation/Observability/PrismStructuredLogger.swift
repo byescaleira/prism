@@ -9,13 +9,20 @@ import Foundation
 
 /// Severity levels for structured log entries, ordered from least to most critical.
 public enum PrismLogLevel: Int, Sendable, Comparable, CaseIterable {
+    /// Finest-grained informational events for detailed tracing.
     case trace = 0
+    /// Diagnostic information useful during development.
     case debug = 1
+    /// General informational messages about normal operation.
     case info = 2
+    /// An indication of a potential issue that does not prevent operation.
     case warning = 3
+    /// An error that affected a specific operation but not the overall system.
     case error = 4
+    /// A severe error that may cause the application to terminate.
     case critical = 5
 
+    /// Compares two log levels by their severity order.
     public static func < (lhs: PrismLogLevel, rhs: PrismLogLevel) -> Bool {
         lhs.rawValue < rhs.rawValue
     }
@@ -69,6 +76,7 @@ public struct PrismConsoleLogDestination: PrismLogDestination {
     /// Creates a new console log destination.
     public init() {}
 
+    /// Prints the log entry to standard output in `[level] [category] message` format.
     public func write(_ entry: PrismLogEntry) {
         print("[\(entry.level)] [\(entry.category)] \(entry.message)")
     }

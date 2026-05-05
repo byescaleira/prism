@@ -15,6 +15,7 @@ public struct PrismFileManager: @unchecked Sendable {
     private let fileManager: FileManager
     private let documentsURL: URL?
 
+    /// Creates a file manager using the default documents directory.
     public init(fileManager: FileManager = .default) {
         self.fileManager = fileManager
         self.documentsURL =
@@ -24,6 +25,7 @@ public struct PrismFileManager: @unchecked Sendable {
             ).first
     }
 
+    /// Creates a file manager with a custom documents directory URL.
     public init(
         fileManager: FileManager = .default,
         documentsURL: URL?
@@ -32,6 +34,7 @@ public struct PrismFileManager: @unchecked Sendable {
         self.documentsURL = documentsURL
     }
 
+    /// Returns the file URL for the given name and privacy level, creating the private directory if needed.
     public func path(
         with name: String,
         privacy: PrismFilePrivacy = .public
@@ -57,6 +60,7 @@ public struct PrismFileManager: @unchecked Sendable {
         }
     }
 
+    /// Returns a human-readable string representing the file size at the given path.
     public func size(at path: URL?) -> String {
         guard let path,
             let attributes = try? fileManager.attributesOfItem(atPath: path.path())

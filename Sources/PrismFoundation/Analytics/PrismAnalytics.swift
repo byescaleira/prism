@@ -41,6 +41,7 @@ public struct PrismAnalyticsEvent: Sendable, Equatable {
     /// Timestamp when the event was created.
     public let timestamp: Date
 
+    /// Creates an analytics event with the given name, parameters, and timestamp.
     public init(
         name: String,
         parameters: [String: String] = [:],
