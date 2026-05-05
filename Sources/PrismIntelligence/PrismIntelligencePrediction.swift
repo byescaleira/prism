@@ -69,6 +69,7 @@ public enum PrismIntelligencePredictionInput: Equatable {
         }
     }
 
+    /// Returns whether two prediction inputs are equal.
     public static func == (
         lhs: PrismIntelligencePredictionInput,
         rhs: PrismIntelligencePredictionInput

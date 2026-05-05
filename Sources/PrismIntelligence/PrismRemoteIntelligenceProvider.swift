@@ -34,6 +34,7 @@ public struct PrismURLSessionRemoteIntelligenceTransport: PrismRemoteIntelligenc
         self.session = session
     }
 
+    /// Sends a URL request using the underlying session and returns the response data.
     public func data(
         for request: URLRequest
     ) async throws -> (Data, URLResponse) {
