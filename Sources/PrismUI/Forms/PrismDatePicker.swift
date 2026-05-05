@@ -48,11 +48,13 @@ public struct PrismDatePicker: View {
                     .font(.system(size: 16))
                     .foregroundStyle(theme.color(.interactive))
                     .frame(width: 28)
+                    .accessibilityHidden(true)
             }
 
             Text(title)
                 .font(TypographyToken.body.font)
                 .foregroundStyle(theme.color(.onSurface))
         }
+        .accessibilityElement(children: .combine)
     }
 }

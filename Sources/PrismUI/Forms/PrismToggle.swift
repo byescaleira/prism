@@ -31,6 +31,7 @@ public struct PrismToggle: View {
                         .font(.system(size: 16))
                         .foregroundStyle(theme.color(.interactive))
                         .frame(width: 28)
+                        .accessibilityHidden(true)
                 }
 
                 VStack(alignment: .leading, spacing: SpacingToken.xxs.rawValue) {
@@ -45,8 +46,10 @@ public struct PrismToggle: View {
                     }
                 }
             }
+            .accessibilityElement(children: .combine)
         }
         .tint(theme.color(.interactive))
+        .accessibilityValue(isOn ? "On" : "Off")
         .padding(.vertical, SpacingToken.xs.rawValue)
     }
 }
