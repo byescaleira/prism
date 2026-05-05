@@ -13,6 +13,7 @@ public actor PrismVideoDownloader {
     private var videoName: String
     private var videoType: AVFileType
 
+    /// Creates a downloader for the given video URL, output name, and file type.
     public init(
         video url: URL,
         with name: String,
