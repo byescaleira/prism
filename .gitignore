@@ -57,5 +57,21 @@ secrets/
 *.code-workspace
 
 # === Claude Code ===
-.claude/settings.local.json
+.claude/
 .claude/worktrees/
+
+# === Project meta (canonical source in .template/) ===
+.prism/
+.editorconfig
+.swift-format
+CHANGELOG.md
+CLAUDE.md
+CONTRIBUTING.md
+LICENSE
+Makefile
+README.md
+SECURITY.md
+scripts/
+playground/
+landing/
+.template/

@@ -1,4 +1,0 @@
-User-agent: *
-Allow: /
-
-Sitemap: https://prism.byescaleira.com/sitemap.xml
