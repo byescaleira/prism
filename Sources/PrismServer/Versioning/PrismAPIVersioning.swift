@@ -2,14 +2,18 @@ import Foundation
 
 /// Represents an API version with major and optional minor component.
 public struct PrismAPIVersion: Sendable, Comparable, Hashable, CustomStringConvertible {
+    /// The major.
     public let major: Int
+    /// The minor.
     public let minor: Int
 
+    /// Creates a new `PrismAPIVersion` with the specified configuration.
     public init(major: Int, minor: Int = 0) {
         self.major = major
         self.minor = minor
     }
 
+    /// The description.
     public var description: String {
         minor == 0 ? "v\(major)" : "v\(major).\(minor)"
     }
@@ -25,6 +29,7 @@ public struct PrismAPIVersion: Sendable, Comparable, Hashable, CustomStringConve
         return PrismAPIVersion(major: major, minor: minor)
     }
 
+    /// Compares two API versions using semantic versioning order.
     public static func < (lhs: PrismAPIVersion, rhs: PrismAPIVersion) -> Bool {
         if lhs.major != rhs.major { return lhs.major < rhs.major }
         return lhs.minor < rhs.minor
@@ -44,6 +49,7 @@ public struct PrismVersioningMiddleware: PrismMiddleware, Sendable {
     private let supportedVersions: [PrismAPIVersion]
     private let defaultVersion: PrismAPIVersion
 
+    /// Creates a new `PrismVersioningMiddleware` with the specified configuration.
     public init(
         strategy: PrismVersioningStrategy = .urlPrefix,
         supportedVersions: [PrismAPIVersion],
@@ -54,6 +60,7 @@ public struct PrismVersioningMiddleware: PrismMiddleware, Sendable {
         self.defaultVersion = defaultVersion
     }
 
+    /// Handles the request and returns a response.
     public func handle(_ request: PrismHTTPRequest, next: @escaping PrismRouteHandler) async throws -> PrismHTTPResponse {
         var req = request
         let extracted: PrismAPIVersion?
@@ -102,7 +109,7 @@ public struct PrismVersioningMiddleware: PrismMiddleware, Sendable {
 extension PrismHTTPRequest {
     /// The API version extracted by PrismVersioningMiddleware.
     public var apiVersion: PrismAPIVersion? {
-        userInfo["apiVersion"].flatMap { $0 as? String }.flatMap(PrismAPIVersion.parse)
+        userInfo["apiVersion"].flatMap(PrismAPIVersion.parse)
     }
 }
 
@@ -110,6 +117,7 @@ extension PrismHTTPRequest {
 public struct PrismVersionedRouter: Sendable {
     private var routes: [(version: PrismAPIVersion, method: PrismHTTPMethod, pattern: String, handler: PrismRouteHandler)]
 
+    /// Creates a new `PrismVersionedRouter`.
     public init() {
         self.routes = []
     }

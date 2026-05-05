@@ -2,8 +2,10 @@ import Foundation
 
 /// A unique request identifier.
 public struct PrismRequestID: Sendable, CustomStringConvertible {
+    /// The value.
     public let value: String
 
+    /// Creates a new `PrismRequestID` with the specified configuration.
     public init(_ value: String) {
         self.value = value
     }
@@ -13,17 +15,24 @@ public struct PrismRequestID: Sendable, CustomStringConvertible {
         PrismRequestID(UUID().uuidString.lowercased())
     }
 
+    /// The description.
     public var description: String { value }
 }
 
 /// Trace context propagated through the request lifecycle.
 public struct PrismTraceContext: Sendable {
+    /// The request i d.
     public let requestID: String
+    /// The correlation i d.
     public let correlationID: String?
+    /// The parent i d.
     public let parentID: String?
+    /// The start time.
     public let startTime: ContinuousClock.Instant
+    /// The extra.
     public var extra: [String: String]
 
+    /// Creates a new `PrismTraceContext` with the specified configuration.
     public init(
         requestID: String,
         correlationID: String? = nil,
@@ -50,6 +59,7 @@ public struct PrismTracingMiddleware: PrismMiddleware, Sendable {
     private let correlationHeader: String
     private let generateIfMissing: Bool
 
+    /// Creates a new `PrismTracingMiddleware` with the specified configuration.
     public init(
         headerName: String = "X-Request-ID",
         correlationHeader: String = "X-Correlation-ID",
@@ -60,6 +70,7 @@ public struct PrismTracingMiddleware: PrismMiddleware, Sendable {
         self.generateIfMissing = generateIfMissing
     }
 
+    /// Handles the request and returns a response.
     public func handle(_ request: PrismHTTPRequest, next: @escaping PrismRouteHandler) async throws -> PrismHTTPResponse {
         var req = request
 
@@ -101,25 +112,29 @@ public struct PrismTracingMiddleware: PrismMiddleware, Sendable {
 extension PrismHTTPRequest {
     /// The trace context set by PrismTracingMiddleware.
     public var traceContext: PrismTraceContext? {
-        guard let requestID = userInfo["traceContext.requestID"] as? String else { return nil }
+        guard let requestID = userInfo["traceContext.requestID"] else { return nil }
         return PrismTraceContext(
             requestID: requestID,
-            correlationID: userInfo["traceContext.correlationID"] as? String,
-            parentID: userInfo["traceContext.parentID"] as? String
+            correlationID: userInfo["traceContext.correlationID"],
+            parentID: userInfo["traceContext.parentID"]
         )
     }
 }
 
 /// Formats log messages with trace context prefix.
 public struct PrismTracingLogger: Sendable {
+    /// The request i d.
     public let requestID: String
+    /// The correlation i d.
     public let correlationID: String?
 
+    /// Creates a new `PrismTracingLogger` with the specified configuration.
     public init(context: PrismTraceContext) {
         self.requestID = context.requestID
         self.correlationID = context.correlationID
     }
 
+    /// Creates a new `PrismTracingLogger` with the specified configuration.
     public init(requestID: String, correlationID: String? = nil) {
         self.requestID = requestID
         self.correlationID = correlationID
