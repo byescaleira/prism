@@ -50,6 +50,8 @@ public struct PrismBarChart<Data: RandomAccessCollection>: View where Data.Eleme
                     .foregroundStyle(theme.color(.onBackgroundSecondary))
             }
         }
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel(Text("Bar chart with \(data.count) items"))
     }
 }
 
@@ -118,6 +120,8 @@ public struct PrismLineChart<Data: RandomAccessCollection>: View where Data.Elem
                     .foregroundStyle(theme.color(.onBackgroundSecondary))
             }
         }
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel(Text("Line chart with \(data.count) data points"))
     }
 }
 
@@ -156,6 +160,8 @@ public struct PrismDonutChart<Data: RandomAccessCollection>: View where Data.Ele
             .cornerRadius(RadiusToken.xs.rawValue)
         }
         .chartForegroundStyleScale(range: colors.prefix(data.count).map { theme.color($0) })
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel(Text("Donut chart with \(data.count) segments"))
     }
 }
 #endif

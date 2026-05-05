@@ -31,6 +31,7 @@ public struct PrismAlert: ViewModifier {
                 Text(message)
             }
         }
+        .accessibilityAddTraits(isPresented ? .isModal : [])
     }
 }
 

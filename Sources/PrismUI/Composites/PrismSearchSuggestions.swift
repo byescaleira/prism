@@ -70,6 +70,7 @@ public struct PrismSearchSuggestions<Item: Identifiable & Sendable, Row: View>: 
             Image(systemName: "magnifyingglass")
                 .font(.system(size: 16))
                 .foregroundStyle(theme.color(.onBackgroundSecondary))
+                .accessibilityHidden(true)
 
             TextField(placeholder, text: $text)
                 .font(TypographyToken.body.font)
@@ -86,6 +87,7 @@ public struct PrismSearchSuggestions<Item: Identifiable & Sendable, Row: View>: 
                         .foregroundStyle(theme.color(.onBackgroundTertiary))
                 }
                 .buttonStyle(.plain)
+                .accessibilityLabel(Text("Clear search"))
             }
         }
         .padding(.horizontal, SpacingToken.md.rawValue)
@@ -109,6 +111,7 @@ public struct PrismSearchSuggestions<Item: Identifiable & Sendable, Row: View>: 
                         .contentShape(Rectangle())
                 }
                 .buttonStyle(.plain)
+                .accessibilityAddTraits(.isButton)
 
                 if item.id != visibleSuggestions.last?.id {
                     Divider().padding(.leading, SpacingToken.md.rawValue)
