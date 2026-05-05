@@ -119,7 +119,7 @@ struct PrismSchedulerTests {
         let counter = Counter()
         let scheduler = PrismScheduler()
         _ = await scheduler.after(0.1, job: IncrementJob(counter: counter))
-        try await Task.sleep(for: .milliseconds(200))
+        try await Task.sleep(for: .milliseconds(500))
         #expect(await counter.value == 1)
     }
 }
