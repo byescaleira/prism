@@ -1,13 +1,14 @@
-import Testing
 import SwiftUI
+import Testing
+
 @testable import PrismUI
 
 #if canImport(MapKit)
-import MapKit
+    import MapKit
 #endif
 
 #if canImport(PhotosUI)
-import PhotosUI
+    import PhotosUI
 #endif
 
 @MainActor
@@ -17,64 +18,64 @@ struct ComprehensiveExpansionTests {
     // MARK: - Map
 
     #if canImport(MapKit)
-    @Suite("Map Integration")
-    struct MapTests {
+        @Suite("Map Integration")
+        struct MapTests {
 
-        @Test("PrismMap creation")
-        @available(iOS 17.0, macOS 14.0, tvOS 17.0, watchOS 10.0, *)
-        @MainActor func mapCreation() {
-            let view = PrismMap {
-                PrismMapMarker("Test", coordinate: CLLocationCoordinate2D(latitude: 37.7749, longitude: -122.4194))
+            @Test("PrismMap creation")
+            @available(iOS 17.0, macOS 14.0, tvOS 17.0, watchOS 10.0, *)
+            @MainActor func mapCreation() {
+                let view = PrismMap {
+                    PrismMapMarker("Test", coordinate: CLLocationCoordinate2D(latitude: 37.7749, longitude: -122.4194))
+                }
+                _ = view.body
             }
-            _ = view.body
-        }
 
-        @Test("PrismMapMarker with custom tint")
-        @available(iOS 17.0, macOS 14.0, tvOS 17.0, watchOS 10.0, *)
-        @MainActor func mapMarkerTint() {
-            let marker = PrismMapMarker(
-                "Location",
-                coordinate: CLLocationCoordinate2D(latitude: 0, longitude: 0),
-                tint: .success
-            )
-            _ = marker
-        }
-
-        @Test("PrismMapAnnotation creation")
-        @available(iOS 17.0, macOS 14.0, tvOS 17.0, watchOS 10.0, *)
-        @MainActor func mapAnnotation() {
-            let annotation = PrismMapAnnotation(
-                coordinate: CLLocationCoordinate2D(latitude: 0, longitude: 0)
-            ) {
-                Image(systemName: "mappin.circle.fill")
+            @Test("PrismMapMarker with custom tint")
+            @available(iOS 17.0, macOS 14.0, tvOS 17.0, watchOS 10.0, *)
+            @MainActor func mapMarkerTint() {
+                let marker = PrismMapMarker(
+                    "Location",
+                    coordinate: CLLocationCoordinate2D(latitude: 0, longitude: 0),
+                    tint: .success
+                )
+                _ = marker
             }
-            _ = annotation
+
+            @Test("PrismMapAnnotation creation")
+            @available(iOS 17.0, macOS 14.0, tvOS 17.0, watchOS 10.0, *)
+            @MainActor func mapAnnotation() {
+                let annotation = PrismMapAnnotation(
+                    coordinate: CLLocationCoordinate2D(latitude: 0, longitude: 0)
+                ) {
+                    Image(systemName: "mappin.circle.fill")
+                }
+                _ = annotation
+            }
         }
-    }
     #endif
 
     // MARK: - Photos
 
     #if canImport(PhotosUI)
-    @Suite("Photo Picker")
-    struct PhotoTests {
+        @Suite("Photo Picker")
+        struct PhotoTests {
 
-        @Test("PrismPhotoPicker creation")
-        @MainActor func photoPicker() {
-            @State var item: PhotosPickerItem? = nil
-            let view = PrismPhotoPicker("Select Photo", selection: $item)
-            _ = view.body
-        }
-
-        @Test("PrismMultiPhotoPicker creation")
-        @MainActor func multiPhotoPicker() {
-            @State var items: [PhotosPickerItem] = []
-            let view = PrismMultiPhotoPicker(selection: $items, maxSelectionCount: 5) {
-                Label("Photos", systemImage: "photo.stack")
+            @Test("PrismPhotoPicker creation")
+            @MainActor func photoPicker() {
+                @State var item: PhotosPickerItem? = nil
+                let view = PrismPhotoPicker("Select Photo", selection: $item)
+                _ = view.body
             }
-            _ = view.body
+
+            @Test("PrismMultiPhotoPicker creation")
+            @MainActor func multiPhotoPicker() {
+                @State var items: [PhotosPickerItem] = []
+                let view = PrismMultiPhotoPicker(selection: $items, maxSelectionCount: 5) {
+                    Label("Photos", systemImage: "photo.stack")
+                }
+                _ = view.body
+            }
         }
-    }
     #endif
 
     // MARK: - Document
@@ -342,7 +343,7 @@ struct ComprehensiveExpansionTests {
         @Test("Single page onboarding")
         @MainActor func singlePage() {
             let view = PrismOnboarding(pages: [
-                .init(icon: "checkmark", title: "Done", message: "Only page"),
+                .init(icon: "checkmark", title: "Done", message: "Only page")
             ]) {}
             _ = view.body
         }

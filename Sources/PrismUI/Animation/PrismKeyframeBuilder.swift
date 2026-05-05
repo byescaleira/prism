@@ -63,7 +63,11 @@ public struct PrismKeyframeView<Content: View>: View {
     /// The keyframe-animated view body driven by the trigger boolean.
     public var body: some View {
         KeyframeAnimator(
-            initialValue: frames.first.map { Values(scale: $0.scale, opacity: $0.opacity, offsetX: $0.offsetX, offsetY: $0.offsetY, rotation: $0.rotation) } ?? Values(),
+            initialValue: frames.first.map {
+                Values(
+                    scale: $0.scale, opacity: $0.opacity, offsetX: $0.offsetX, offsetY: $0.offsetY,
+                    rotation: $0.rotation)
+            } ?? Values(),
             trigger: trigger
         ) { value in
             content(value)

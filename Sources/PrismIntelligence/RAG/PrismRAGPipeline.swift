@@ -123,7 +123,8 @@ public actor PrismRAGPipeline {
         let results = await store.search(query: queryVector, topK: config.topK)
         let sources = results.compactMap { chunkTexts[$0.embedding.id] }
         let answer = try await generationProvider.generate(question: question, context: sources)
-        let avgSimilarity = results.isEmpty
+        let avgSimilarity =
+            results.isEmpty
             ? 0.0
             : Double(results.map(\.similarity).reduce(0, +)) / Double(results.count)
         return PrismRAGResponse(

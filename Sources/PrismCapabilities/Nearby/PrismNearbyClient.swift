@@ -45,121 +45,124 @@ public enum PrismNearbySessionState: Sendable, CaseIterable {
 // MARK: - Nearby Client
 
 #if canImport(NearbyInteraction) && os(iOS)
-import NearbyInteraction
+    import NearbyInteraction
 
-/// Observable client that manages a NearbyInteraction session for peer discovery
-/// and UWB-based spatial awareness.
-///
-/// Uses `NISession` under the hood to generate discovery tokens, start ranging,
-/// and publish nearby object updates. The session delegate is forwarded through
-/// the `@Observable` properties so SwiftUI views update automatically.
-///
-/// ## Example
-/// ```swift
-/// let client = PrismNearbyClient()
-/// if let token = client.generateToken() {
-///     // Exchange token with peer via MultipeerConnectivity or another channel
-///     client.start(peerToken: peerToken)
-/// }
-/// ```
-@MainActor @Observable
-public final class PrismNearbyClient: NSObject, NISessionDelegate {
-    /// Current state of the NearbyInteraction session.
-    public private(set) var sessionState: PrismNearbySessionState = .idle
-    /// All nearby objects currently being tracked.
-    public private(set) var nearbyObjects: [PrismNearbyObject] = []
-
-    private var session: NISession?
-
-    /// Creates a new nearby interaction client.
-    public override init() {
-        super.init()
-    }
-
-    /// Starts a NearbyInteraction session with the given peer discovery token.
+    /// Observable client that manages a NearbyInteraction session for peer discovery
+    /// and UWB-based spatial awareness.
     ///
-    /// Creates a new `NISession`, assigns this client as the delegate, and runs
-    /// the session with the peer's token. Any previously running session is
-    /// invalidated first.
+    /// Uses `NISession` under the hood to generate discovery tokens, start ranging,
+    /// and publish nearby object updates. The session delegate is forwarded through
+    /// the `@Observable` properties so SwiftUI views update automatically.
     ///
-    /// - Parameter peerToken: The discovery token received from the remote peer.
-    public func start(peerToken: Data) {
-        session?.invalidate()
-        let niSession = NISession()
-        niSession.delegate = self
-        session = niSession
+    /// ## Example
+    /// ```swift
+    /// let client = PrismNearbyClient()
+    /// if let token = client.generateToken() {
+    ///     // Exchange token with peer via MultipeerConnectivity or another channel
+    ///     client.start(peerToken: peerToken)
+    /// }
+    /// ```
+    @MainActor @Observable
+    public final class PrismNearbyClient: NSObject, NISessionDelegate {
+        /// Current state of the NearbyInteraction session.
+        public private(set) var sessionState: PrismNearbySessionState = .idle
+        /// All nearby objects currently being tracked.
+        public private(set) var nearbyObjects: [PrismNearbyObject] = []
 
-        guard let token = try? NSKeyedUnarchiver.unarchivedObject(ofClass: NIDiscoveryToken.self, from: peerToken) else { return }
-        let config = NINearbyPeerConfiguration(peerToken: token)
-        niSession.run(config)
-        sessionState = .running
-    }
+        private var session: NISession?
 
-    /// Stops and invalidates the current NearbyInteraction session.
-    public func stop() {
-        session?.invalidate()
-        session = nil
-        sessionState = .idle
-        nearbyObjects = []
-    }
-
-    /// Generates a discovery token for this device.
-    ///
-    /// The token must be exchanged with the remote peer (e.g. via
-    /// MultipeerConnectivity) before calling `start(peerToken:)`.
-    ///
-    /// - Returns: The serialized discovery token data, or `nil` if unavailable.
-    public func generateToken() -> Data? {
-        let niSession = NISession()
-        session = niSession
-        guard let token = niSession.discoveryToken else { return nil }
-        return try? NSKeyedArchiver.archivedData(withRootObject: token, requiringSecureCoding: true)
-    }
-
-    // MARK: - NISessionDelegate
-
-    /// Serializes an `NIDiscoveryToken` to `Data` using secure coding.
-    private nonisolated func tokenData(from token: NIDiscoveryToken) -> Data {
-        (try? NSKeyedArchiver.archivedData(withRootObject: token, requiringSecureCoding: true)) ?? Data()
-    }
-
-    nonisolated public func session(_ session: NISession, didUpdate nearbyObjects: [NINearbyObject]) {
-        let objects = nearbyObjects.map { obj in
-            PrismNearbyObject(
-                peerToken: tokenData(from: obj.discoveryToken),
-                distance: obj.distance,
-                direction: obj.direction
-            )
+        /// Creates a new nearby interaction client.
+        public override init() {
+            super.init()
         }
-        Task { @MainActor in
-            self.nearbyObjects = objects
-        }
-    }
 
-    nonisolated public func session(_ session: NISession, didRemove nearbyObjects: [NINearbyObject], reason: NINearbyObject.RemovalReason) {
-        let removedTokens = Set(nearbyObjects.map { tokenData(from: $0.discoveryToken) })
-        Task { @MainActor in
-            self.nearbyObjects.removeAll { removedTokens.contains($0.peerToken) }
-        }
-    }
+        /// Starts a NearbyInteraction session with the given peer discovery token.
+        ///
+        /// Creates a new `NISession`, assigns this client as the delegate, and runs
+        /// the session with the peer's token. Any previously running session is
+        /// invalidated first.
+        ///
+        /// - Parameter peerToken: The discovery token received from the remote peer.
+        public func start(peerToken: Data) {
+            session?.invalidate()
+            let niSession = NISession()
+            niSession.delegate = self
+            session = niSession
 
-    nonisolated public func sessionWasSuspended(_ session: NISession) {
-        Task { @MainActor in
-            self.sessionState = .suspended
+            guard let token = try? NSKeyedUnarchiver.unarchivedObject(ofClass: NIDiscoveryToken.self, from: peerToken)
+            else { return }
+            let config = NINearbyPeerConfiguration(peerToken: token)
+            niSession.run(config)
+            sessionState = .running
         }
-    }
 
-    nonisolated public func sessionSuspensionEnded(_ session: NISession) {
-        Task { @MainActor in
-            self.sessionState = .running
+        /// Stops and invalidates the current NearbyInteraction session.
+        public func stop() {
+            session?.invalidate()
+            session = nil
+            sessionState = .idle
+            nearbyObjects = []
         }
-    }
 
-    nonisolated public func session(_ session: NISession, didInvalidateWith error: Error) {
-        Task { @MainActor in
-            self.sessionState = .invalidated
-            self.nearbyObjects = []
+        /// Generates a discovery token for this device.
+        ///
+        /// The token must be exchanged with the remote peer (e.g. via
+        /// MultipeerConnectivity) before calling `start(peerToken:)`.
+        ///
+        /// - Returns: The serialized discovery token data, or `nil` if unavailable.
+        public func generateToken() -> Data? {
+            let niSession = NISession()
+            session = niSession
+            guard let token = niSession.discoveryToken else { return nil }
+            return try? NSKeyedArchiver.archivedData(withRootObject: token, requiringSecureCoding: true)
+        }
+
+        // MARK: - NISessionDelegate
+
+        /// Serializes an `NIDiscoveryToken` to `Data` using secure coding.
+        private nonisolated func tokenData(from token: NIDiscoveryToken) -> Data {
+            (try? NSKeyedArchiver.archivedData(withRootObject: token, requiringSecureCoding: true)) ?? Data()
+        }
+
+        nonisolated public func session(_ session: NISession, didUpdate nearbyObjects: [NINearbyObject]) {
+            let objects = nearbyObjects.map { obj in
+                PrismNearbyObject(
+                    peerToken: tokenData(from: obj.discoveryToken),
+                    distance: obj.distance,
+                    direction: obj.direction
+                )
+            }
+            Task { @MainActor in
+                self.nearbyObjects = objects
+            }
+        }
+
+        nonisolated public func session(
+            _ session: NISession, didRemove nearbyObjects: [NINearbyObject], reason: NINearbyObject.RemovalReason
+        ) {
+            let removedTokens = Set(nearbyObjects.map { tokenData(from: $0.discoveryToken) })
+            Task { @MainActor in
+                self.nearbyObjects.removeAll { removedTokens.contains($0.peerToken) }
+            }
+        }
+
+        nonisolated public func sessionWasSuspended(_ session: NISession) {
+            Task { @MainActor in
+                self.sessionState = .suspended
+            }
+        }
+
+        nonisolated public func sessionSuspensionEnded(_ session: NISession) {
+            Task { @MainActor in
+                self.sessionState = .running
+            }
+        }
+
+        nonisolated public func session(_ session: NISession, didInvalidateWith error: Error) {
+            Task { @MainActor in
+                self.sessionState = .invalidated
+                self.nearbyObjects = []
+            }
         }
     }
-}
 #endif

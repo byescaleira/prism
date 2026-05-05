@@ -43,7 +43,10 @@ public struct PrismClientRequest: Sendable {
     public var timeout: TimeInterval?
 
     /// Creates a new `PrismClientRequest` with the specified configuration.
-    public init(url: String, method: String = "GET", headers: [String: String] = [:], body: Data? = nil, timeout: TimeInterval? = nil) {
+    public init(
+        url: String, method: String = "GET", headers: [String: String] = [:], body: Data? = nil,
+        timeout: TimeInterval? = nil
+    ) {
         self.url = url
         self.method = method
         self.headers = headers
@@ -166,17 +169,23 @@ public struct PrismHTTPClient: Sendable {
     }
 
     /// Sends a POST request.
-    public func post(_ url: String, body: Data? = nil, headers: [String: String] = [:]) async throws -> PrismClientResponse {
+    public func post(_ url: String, body: Data? = nil, headers: [String: String] = [:]) async throws
+        -> PrismClientResponse
+    {
         try await request(PrismClientRequest(url: url, method: "POST", headers: headers, body: body))
     }
 
     /// Sends a PUT request.
-    public func put(_ url: String, body: Data? = nil, headers: [String: String] = [:]) async throws -> PrismClientResponse {
+    public func put(_ url: String, body: Data? = nil, headers: [String: String] = [:]) async throws
+        -> PrismClientResponse
+    {
         try await request(PrismClientRequest(url: url, method: "PUT", headers: headers, body: body))
     }
 
     /// Sends a PATCH request.
-    public func patch(_ url: String, body: Data? = nil, headers: [String: String] = [:]) async throws -> PrismClientResponse {
+    public func patch(_ url: String, body: Data? = nil, headers: [String: String] = [:]) async throws
+        -> PrismClientResponse
+    {
         try await request(PrismClientRequest(url: url, method: "PATCH", headers: headers, body: body))
     }
 

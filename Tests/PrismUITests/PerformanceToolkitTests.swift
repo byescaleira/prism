@@ -1,5 +1,6 @@
-import Testing
 import SwiftUI
+import Testing
+
 @testable import PrismUI
 
 @MainActor
@@ -19,9 +20,10 @@ struct PerformanceToolkitTests {
 
         @Test("PrismLazyView with custom placeholder conforms to View")
         @MainActor func lazyViewWithPlaceholder() {
-            let view = PrismLazyView(placeholder: { Text("Loading...") }) {
-                Text("Loaded")
-            }
+            let view = PrismLazyView(
+                placeholder: { Text("Loading...") },
+                content: { Text("Loaded") }
+            )
             #expect(type(of: view) is any View.Type)
         }
 

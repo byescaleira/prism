@@ -47,7 +47,10 @@ private final class XMLParserDelegateImpl: NSObject, XMLParserDelegate, @uncheck
     private var stack: [PrismXMLNode] = []
     private var currentText = ""
 
-    func parser(_ parser: XMLParser, didStartElement elementName: String, namespaceURI: String?, qualifiedName: String?, attributes attributeDict: [String: String] = [:]) {
+    func parser(
+        _ parser: XMLParser, didStartElement elementName: String, namespaceURI: String?, qualifiedName: String?,
+        attributes attributeDict: [String: String] = [:]
+    ) {
         let node = PrismXMLNode(name: elementName, attributes: attributeDict)
         stack.append(node)
         currentText = ""
@@ -146,7 +149,8 @@ public struct PrismBodyParserMiddleware: PrismMiddleware, Sendable {
     public init() {}
 
     /// Detects the content type and annotates the request with the parsed body type.
-    public func handle(_ request: PrismHTTPRequest, next: @escaping PrismRouteHandler) async throws -> PrismHTTPResponse {
+    public func handle(_ request: PrismHTTPRequest, next: @escaping PrismRouteHandler) async throws -> PrismHTTPResponse
+    {
         var req = request
         let contentType = req.headers.value(for: "Content-Type")?.lowercased() ?? ""
 

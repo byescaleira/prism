@@ -76,41 +76,41 @@ extension BrandTheme {
 
     private var platformBackground: Color {
         #if canImport(UIKit) && !os(watchOS)
-        Color(.systemBackground)
+            Color(.systemBackground)
         #elseif os(macOS)
-        Color(.windowBackgroundColor)
+            Color(.windowBackgroundColor)
         #else
-        .black
+            .black
         #endif
     }
 
     private var platformBackgroundSecondary: Color {
         #if canImport(UIKit) && !os(watchOS)
-        Color(.secondarySystemBackground)
+            Color(.secondarySystemBackground)
         #elseif os(macOS)
-        Color(.controlBackgroundColor)
+            Color(.controlBackgroundColor)
         #else
-        Color(white: 0.11)
+            Color(white: 0.11)
         #endif
     }
 
     private var platformBackgroundTertiary: Color {
         #if canImport(UIKit) && !os(watchOS)
-        Color(.tertiarySystemBackground)
+            Color(.tertiarySystemBackground)
         #elseif os(macOS)
-        Color(.underPageBackgroundColor)
+            Color(.underPageBackgroundColor)
         #else
-        Color(white: 0.17)
+            Color(white: 0.17)
         #endif
     }
 
     private var platformSeparator: Color {
         #if canImport(UIKit) && !os(watchOS)
-        Color(.separator)
+            Color(.separator)
         #elseif os(macOS)
-        Color(.separatorColor)
+            Color(.separatorColor)
         #else
-        .gray.opacity(0.3)
+            .gray.opacity(0.3)
         #endif
     }
 }

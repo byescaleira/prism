@@ -46,7 +46,8 @@ public struct PrismRateLimitConfig: Sendable {
     public let keyExtractor: @Sendable (PrismHTTPRequest) -> String
 
     /// Creates a new `PrismRateLimitConfig` with the specified configuration.
-    public init(windowSeconds: Double, maxRequests: Int, keyExtractor: @escaping @Sendable (PrismHTTPRequest) -> String) {
+    public init(windowSeconds: Double, maxRequests: Int, keyExtractor: @escaping @Sendable (PrismHTTPRequest) -> String)
+    {
         self.windowSeconds = windowSeconds
         self.maxRequests = maxRequests
         self.keyExtractor = keyExtractor
@@ -90,7 +91,8 @@ public struct PrismSlidingWindowMiddleware: PrismMiddleware, Sendable {
     }
 
     /// Handles the request and returns a response.
-    public func handle(_ request: PrismHTTPRequest, next: @escaping PrismRouteHandler) async throws -> PrismHTTPResponse {
+    public func handle(_ request: PrismHTTPRequest, next: @escaping PrismRouteHandler) async throws -> PrismHTTPResponse
+    {
         let key = config.keyExtractor(request)
         let now = Date()
         let windowStart = now.addingTimeInterval(-config.windowSeconds)

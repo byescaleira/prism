@@ -53,7 +53,9 @@ public struct PrismMenu<Label: View>: View {
             Section(title) {
                 ForEach(Array(sectionItems.enumerated()), id: \.offset) { _, subItem in
                     if case .button(let t, let i, let r, let a) = subItem {
-                        Button(role: r) { a() } label: {
+                        Button(role: r) {
+                            a()
+                        } label: {
                             if let i {
                                 SwiftUI.Label(t, systemImage: i)
                             } else {

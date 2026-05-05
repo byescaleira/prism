@@ -1,5 +1,6 @@
-import Testing
 import SwiftUI
+import Testing
+
 @testable import PrismUI
 
 @MainActor
@@ -157,7 +158,7 @@ struct InternationalizationV2Tests {
     @Test("PrismDateFormatter short style")
     func dateFormatterShort() {
         let formatter = PrismDateFormatter.shared
-        let date = Date(timeIntervalSince1970: 1_777_536_000) // 2026-04-28 approx
+        let date = Date(timeIntervalSince1970: 1_777_536_000)  // 2026-04-28 approx
         let result = formatter.format(date, style: .short, locale: Locale(identifier: "en_US"))
         #expect(!result.isEmpty)
         #expect(result.contains("2026") || result.contains("26"))

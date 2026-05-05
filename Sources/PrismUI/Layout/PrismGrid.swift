@@ -25,10 +25,12 @@ where Data.Element: Identifiable {
     /// The content and behavior of the grid.
     public var body: some View {
         LazyVGrid(
-            columns: [GridItem(
-                .adaptive(minimum: minItemWidth),
-                spacing: spacing.rawValue
-            )],
+            columns: [
+                GridItem(
+                    .adaptive(minimum: minItemWidth),
+                    spacing: spacing.rawValue
+                )
+            ],
             spacing: spacing.rawValue
         ) {
             ForEach(data) { item in

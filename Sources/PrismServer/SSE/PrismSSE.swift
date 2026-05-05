@@ -121,7 +121,8 @@ public struct PrismSSEMiddleware: PrismMiddleware, Sendable {
     }
 
     /// Handles the request and returns a response.
-    public func handle(_ request: PrismHTTPRequest, next: @escaping PrismRouteHandler) async throws -> PrismHTTPResponse {
+    public func handle(_ request: PrismHTTPRequest, next: @escaping PrismRouteHandler) async throws -> PrismHTTPResponse
+    {
         guard request.path == path && request.method == .GET else {
             return try await next(request)
         }

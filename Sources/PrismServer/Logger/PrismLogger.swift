@@ -44,13 +44,14 @@ public struct PrismJSONLogDestination: PrismLogDestination {
             "category": entry.category,
             "timestamp": ISO8601DateFormatter().string(from: entry.timestamp),
             "file": entry.file,
-            "line": entry.line
+            "line": entry.line,
         ]
         if !entry.metadata.isEmpty {
             dict["metadata"] = entry.metadata
         }
         if let data = try? JSONSerialization.data(withJSONObject: dict, options: []),
-           let str = String(data: data, encoding: .utf8) {
+            let str = String(data: data, encoding: .utf8)
+        {
             print(str)
         }
     }
@@ -74,14 +75,15 @@ public struct PrismLoggerMiddleware: PrismMiddleware {
     }
 
     /// Handles the request and returns a response.
-    public func handle(_ request: PrismHTTPRequest, next: @escaping PrismRouteHandler) async throws -> PrismHTTPResponse {
+    public func handle(_ request: PrismHTTPRequest, next: @escaping PrismRouteHandler) async throws -> PrismHTTPResponse
+    {
         let start = ContinuousClock.now
         let requestId = request.userInfo["requestId"] ?? UUID().uuidString
 
         var metadata: [String: String] = [
             "method": request.method.rawValue,
             "path": request.path,
-            "requestId": requestId
+            "requestId": requestId,
         ]
 
         if let contentLength = request.contentLength {
@@ -104,10 +106,12 @@ public struct PrismLoggerMiddleware: PrismMiddleware {
             responseMeta["duration_ms"] = "\(ms)"
             responseMeta["responseSize"] = "\(response.body.data.count)"
 
-            let level: PrismLogLevel = response.status.code >= 500 ? .error :
-                                        response.status.code >= 400 ? .warning : .info
+            let level: PrismLogLevel =
+                response.status.code >= 500 ? .error : response.status.code >= 400 ? .warning : .info
 
-            await logger.log(level, "← \(response.status.code) \(request.method.rawValue) \(request.path) (\(ms)ms)", category: "http", metadata: responseMeta)
+            await logger.log(
+                level, "← \(response.status.code) \(request.method.rawValue) \(request.path) (\(ms)ms)",
+                category: "http", metadata: responseMeta)
 
             return response
         } catch {
@@ -118,7 +122,9 @@ public struct PrismLoggerMiddleware: PrismMiddleware {
             errorMeta["error"] = "\(error)"
             errorMeta["duration_ms"] = "\(ms)"
 
-            await logger.error("✗ \(request.method.rawValue) \(request.path) (\(ms)ms): \(error)", category: "http", metadata: errorMeta)
+            await logger.error(
+                "✗ \(request.method.rawValue) \(request.path) (\(ms)ms): \(error)", category: "http",
+                metadata: errorMeta)
             throw error
         }
     }
@@ -134,7 +140,8 @@ public struct PrismRequestIdMiddleware: PrismMiddleware {
     }
 
     /// Handles the request and returns a response.
-    public func handle(_ request: PrismHTTPRequest, next: @escaping PrismRouteHandler) async throws -> PrismHTTPResponse {
+    public func handle(_ request: PrismHTTPRequest, next: @escaping PrismRouteHandler) async throws -> PrismHTTPResponse
+    {
         var req = request
         let requestId = request.headers.value(for: headerName) ?? UUID().uuidString
         req.userInfo["requestId"] = requestId

@@ -113,14 +113,15 @@ extension View {
         background: PrismSheetBackground = .automatic,
         @ViewBuilder content: @escaping () -> Content
     ) -> some View {
-        modifier(PrismSheetModifier(
-            isPresented: isPresented,
-            detents: detents,
-            showDragIndicator: showDragIndicator,
-            interactiveDismiss: interactiveDismiss,
-            backgroundStyle: background,
-            sheetContent: content
-        ))
+        modifier(
+            PrismSheetModifier(
+                isPresented: isPresented,
+                detents: detents,
+                showDragIndicator: showDragIndicator,
+                interactiveDismiss: interactiveDismiss,
+                backgroundStyle: background,
+                sheetContent: content
+            ))
     }
 
     /// Presents a sheet bound to an optional identifiable item.
@@ -130,12 +131,13 @@ extension View {
         showDragIndicator: Bool = true,
         @ViewBuilder content: @escaping (Item) -> Content
     ) -> some View {
-        modifier(PrismItemSheetModifier(
-            item: item,
-            detents: detents,
-            showDragIndicator: showDragIndicator,
-            sheetContent: content
-        ))
+        modifier(
+            PrismItemSheetModifier(
+                item: item,
+                detents: detents,
+                showDragIndicator: showDragIndicator,
+                sheetContent: content
+            ))
     }
 
     /// Presents a confirmation dialog with themed actions.
@@ -144,12 +146,13 @@ extension View {
         isPresented: Binding<Bool>,
         @ViewBuilder actions: @escaping () -> Actions
     ) -> some View {
-        modifier(PrismConfirmationDialogModifier(
-            title: title,
-            isPresented: isPresented,
-            actions: actions,
-            message: nil as (() -> EmptyView)?
-        ))
+        modifier(
+            PrismConfirmationDialogModifier(
+                title: title,
+                isPresented: isPresented,
+                actions: actions,
+                message: nil as (() -> EmptyView)?
+            ))
     }
 
     /// Presents a confirmation dialog with message.
@@ -159,12 +162,13 @@ extension View {
         @ViewBuilder actions: @escaping () -> Actions,
         @ViewBuilder message: @escaping () -> Message
     ) -> some View {
-        modifier(PrismConfirmationDialogModifier(
-            title: title,
-            isPresented: isPresented,
-            actions: actions,
-            message: message
-        ))
+        modifier(
+            PrismConfirmationDialogModifier(
+                title: title,
+                isPresented: isPresented,
+                actions: actions,
+                message: message
+            ))
     }
 
     /// Presents an inspector sidebar (iPad/macOS).
@@ -172,9 +176,10 @@ extension View {
         isPresented: Binding<Bool>,
         @ViewBuilder content: @escaping () -> Content
     ) -> some View {
-        modifier(PrismInspectorModifier(
-            isPresented: isPresented,
-            inspectorContent: content
-        ))
+        modifier(
+            PrismInspectorModifier(
+                isPresented: isPresented,
+                inspectorContent: content
+            ))
     }
 }

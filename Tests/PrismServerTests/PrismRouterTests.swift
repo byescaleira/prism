@@ -1,5 +1,6 @@
-import Testing
 import Foundation
+import Testing
+
 @testable import PrismServer
 
 @Suite("PrismRouter Tests")
@@ -49,7 +50,9 @@ struct PrismRouterTests {
     @Test("Middleware modifies response")
     func middlewareChain() async throws {
         struct AddHeaderMiddleware: PrismMiddleware {
-            func handle(_ request: PrismHTTPRequest, next: @escaping PrismRouteHandler) async throws -> PrismHTTPResponse {
+            func handle(_ request: PrismHTTPRequest, next: @escaping PrismRouteHandler) async throws
+                -> PrismHTTPResponse
+            {
                 var response = try await next(request)
                 response.headers.set(name: "X-Custom", value: "added")
                 return response

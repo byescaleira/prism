@@ -1,5 +1,6 @@
-import Testing
 import Foundation
+import Testing
+
 @testable import PrismServer
 
 @Suite("PrismGraphQLType Tests")
@@ -135,7 +136,7 @@ struct PrismGraphQLParserTests {
             #expect(field.arguments.count == 3)
             if case .boolean(let v) = field.arguments[0].value { #expect(v == true) }
             if case .boolean(let v) = field.arguments[1].value { #expect(v == false) }
-            if case .null = field.arguments[2].value { } else { #expect(Bool(false), "Expected null") }
+            if case .null = field.arguments[2].value {} else { #expect(Bool(false), "Expected null") }
         }
     }
 
@@ -175,9 +176,11 @@ struct PrismGraphQLExecutorTests {
 
     @Test("Handles missing field error")
     func missingField() async throws {
-        let queryType = PrismGraphQLObjectType(name: "Query", fields: [
-            PrismGraphQLField(name: "hello", type: .string, resolve: { _ in "world" })
-        ])
+        let queryType = PrismGraphQLObjectType(
+            name: "Query",
+            fields: [
+                PrismGraphQLField(name: "hello", type: .string, resolve: { _ in "world" })
+            ])
         let schema = PrismGraphQLSchema(query: queryType)
 
         let parser = PrismGraphQLParser()

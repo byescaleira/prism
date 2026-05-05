@@ -67,7 +67,8 @@ public struct PrismHelmetMiddleware: PrismMiddleware {
     }
 
     /// Handles the request and returns a response.
-    public func handle(_ request: PrismHTTPRequest, next: @escaping PrismRouteHandler) async throws -> PrismHTTPResponse {
+    public func handle(_ request: PrismHTTPRequest, next: @escaping PrismRouteHandler) async throws -> PrismHTTPResponse
+    {
         var response = try await next(request)
 
         if let v = config.contentTypeOptions { response.headers.set(name: "X-Content-Type-Options", value: v) }
@@ -76,9 +77,13 @@ public struct PrismHelmetMiddleware: PrismMiddleware {
         if let v = config.referrerPolicy { response.headers.set(name: "Referrer-Policy", value: v) }
         if let v = config.contentSecurityPolicy { response.headers.set(name: "Content-Security-Policy", value: v) }
         if let v = config.permissionsPolicy { response.headers.set(name: "Permissions-Policy", value: v) }
-        if let v = config.crossOriginEmbedderPolicy { response.headers.set(name: "Cross-Origin-Embedder-Policy", value: v) }
+        if let v = config.crossOriginEmbedderPolicy {
+            response.headers.set(name: "Cross-Origin-Embedder-Policy", value: v)
+        }
         if let v = config.crossOriginOpenerPolicy { response.headers.set(name: "Cross-Origin-Opener-Policy", value: v) }
-        if let v = config.crossOriginResourcePolicy { response.headers.set(name: "Cross-Origin-Resource-Policy", value: v) }
+        if let v = config.crossOriginResourcePolicy {
+            response.headers.set(name: "Cross-Origin-Resource-Policy", value: v)
+        }
 
         return response
     }

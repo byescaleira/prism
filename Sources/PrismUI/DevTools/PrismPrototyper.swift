@@ -122,7 +122,7 @@ public struct PrismPrototyper: View {
             }
         }
         #if os(iOS) || os(visionOS)
-        .listStyle(.insetGrouped)
+            .listStyle(.insetGrouped)
         #endif
     }
 
@@ -156,10 +156,10 @@ public struct PrismPrototyper: View {
             .accessibilityLabel("Add screen")
         }
         #if os(iOS) || os(visionOS)
-        ToolbarItem(placement: .automatic) {
-            EditButton()
-                .accessibilityLabel("Reorder screens")
-        }
+            ToolbarItem(placement: .automatic) {
+                EditButton()
+                    .accessibilityLabel("Reorder screens")
+            }
         #endif
     }
 

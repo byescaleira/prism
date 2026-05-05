@@ -68,12 +68,17 @@ public struct PrismCandlestickChart: View {
                     ForEach(Array(sorted.enumerated()), id: \.element.id) { index, candle in
                         let x = spacing * (CGFloat(index) + 0.5)
                         let bullish = candle.isBullish
-                        let fillColor = bullish ? (bullishColor ?? theme.color(.success)) : (bearishColor ?? theme.color(.error))
+                        let fillColor =
+                            bullish ? (bullishColor ?? theme.color(.success)) : (bearishColor ?? theme.color(.error))
 
-                        let highY = yPosition(value: candle.high, minPrice: minPrice, range: priceRange, height: geo.size.height)
-                        let lowY = yPosition(value: candle.low, minPrice: minPrice, range: priceRange, height: geo.size.height)
-                        let openY = yPosition(value: candle.open, minPrice: minPrice, range: priceRange, height: geo.size.height)
-                        let closeY = yPosition(value: candle.close, minPrice: minPrice, range: priceRange, height: geo.size.height)
+                        let highY = yPosition(
+                            value: candle.high, minPrice: minPrice, range: priceRange, height: geo.size.height)
+                        let lowY = yPosition(
+                            value: candle.low, minPrice: minPrice, range: priceRange, height: geo.size.height)
+                        let openY = yPosition(
+                            value: candle.open, minPrice: minPrice, range: priceRange, height: geo.size.height)
+                        let closeY = yPosition(
+                            value: candle.close, minPrice: minPrice, range: priceRange, height: geo.size.height)
 
                         // Wick (high-low line)
                         Path { path in
@@ -89,7 +94,9 @@ public struct PrismCandlestickChart: View {
                             .fill(fillColor)
                             .frame(width: candleWidth, height: bodyHeight)
                             .position(x: x, y: bodyTop + bodyHeight / 2)
-                            .accessibilityLabel("Candle: O \(candle.open, specifier: "%.2f") H \(candle.high, specifier: "%.2f") L \(candle.low, specifier: "%.2f") C \(candle.close, specifier: "%.2f")")
+                            .accessibilityLabel(
+                                "Candle: O \(candle.open, specifier: "%.2f") H \(candle.high, specifier: "%.2f") L \(candle.low, specifier: "%.2f") C \(candle.close, specifier: "%.2f")"
+                            )
                     }
                 }
             }

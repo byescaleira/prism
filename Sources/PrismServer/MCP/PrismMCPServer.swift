@@ -71,7 +71,7 @@ public actor PrismMCPServer {
             let errorResp: [String: Any] = [
                 "jsonrpc": "2.0",
                 "error": ["code": -32700, "message": "Parse error"],
-                "id": NSNull()
+                "id": NSNull(),
             ]
             return (try? JSONSerialization.data(withJSONObject: errorResp)) ?? Data()
         }
@@ -130,8 +130,8 @@ public actor PrismMCPServer {
             "capabilities": capabilities,
             "serverInfo": [
                 "name": serverName,
-                "version": serverVersion
-            ]
+                "version": serverVersion,
+            ],
         ]
     }
 
@@ -169,7 +169,7 @@ public actor PrismMCPServer {
                 [
                     "uri": uri,
                     "mimeType": registered.resource.mimeType,
-                    "text": text
+                    "text": text,
                 ]
             ]
         ]
@@ -190,7 +190,7 @@ public actor PrismMCPServer {
         let messages = try await registered.handler(arguments)
         return [
             "description": registered.prompt.description,
-            "messages": messages.map { $0.toJSON() }
+            "messages": messages.map { $0.toJSON() },
         ]
     }
 
@@ -199,7 +199,7 @@ public actor PrismMCPServer {
     private func makeResponse(id: Any?, result: [String: Any]) -> [String: Any] {
         var resp: [String: Any] = [
             "jsonrpc": "2.0",
-            "result": result
+            "result": result,
         ]
         if let id { resp["id"] = id }
         return resp
@@ -219,7 +219,7 @@ public actor PrismMCPServer {
 
         var resp: [String: Any] = [
             "jsonrpc": "2.0",
-            "error": ["code": code, "message": message]
+            "error": ["code": code, "message": message],
         ]
         if let id { resp["id"] = id }
         return resp

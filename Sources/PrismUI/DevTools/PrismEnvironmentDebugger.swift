@@ -124,27 +124,27 @@ private struct PrismEnvironmentDebugBadge: ViewModifier {
 
     func body(content: Content) -> some View {
         #if DEBUG
-        content.overlay(alignment: .bottomTrailing) {
-            HStack(spacing: 4) {
-                Image(systemName: colorScheme == .dark ? "moon.fill" : "sun.max.fill")
-                    .font(.system(size: 9))
-                Text(String(describing: dynamicTypeSize))
-                    .font(.system(size: 8, weight: .medium, design: .monospaced))
-                if reduceMotion {
-                    Image(systemName: "figure.walk")
+            content.overlay(alignment: .bottomTrailing) {
+                HStack(spacing: 4) {
+                    Image(systemName: colorScheme == .dark ? "moon.fill" : "sun.max.fill")
                         .font(.system(size: 9))
+                    Text(String(describing: dynamicTypeSize))
+                        .font(.system(size: 8, weight: .medium, design: .monospaced))
+                    if reduceMotion {
+                        Image(systemName: "figure.walk")
+                            .font(.system(size: 9))
+                    }
                 }
+                .foregroundStyle(.white)
+                .padding(.horizontal, 6)
+                .padding(.vertical, 3)
+                .background(.black.opacity(0.7))
+                .clipShape(RoundedRectangle(cornerRadius: 6, style: .continuous))
+                .padding(8)
+                .allowsHitTesting(false)
             }
-            .foregroundStyle(.white)
-            .padding(.horizontal, 6)
-            .padding(.vertical, 3)
-            .background(.black.opacity(0.7))
-            .clipShape(RoundedRectangle(cornerRadius: 6, style: .continuous))
-            .padding(8)
-            .allowsHitTesting(false)
-        }
         #else
-        content
+            content
         #endif
     }
 }

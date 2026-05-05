@@ -1,11 +1,14 @@
-import Testing
 import Foundation
+import Testing
+
 @testable import PrismServer
 
 @Suite("PrismCronExpression Tests")
 struct PrismCronExpressionTests {
 
-    private func makeDate(minute: Int = 0, hour: Int = 0, day: Int = 1, month: Int = 1, year: Int = 2026, weekday: Int? = nil) -> Date {
+    private func makeDate(
+        minute: Int = 0, hour: Int = 0, day: Int = 1, month: Int = 1, year: Int = 2026, weekday: Int? = nil
+    ) -> Date {
         var comps = DateComponents()
         comps.year = year
         comps.month = month

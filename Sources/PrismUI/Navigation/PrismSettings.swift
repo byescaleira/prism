@@ -78,10 +78,12 @@ extension View {
 
     /// Opens the system Settings app (iOS) or app preferences (macOS).
     #if os(iOS) || os(visionOS)
-    public func prismOpenSettings() -> some View {
-        self.environment(\.openURL, OpenURLAction { url in
-            return .systemAction
-        })
-    }
+        public func prismOpenSettings() -> some View {
+            self.environment(
+                \.openURL,
+                OpenURLAction { url in
+                    return .systemAction
+                })
+        }
     #endif
 }

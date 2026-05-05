@@ -1,5 +1,6 @@
-import Testing
 import Foundation
+import Testing
+
 @testable import PrismServer
 
 @Suite("PrismCSRFConfig Tests")
@@ -52,7 +53,9 @@ struct PrismCSRFMiddlewareTests {
         return nil
     }
 
-    private func makeRequestWithCSRFCookie(method: PrismHTTPMethod, token: String, config: PrismCSRFConfig = PrismCSRFConfig()) -> PrismHTTPRequest {
+    private func makeRequestWithCSRFCookie(
+        method: PrismHTTPMethod, token: String, config: PrismCSRFConfig = PrismCSRFConfig()
+    ) -> PrismHTTPRequest {
         var headers = PrismHTTPHeaders()
         headers.set(name: "Cookie", value: "\(config.cookieName)=\(token)")
         return PrismHTTPRequest(method: method, uri: "/submit", headers: headers)

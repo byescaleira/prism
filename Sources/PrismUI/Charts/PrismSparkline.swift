@@ -123,7 +123,8 @@ public struct PrismSparkline: View {
     @ViewBuilder
     private func minMaxMarkers(in rect: CGRect) -> some View {
         if let minIndex = data.indices.min(by: { data[$0] < data[$1] }),
-           let maxIndex = data.indices.max(by: { data[$0] < data[$1] }) {
+            let maxIndex = data.indices.max(by: { data[$0] < data[$1] })
+        {
             let minPt = pointFor(index: minIndex, in: rect)
             let maxPt = pointFor(index: maxIndex, in: rect)
 

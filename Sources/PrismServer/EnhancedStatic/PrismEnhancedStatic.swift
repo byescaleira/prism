@@ -1,5 +1,5 @@
-import Foundation
 import CryptoKit
+import Foundation
 
 /// Configuration for the enhanced static file middleware.
 public struct PrismEnhancedStaticConfig: Sendable {
@@ -52,7 +52,8 @@ public struct PrismEnhancedStaticMiddleware: PrismMiddleware {
     }
 
     /// Serves static files for GET/HEAD requests with caching, ETag, and range support.
-    public func handle(_ request: PrismHTTPRequest, next: @escaping PrismRouteHandler) async throws -> PrismHTTPResponse {
+    public func handle(_ request: PrismHTTPRequest, next: @escaping PrismRouteHandler) async throws -> PrismHTTPResponse
+    {
         guard request.method == .GET || request.method == .HEAD else {
             return try await next(request)
         }
@@ -108,12 +109,14 @@ public struct PrismEnhancedStaticMiddleware: PrismMiddleware {
 
         if config.enableConditionalRequests {
             if let ifNoneMatch = request.headers.value(for: PrismHTTPHeaders.ifNoneMatch),
-               let etag = etag, ifNoneMatch == etag {
+                let etag = etag, ifNoneMatch == etag
+            {
                 return PrismHTTPResponse(status: .notModified, headers: headers)
             }
 
             if let ifModifiedSince = request.headers.value(for: "If-Modified-Since"),
-               let modDate = modificationDate {
+                let modDate = modificationDate
+            {
                 if let sinceDate = parseHTTPDate(ifModifiedSince) {
                     if modDate <= sinceDate {
                         return PrismHTTPResponse(status: .notModified, headers: headers)
@@ -137,7 +140,8 @@ public struct PrismEnhancedStaticMiddleware: PrismMiddleware {
                     let data = fileHandle.readData(ofLength: length)
 
                     headers.set(name: PrismHTTPHeaders.contentLength, value: "\(data.count)")
-                    headers.set(name: "Content-Range", value: "bytes \(range.lowerBound)-\(range.upperBound)/\(fileSize)")
+                    headers.set(
+                        name: "Content-Range", value: "bytes \(range.lowerBound)-\(range.upperBound)/\(fileSize)")
 
                     return PrismHTTPResponse(
                         status: .partialContent,

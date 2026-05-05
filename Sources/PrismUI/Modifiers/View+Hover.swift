@@ -23,12 +23,12 @@ private struct PrismHoverModifier: ViewModifier {
                 value: isHovering
             )
             #if os(macOS) || os(visionOS) || targetEnvironment(macCatalyst)
-            .onHover { hovering in
-                isHovering = hovering
-            }
+                .onHover { hovering in
+                    isHovering = hovering
+                }
             #endif
             #if os(visionOS)
-            .hoverEffect(.highlight)
+                .hoverEffect(.highlight)
             #endif
     }
 }

@@ -44,39 +44,39 @@ struct SnapshotTests {
     }
 
     #if canImport(UIKit) && !os(watchOS)
-    @Test
-    func renderProducesImage() {
-        let image = PrismSnapshotTest.render {
-            Text("Hello")
-                .padding()
+        @Test
+        func renderProducesImage() {
+            let image = PrismSnapshotTest.render {
+                Text("Hello")
+                    .padding()
+            }
+            #expect(image != nil)
         }
-        #expect(image != nil)
-    }
 
-    @Test
-    func renderAllProducesMultipleImages() {
-        let results = PrismSnapshotTest.renderAll {
-            Text("Test")
-                .padding()
+        @Test
+        func renderAllProducesMultipleImages() {
+            let results = PrismSnapshotTest.renderAll {
+                Text("Test")
+                    .padding()
+            }
+            #expect(results.count == 4)
+            #expect(results["light"] != nil)
+            #expect(results["dark"] != nil)
         }
-        #expect(results.count == 4)
-        #expect(results["light"] != nil)
-        #expect(results["dark"] != nil)
-    }
 
-    @Test
-    func identicalImagesCompareAsEqual() {
-        let image1 = PrismSnapshotTest.render {
-            Text("Same").padding()
+        @Test
+        func identicalImagesCompareAsEqual() {
+            let image1 = PrismSnapshotTest.render {
+                Text("Same").padding()
+            }
+            let image2 = PrismSnapshotTest.render {
+                Text("Same").padding()
+            }
+            guard let img1 = image1, let img2 = image2 else {
+                #expect(Bool(false), "Failed to render")
+                return
+            }
+            #expect(PrismSnapshotTest.compare(img1, img2))
         }
-        let image2 = PrismSnapshotTest.render {
-            Text("Same").padding()
-        }
-        guard let img1 = image1, let img2 = image2 else {
-            #expect(Bool(false), "Failed to render")
-            return
-        }
-        #expect(PrismSnapshotTest.compare(img1, img2))
-    }
     #endif
 }

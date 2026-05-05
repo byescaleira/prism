@@ -105,9 +105,10 @@ public struct PrismBottomSheet<Content: View>: View {
                 if value.translation.height > 100 && ratio < (snapPoints.first ?? 0.3) {
                     isPresented = false
                 } else {
-                    let closest = snapPoints.min(by: {
-                        abs($0 - ratio) < abs($1 - ratio)
-                    }) ?? snapPoints.first ?? 0.4
+                    let closest =
+                        snapPoints.min(by: {
+                            abs($0 - ratio) < abs($1 - ratio)
+                        }) ?? snapPoints.first ?? 0.4
                     currentHeight = closest * maxHeight
                 }
                 dragOffset = 0

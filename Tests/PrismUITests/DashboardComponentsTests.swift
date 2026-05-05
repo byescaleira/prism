@@ -153,7 +153,7 @@ struct DashboardComponentsTests {
     @Test("PrismActivityFeed conforms to View")
     func activityFeedIsView() {
         let feed = PrismActivityFeed(activities: [
-            PrismActivity(user: "Bob", action: "merged", target: "PR #7", timestamp: Date()),
+            PrismActivity(user: "Bob", action: "merged", target: "PR #7", timestamp: Date())
         ])
         #expect(feed is any View)
     }
@@ -162,7 +162,7 @@ struct DashboardComponentsTests {
     func activityFeedGrouped() {
         let feed = PrismActivityFeed(
             activities: [
-                PrismActivity(user: "Bob", action: "merged", target: "PR #7", timestamp: Date()),
+                PrismActivity(user: "Bob", action: "merged", target: "PR #7", timestamp: Date())
             ],
             groupByDate: true
         )
@@ -294,7 +294,7 @@ struct DashboardComponentsTests {
         let table = PrismComparisonTable(
             columnHeaders: ["Free", "Pro", "Enterprise"],
             features: [
-                PrismComparisonFeature(name: "API", values: [.check, .check, .check]),
+                PrismComparisonFeature(name: "API", values: [.check, .check, .check])
             ],
             highlightedColumn: 1
         )

@@ -134,8 +134,8 @@ public struct PrismRichTextEditor: View {
                 Section("URL") {
                     TextField("https://example.com", text: $linkURLString)
                         #if canImport(UIKit) && !os(watchOS)
-                        .keyboardType(.URL)
-                        .textContentType(.URL)
+                            .keyboardType(.URL)
+                            .textContentType(.URL)
                         #endif
                         .autocorrectionDisabled()
                 }

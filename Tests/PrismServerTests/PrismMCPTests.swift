@@ -1,5 +1,6 @@
-import Testing
 import Foundation
+import Testing
+
 @testable import PrismServer
 
 @Suite("PrismMCPTypes Tests")
@@ -74,7 +75,7 @@ struct PrismMCPServerTests {
             "jsonrpc": "2.0",
             "method": method,
             "params": params,
-            "id": id
+            "id": id,
         ]
         return (try? JSONSerialization.data(withJSONObject: dict)) ?? Data()
     }

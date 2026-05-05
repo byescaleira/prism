@@ -87,7 +87,7 @@ public struct PrismProgressBar: View {
                 guard !reduceMotion else { return }
                 withAnimation(
                     .easeInOut(duration: 1.2)
-                    .repeatForever(autoreverses: true)
+                        .repeatForever(autoreverses: true)
                 ) {
                     indeterminateOffset = 1
                 }

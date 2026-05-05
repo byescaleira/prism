@@ -1,5 +1,6 @@
-import Testing
 import Foundation
+import Testing
+
 @testable import PrismServer
 
 @Suite("PrismFlagValue Tests")
@@ -306,13 +307,13 @@ struct PrismFeatureFlagStoreTests {
     func loadJSON() async throws {
         let store = PrismFeatureFlagStore()
         let json = """
-        [
-            {"name": "flag1", "value": true, "enabled": true},
-            {"name": "flag2", "value": "variant-a", "enabled": false},
-            {"name": "flag3", "value": 42},
-            {"name": "flag4", "value": 0.75}
-        ]
-        """.data(using: .utf8)!
+            [
+                {"name": "flag1", "value": true, "enabled": true},
+                {"name": "flag2", "value": "variant-a", "enabled": false},
+                {"name": "flag3", "value": 42},
+                {"name": "flag4", "value": 0.75}
+            ]
+            """.data(using: .utf8)!
         try await store.loadJSON(data: json)
 
         #expect(await store.isEnabled("flag1") == true)
@@ -327,8 +328,8 @@ struct PrismFeatureFlagStoreTests {
     func loadJSONTargets() async throws {
         let store = PrismFeatureFlagStore()
         let json = """
-        [{"name": "beta", "targetUsers": ["u1", "u2"], "targetGroups": ["staff"]}]
-        """.data(using: .utf8)!
+            [{"name": "beta", "targetUsers": ["u1", "u2"], "targetGroups": ["staff"]}]
+            """.data(using: .utf8)!
         try await store.loadJSON(data: json)
         let ctx = PrismFlagContext(userId: "u1")
         #expect(await store.isEnabled("beta", context: ctx) == true)

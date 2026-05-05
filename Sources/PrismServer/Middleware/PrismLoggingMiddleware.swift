@@ -11,7 +11,8 @@ public struct PrismLoggingMiddleware: PrismMiddleware {
     }
 
     /// Handles the request and returns a response.
-    public func handle(_ request: PrismHTTPRequest, next: @escaping PrismRouteHandler) async throws -> PrismHTTPResponse {
+    public func handle(_ request: PrismHTTPRequest, next: @escaping PrismRouteHandler) async throws -> PrismHTTPResponse
+    {
         let start = ContinuousClock.now
 
         await logger.info(

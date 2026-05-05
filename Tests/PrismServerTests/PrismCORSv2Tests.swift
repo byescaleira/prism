@@ -1,5 +1,6 @@
-import Testing
 import Foundation
+import Testing
+
 @testable import PrismServer
 
 @Suite("PrismCORSv2 Tests")
@@ -65,9 +66,10 @@ struct PrismCORSv2Tests {
 
     @Test("Custom origin checker")
     func customOriginChecker() async throws {
-        let config = PrismCORSv2Config(allowedOrigins: .custom { origin in
-            origin.hasSuffix(".myapp.com")
-        })
+        let config = PrismCORSv2Config(
+            allowedOrigins: .custom { origin in
+                origin.hasSuffix(".myapp.com")
+            })
         let middleware = PrismCORSv2Middleware(config: config)
 
         var req1 = PrismHTTPRequest(method: .GET, uri: "/api")

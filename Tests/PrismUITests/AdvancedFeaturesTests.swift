@@ -1,5 +1,6 @@
-import Testing
 import SwiftUI
+import Testing
+
 @testable import PrismUI
 
 @MainActor
@@ -71,7 +72,8 @@ struct AdvancedFeaturesTests {
             let tri = PrismAutoTheme.generate(from: .blue, harmony: .triadic)
             let brandComp = comp.color(.brandVariant).resolve(in: .init())
             let brandTri = tri.color(.brandVariant).resolve(in: .init())
-            let different = abs(Double(brandComp.red) - Double(brandTri.red)) > 0.01
+            let different =
+                abs(Double(brandComp.red) - Double(brandTri.red)) > 0.01
                 || abs(Double(brandComp.green) - Double(brandTri.green)) > 0.01
                 || abs(Double(brandComp.blue) - Double(brandTri.blue)) > 0.01
             #expect(different)

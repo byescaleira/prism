@@ -28,16 +28,16 @@ public struct PrismPerformanceBenchmark: ViewModifier {
     /// Wraps the content with performance measurement.
     public func body(content: Content) -> some View {
         #if DEBUG
-        let _ = Self.signposter.emitEvent("body", "\(label)")
-        let _ = {
-            renderCount += 1
-            if renderCount > 1 {
-                Self.logger.debug("⚡ \(label) body #\(renderCount)")
-            }
-        }()
-        content
+            let _ = Self.signposter.emitEvent("body", "\(label)")
+            let _ = {
+                renderCount += 1
+                if renderCount > 1 {
+                    Self.logger.debug("⚡ \(label) body #\(renderCount)")
+                }
+            }()
+            content
         #else
-        content
+            content
         #endif
     }
 }
@@ -45,21 +45,21 @@ public struct PrismPerformanceBenchmark: ViewModifier {
 /// Tracks memory footprint for DEBUG profiling.
 public enum PrismMemoryTracker: Sendable {
     #if DEBUG
-    /// Logs the current resident memory footprint for the given label.
-    public static func logFootprint(_ label: String) {
-        var info = mach_task_basic_info()
-        var count = mach_msg_type_number_t(MemoryLayout<mach_task_basic_info>.size) / 4
-        let result = withUnsafeMutablePointer(to: &info) {
-            $0.withMemoryRebound(to: integer_t.self, capacity: Int(count)) {
-                task_info(mach_task_self_, task_flavor_t(MACH_TASK_BASIC_INFO), $0, &count)
+        /// Logs the current resident memory footprint for the given label.
+        public static func logFootprint(_ label: String) {
+            var info = mach_task_basic_info()
+            var count = mach_msg_type_number_t(MemoryLayout<mach_task_basic_info>.size) / 4
+            let result = withUnsafeMutablePointer(to: &info) {
+                $0.withMemoryRebound(to: integer_t.self, capacity: Int(count)) {
+                    task_info(mach_task_self_, task_flavor_t(MACH_TASK_BASIC_INFO), $0, &count)
+                }
+            }
+            if result == KERN_SUCCESS {
+                let mb = Double(info.resident_size) / 1_048_576
+                Logger(subsystem: "com.prism.ui", category: "memory")
+                    .debug("📊 \(label): \(String(format: "%.1f", mb)) MB")
             }
         }
-        if result == KERN_SUCCESS {
-            let mb = Double(info.resident_size) / 1_048_576
-            Logger(subsystem: "com.prism.ui", category: "memory")
-                .debug("📊 \(label): \(String(format: "%.1f", mb)) MB")
-        }
-    }
     #endif
 }
 

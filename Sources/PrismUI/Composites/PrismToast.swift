@@ -116,13 +116,14 @@ extension View {
         edge: VerticalEdge = .bottom,
         duration: TimeInterval = 3
     ) -> some View {
-        modifier(PrismToastModifier(
-            isPresented: isPresented,
-            message: message,
-            icon: icon,
-            style: style,
-            edge: edge,
-            duration: duration
-        ))
+        modifier(
+            PrismToastModifier(
+                isPresented: isPresented,
+                message: message,
+                icon: icon,
+                style: style,
+                edge: edge,
+                duration: duration
+            ))
     }
 }

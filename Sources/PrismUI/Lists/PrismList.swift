@@ -48,10 +48,11 @@ extension PrismList where EmptyContent == PrismLoadingState {
     ) {
         self.data = data
         self.rowContent = rowContent
-        self.emptyContent = PrismLoadingState(.empty(
-            title: emptyTitle,
-            message: nil,
-            icon: emptyIcon
-        ))
+        self.emptyContent = PrismLoadingState(
+            .empty(
+                title: emptyTitle,
+                message: nil,
+                icon: emptyIcon
+            ))
     }
 }

@@ -1,5 +1,6 @@
-import Testing
 import Foundation
+import Testing
+
 @testable import PrismServer
 
 @Suite("PrismCircuitBreaker Tests")
@@ -28,8 +29,7 @@ struct PrismCircuitBreakerTests {
         for _ in 0..<3 {
             do {
                 _ = try await cb.execute { throw CircuitBreakerTestError.failure }
-            } catch is CircuitBreakerTestError {}
-            catch {}
+            } catch is CircuitBreakerTestError {} catch {}
         }
 
         #expect(await cb.currentState() == .open)

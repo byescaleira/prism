@@ -60,7 +60,10 @@ public struct PrismAPIParameter: Sendable {
     public let description: String
 
     /// Creates a new `Location` with the specified configuration.
-    public init(name: String, location: Location = .query, required: Bool = false, type: String = "string", description: String = "") {
+    public init(
+        name: String, location: Location = .query, required: Bool = false, type: String = "string",
+        description: String = ""
+    ) {
         self.name = name
         self.location = location
         self.required = required
@@ -199,10 +202,11 @@ public struct PrismOpenAPIGenerator: Sendable {
                 mediaType["schema"] = ["$ref": "#/components/schemas/\(ref)"]
             }
             content[body.contentType] = mediaType
-            op["requestBody"] = [
-                "description": body.description,
-                "content": content,
-            ] as [String: Any]
+            op["requestBody"] =
+                [
+                    "description": body.description,
+                    "content": content,
+                ] as [String: Any]
         }
 
         if !endpoint.responses.isEmpty {
@@ -241,7 +245,8 @@ public struct PrismOpenAPIMiddleware: PrismMiddleware {
     }
 
     /// Handles the request and returns a response.
-    public func handle(_ request: PrismHTTPRequest, next: @escaping PrismRouteHandler) async throws -> PrismHTTPResponse {
+    public func handle(_ request: PrismHTTPRequest, next: @escaping PrismRouteHandler) async throws -> PrismHTTPResponse
+    {
         if request.path == specPath && request.method == .GET {
             do {
                 let data = try generator.generateJSON()

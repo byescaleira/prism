@@ -56,12 +56,13 @@ public struct PrismHTTPParser: Sendable {
             headers.add(name: name, value: value)
         }
 
-        let bodyStart = headerEnd + 4 // skip \r\n\r\n
+        let bodyStart = headerEnd + 4  // skip \r\n\r\n
         var body: Data?
         var totalConsumed = bodyStart
 
         if let contentLengthStr = headers.value(for: PrismHTTPHeaders.contentLength),
-           let contentLength = Int(contentLengthStr) {
+            let contentLength = Int(contentLengthStr)
+        {
             guard contentLength <= maxBodySize else {
                 throw ParserError.bodyTooLarge
             }
@@ -87,7 +88,7 @@ public struct PrismHTTPParser: Sendable {
     // MARK: - Private
 
     private func findHeaderEnd(in data: Data) -> Int? {
-        let separator: [UInt8] = [0x0D, 0x0A, 0x0D, 0x0A] // \r\n\r\n
+        let separator: [UInt8] = [0x0D, 0x0A, 0x0D, 0x0A]  // \r\n\r\n
         guard data.count >= 4 else { return nil }
         for i in 0...(data.count - 4) {
             if data[data.startIndex + i] == separator[0]

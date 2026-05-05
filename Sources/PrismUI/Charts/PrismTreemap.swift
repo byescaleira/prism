@@ -58,7 +58,13 @@ public struct PrismTreemap: View {
     }
 
     private var currentItems: [PrismTreemapItem] {
-        if let last = breadcrumb.last, !last.children.isEmpty { last.children } else if breadcrumb.isEmpty { rootItems } else { [] }
+        if let last = breadcrumb.last, !last.children.isEmpty {
+            last.children
+        } else if breadcrumb.isEmpty {
+            rootItems
+        } else {
+            []
+        }
     }
 
     /// The treemap view body with breadcrumb navigation and squarified layout.
@@ -95,7 +101,8 @@ public struct PrismTreemap: View {
                 } label: {
                     Text(crumb.label)
                         .font(.caption)
-                        .foregroundStyle(index == breadcrumb.count - 1 ? theme.color(.onBackground) : theme.color(.interactive))
+                        .foregroundStyle(
+                            index == breadcrumb.count - 1 ? theme.color(.onBackground) : theme.color(.interactive))
                 }
                 .buttonStyle(.plain)
             }
@@ -162,8 +169,13 @@ public struct PrismTreemap: View {
             for item in remaining {
                 let testRow = row + [item]
                 let testArea = rowArea + max(item.value, 0) * areaScale
-                let testRatio = worstAspectRatio(areas: testRow.map { max($0.value, 0) * areaScale }, side: sideLength, totalArea: testArea)
-                let currentRatio = row.isEmpty ? Double.infinity : worstAspectRatio(areas: row.map { max($0.value, 0) * areaScale }, side: sideLength, totalArea: rowArea)
+                let testRatio = worstAspectRatio(
+                    areas: testRow.map { max($0.value, 0) * areaScale }, side: sideLength, totalArea: testArea)
+                let currentRatio =
+                    row.isEmpty
+                    ? Double.infinity
+                    : worstAspectRatio(
+                        areas: row.map { max($0.value, 0) * areaScale }, side: sideLength, totalArea: rowArea)
 
                 if testRatio <= currentRatio || row.isEmpty {
                     row.append(item)
@@ -184,18 +196,24 @@ public struct PrismTreemap: View {
 
                 let itemRect: CGRect
                 if isWide {
-                    itemRect = CGRect(x: currentRect.minX, y: currentRect.minY + offset, width: rowLength, height: itemLength)
+                    itemRect = CGRect(
+                        x: currentRect.minX, y: currentRect.minY + offset, width: rowLength, height: itemLength)
                 } else {
-                    itemRect = CGRect(x: currentRect.minX + offset, y: currentRect.minY, width: itemLength, height: rowLength)
+                    itemRect = CGRect(
+                        x: currentRect.minX + offset, y: currentRect.minY, width: itemLength, height: rowLength)
                 }
                 results.append((item, itemRect))
                 offset += itemLength
             }
 
             if isWide {
-                currentRect = CGRect(x: currentRect.minX + rowLength, y: currentRect.minY, width: currentRect.width - rowLength, height: currentRect.height)
+                currentRect = CGRect(
+                    x: currentRect.minX + rowLength, y: currentRect.minY, width: currentRect.width - rowLength,
+                    height: currentRect.height)
             } else {
-                currentRect = CGRect(x: currentRect.minX, y: currentRect.minY + rowLength, width: currentRect.width, height: currentRect.height - rowLength)
+                currentRect = CGRect(
+                    x: currentRect.minX, y: currentRect.minY + rowLength, width: currentRect.width,
+                    height: currentRect.height - rowLength)
             }
         }
 

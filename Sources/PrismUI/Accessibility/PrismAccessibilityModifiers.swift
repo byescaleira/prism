@@ -43,9 +43,10 @@ extension View {
     /// Posts an accessibility announcement.
     public static func prismAnnounce(_ message: String) {
         #if canImport(UIKit)
-        UIAccessibility.post(notification: .announcement, argument: message)
+            UIAccessibility.post(notification: .announcement, argument: message)
         #elseif canImport(AppKit)
-        NSAccessibility.post(element: NSApp as Any, notification: .announcementRequested, userInfo: [.announcement: message])
+            NSAccessibility.post(
+                element: NSApp as Any, notification: .announcementRequested, userInfo: [.announcement: message])
         #endif
     }
 }

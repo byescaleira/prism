@@ -52,20 +52,43 @@ private struct Tokenizer {
 
             let c = source[pos]
             switch c {
-            case "{": tokens.append(.leftBrace); pos += 1
-            case "}": tokens.append(.rightBrace); pos += 1
-            case "(": tokens.append(.leftParen); pos += 1
-            case ")": tokens.append(.rightParen); pos += 1
-            case "[": tokens.append(.leftBracket); pos += 1
-            case "]": tokens.append(.rightBracket); pos += 1
-            case ":": tokens.append(.colon); pos += 1
-            case ",": tokens.append(.comma); pos += 1
-            case "!": tokens.append(.bang); pos += 1
-            case "$": tokens.append(.dollar); pos += 1
-            case "=": tokens.append(.equals); pos += 1
+            case "{":
+                tokens.append(.leftBrace)
+                pos += 1
+            case "}":
+                tokens.append(.rightBrace)
+                pos += 1
+            case "(":
+                tokens.append(.leftParen)
+                pos += 1
+            case ")":
+                tokens.append(.rightParen)
+                pos += 1
+            case "[":
+                tokens.append(.leftBracket)
+                pos += 1
+            case "]":
+                tokens.append(.rightBracket)
+                pos += 1
+            case ":":
+                tokens.append(.colon)
+                pos += 1
+            case ",":
+                tokens.append(.comma)
+                pos += 1
+            case "!":
+                tokens.append(.bang)
+                pos += 1
+            case "$":
+                tokens.append(.dollar)
+                pos += 1
+            case "=":
+                tokens.append(.equals)
+                pos += 1
             case ".":
                 if pos + 2 < source.count && source[pos + 1] == "." && source[pos + 2] == "." {
-                    tokens.append(.ellipsis); pos += 3
+                    tokens.append(.ellipsis)
+                    pos += 3
                 } else {
                     throw PrismGraphQLExecutionError.parserError("Unexpected '.'")
                 }
@@ -107,7 +130,7 @@ private struct Tokenizer {
     }
 
     private mutating func readString() throws -> Token {
-        pos += 1 // skip opening quote
+        pos += 1  // skip opening quote
         var result = ""
         while pos < source.count && source[pos] != "\"" {
             if source[pos] == "\\" && pos + 1 < source.count {
@@ -127,7 +150,7 @@ private struct Tokenizer {
         guard pos < source.count else {
             throw PrismGraphQLExecutionError.parserError("Unterminated string")
         }
-        pos += 1 // skip closing quote
+        pos += 1  // skip closing quote
         return .stringValue(result)
     }
 
@@ -188,7 +211,8 @@ private struct TokenParser {
     mutating func parseOperation() throws -> PrismGraphQLOperation {
         if case .leftBrace = current {
             let selections = try parseSelectionSet()
-            return PrismGraphQLOperation(operationType: .query, name: nil, selectionSet: selections, variableDefinitions: [])
+            return PrismGraphQLOperation(
+                operationType: .query, name: nil, selectionSet: selections, variableDefinitions: [])
         }
 
         guard case .name(let opType) = current else {
@@ -217,7 +241,8 @@ private struct TokenParser {
         }
 
         let selections = try parseSelectionSet()
-        return PrismGraphQLOperation(operationType: operationType, name: name, selectionSet: selections, variableDefinitions: variables)
+        return PrismGraphQLOperation(
+            operationType: operationType, name: name, selectionSet: selections, variableDefinitions: variables)
     }
 
     mutating func parseVariableDefinitions() throws -> [PrismGraphQLVariableDefinition] {
@@ -311,7 +336,8 @@ private struct TokenParser {
             selectionSet = try parseSelectionSet()
         }
 
-        return PrismGraphQLFieldSelection(alias: alias, name: fieldName, arguments: arguments, selectionSet: selectionSet)
+        return PrismGraphQLFieldSelection(
+            alias: alias, name: fieldName, arguments: arguments, selectionSet: selectionSet)
     }
 
     mutating func parseArguments() throws -> [PrismGraphQLArgumentValue] {

@@ -10,8 +10,9 @@ struct TokenTests {
     func spacingTokensFollowFourPointGrid() {
         let values = SpacingToken.allCases.map(\.rawValue)
         for value in values where value > 0 {
-            #expect(value.truncatingRemainder(dividingBy: 2) == 0,
-                    "Spacing \(value) should be even (4pt grid)")
+            #expect(
+                value.truncatingRemainder(dividingBy: 2) == 0,
+                "Spacing \(value) should be even (4pt grid)")
         }
     }
 

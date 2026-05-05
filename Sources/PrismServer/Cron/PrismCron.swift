@@ -40,9 +40,10 @@ public struct PrismCronField: Sendable, Equatable {
             } else if token.contains("-") {
                 let rangeParts = token.split(separator: "-")
                 guard rangeParts.count == 2,
-                      let low = Int(rangeParts[0]),
-                      let high = Int(rangeParts[1]),
-                      low >= min, high <= max, low <= high else {
+                    let low = Int(rangeParts[0]),
+                    let high = Int(rangeParts[1]),
+                    low >= min, high <= max, low <= high
+                else {
                     throw PrismCronError.invalidField(expression, "invalid range")
                 }
                 values.formUnion(low...high)
@@ -98,9 +99,10 @@ public struct PrismCronExpression: Sendable {
         let cal = Calendar.current
         let comps = cal.dateComponents([.minute, .hour, .day, .month, .weekday], from: date)
         guard let min = comps.minute, let hr = comps.hour,
-              let day = comps.day, let mon = comps.month,
-              let wd = comps.weekday else { return false }
-        let cronWeekday = (wd + 5) % 7 // Convert Sunday=1 to Sunday=0
+            let day = comps.day, let mon = comps.month,
+            let wd = comps.weekday
+        else { return false }
+        let cronWeekday = (wd + 5) % 7  // Convert Sunday=1 to Sunday=0
         return minute.matches(min)
             && hour.matches(hr)
             && dayOfMonth.matches(day)
@@ -149,7 +151,9 @@ public actor PrismCronScheduler {
     public init() {}
 
     /// Schedules a job with a cron expression string.
-    public func schedule(_ name: String, expression: String, handler: @escaping @Sendable () async throws -> Void) throws {
+    public func schedule(_ name: String, expression: String, handler: @escaping @Sendable () async throws -> Void)
+        throws
+    {
         let expr = try PrismCronExpression(expression)
         cronJobs[name] = PrismCronJob(name: name, expression: expr, handler: handler)
     }

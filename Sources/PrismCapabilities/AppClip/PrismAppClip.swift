@@ -51,50 +51,50 @@ public enum PrismAppClipExperience: Sendable {
 // MARK: - App Clip Client
 
 #if canImport(AppClip) && canImport(UIKit)
-import AppClip
-import CoreLocation
-import UIKit
-import StoreKit
+    import AppClip
+    import CoreLocation
+    import UIKit
+    import StoreKit
 
-/// Client for handling App Clip invocations, location verification, and full app promotion.
-public final class PrismAppClipClient: Sendable {
+    /// Client for handling App Clip invocations, location verification, and full app promotion.
+    public final class PrismAppClipClient: Sendable {
 
-    /// Creates a new App Clip client.
-    public init() {}
+        /// Creates a new App Clip client.
+        public init() {}
 
-    /// Parses an invocation URL into a structured App Clip invocation.
-    public func handleInvocation(url: URL) -> PrismAppClipInvocation {
-        let payload = url.query
-        return PrismAppClipInvocation(url: url, payload: payload)
-    }
+        /// Parses an invocation URL into a structured App Clip invocation.
+        public func handleInvocation(url: URL) -> PrismAppClipInvocation {
+            let payload = url.query
+            return PrismAppClipInvocation(url: url, payload: payload)
+        }
 
-    /// Verifies whether the user's location matches the expected App Clip region.
-    public func verifyLocation(latitude: Double, longitude: Double) async -> Bool {
-        await withCheckedContinuation { continuation in
+        /// Verifies whether the user's location matches the expected App Clip region.
+        public func verifyLocation(latitude: Double, longitude: Double) async -> Bool {
+            await withCheckedContinuation { continuation in
+                guard let scene = UIApplication.shared.connectedScenes.first as? UIWindowScene else {
+                    continuation.resume(returning: false)
+                    return
+                }
+                scene.confirmVerifiedPromptForExperience(
+                    inRegion: CLCircularRegion(
+                        center: CLLocationCoordinate2D(latitude: latitude, longitude: longitude),
+                        radius: 100,
+                        identifier: "prism-verify"
+                    )
+                ) { verified, _ in
+                    continuation.resume(returning: verified)
+                }
+            }
+        }
+
+        /// Prompts the user to install the full app from the App Store.
+        @MainActor
+        public func requestFullAppInstall() {
             guard let scene = UIApplication.shared.connectedScenes.first as? UIWindowScene else {
-                continuation.resume(returning: false)
                 return
             }
-            scene.confirmVerifiedPromptForExperience(
-                inRegion: CLCircularRegion(
-                    center: CLLocationCoordinate2D(latitude: latitude, longitude: longitude),
-                    radius: 100,
-                    identifier: "prism-verify"
-                )
-            ) { verified, _ in
-                continuation.resume(returning: verified)
-            }
+            let overlay = SKOverlay(configuration: SKOverlay.AppClipConfiguration(position: .bottom))
+            overlay.present(in: scene)
         }
     }
-
-    /// Prompts the user to install the full app from the App Store.
-    @MainActor
-    public func requestFullAppInstall() {
-        guard let scene = UIApplication.shared.connectedScenes.first as? UIWindowScene else {
-            return
-        }
-        let overlay = SKOverlay(configuration: SKOverlay.AppClipConfiguration(position: .bottom))
-        overlay.present(in: scene)
-    }
-}
 #endif

@@ -26,7 +26,10 @@ public struct PrismBackgroundTaskConfig: Sendable {
     public let earliestBeginDate: Date?
 
     /// Creates a new background task configuration with the given identifier and requirements.
-    public init(identifier: String, type: PrismBackgroundTaskType, requiresNetwork: Bool = false, requiresCharging: Bool = false, earliestBeginDate: Date? = nil) {
+    public init(
+        identifier: String, type: PrismBackgroundTaskType, requiresNetwork: Bool = false,
+        requiresCharging: Bool = false, earliestBeginDate: Date? = nil
+    ) {
         self.identifier = identifier
         self.type = type
         self.requiresNetwork = requiresNetwork
@@ -38,51 +41,51 @@ public struct PrismBackgroundTaskConfig: Sendable {
 // MARK: - Background Task Client
 
 #if canImport(BackgroundTasks) && !os(macOS)
-import BackgroundTasks
+    import BackgroundTasks
 
-/// Client that wraps BGTaskScheduler for registering and scheduling background tasks.
-public final class PrismBackgroundTaskClient: Sendable {
+    /// Client that wraps BGTaskScheduler for registering and scheduling background tasks.
+    public final class PrismBackgroundTaskClient: Sendable {
 
-    /// Creates a new background task client.
-    public init() {}
+        /// Creates a new background task client.
+        public init() {}
 
-    /// Registers a background task handler with the system.
-    public func register(config: PrismBackgroundTaskConfig, handler: @escaping @Sendable () async -> Bool) {
-        BGTaskScheduler.shared.register(forTaskWithIdentifier: config.identifier, using: nil) { task in
-            let work = Task {
-                let success = await handler()
-                task.setTaskCompleted(success: success)
-            }
-            task.expirationHandler = {
-                work.cancel()
+        /// Registers a background task handler with the system.
+        public func register(config: PrismBackgroundTaskConfig, handler: @escaping @Sendable () async -> Bool) {
+            BGTaskScheduler.shared.register(forTaskWithIdentifier: config.identifier, using: nil) { task in
+                let work = Task {
+                    let success = await handler()
+                    task.setTaskCompleted(success: success)
+                }
+                task.expirationHandler = {
+                    work.cancel()
+                }
             }
         }
-    }
 
-    /// Schedules the next execution of a background task.
-    public func schedule(config: PrismBackgroundTaskConfig) throws {
-        let request: BGTaskRequest
-        switch config.type {
-        case .appRefresh:
-            request = BGAppRefreshTaskRequest(identifier: config.identifier)
-        case .processing:
-            let processingRequest = BGProcessingTaskRequest(identifier: config.identifier)
-            processingRequest.requiresNetworkConnectivity = config.requiresNetwork
-            processingRequest.requiresExternalPower = config.requiresCharging
-            request = processingRequest
+        /// Schedules the next execution of a background task.
+        public func schedule(config: PrismBackgroundTaskConfig) throws {
+            let request: BGTaskRequest
+            switch config.type {
+            case .appRefresh:
+                request = BGAppRefreshTaskRequest(identifier: config.identifier)
+            case .processing:
+                let processingRequest = BGProcessingTaskRequest(identifier: config.identifier)
+                processingRequest.requiresNetworkConnectivity = config.requiresNetwork
+                processingRequest.requiresExternalPower = config.requiresCharging
+                request = processingRequest
+            }
+            request.earliestBeginDate = config.earliestBeginDate
+            try BGTaskScheduler.shared.submit(request)
         }
-        request.earliestBeginDate = config.earliestBeginDate
-        try BGTaskScheduler.shared.submit(request)
-    }
 
-    /// Cancels a pending background task by identifier.
-    public func cancel(identifier: String) {
-        BGTaskScheduler.shared.cancel(taskRequestWithIdentifier: identifier)
-    }
+        /// Cancels a pending background task by identifier.
+        public func cancel(identifier: String) {
+            BGTaskScheduler.shared.cancel(taskRequestWithIdentifier: identifier)
+        }
 
-    /// Cancels all pending background task requests.
-    public func cancelAll() {
-        BGTaskScheduler.shared.cancelAllTaskRequests()
+        /// Cancels all pending background task requests.
+        public func cancelAll() {
+            BGTaskScheduler.shared.cancelAllTaskRequests()
+        }
     }
-}
 #endif

@@ -1,11 +1,14 @@
-import Testing
 import Foundation
+import Testing
+
 @testable import PrismServer
 
 @Suite("PrismMultipartStreaming Tests")
 struct PrismMultipartStreamingTests {
 
-    private func buildMultipartBody(boundary: String, parts: [(name: String, filename: String?, contentType: String?, data: Data)]) -> Data {
+    private func buildMultipartBody(
+        boundary: String, parts: [(name: String, filename: String?, contentType: String?, data: Data)]
+    ) -> Data {
         var body = Data()
         for part in parts {
             body.append(Data("--\(boundary)\r\n".utf8))
@@ -49,9 +52,11 @@ struct PrismMultipartStreamingTests {
     @Test("Parse single text part")
     func parseSinglePart() throws {
         let boundary = "test-boundary"
-        let body = buildMultipartBody(boundary: boundary, parts: [
-            (name: "field", filename: nil, contentType: nil, data: Data("hello".utf8))
-        ])
+        let body = buildMultipartBody(
+            boundary: boundary,
+            parts: [
+                (name: "field", filename: nil, contentType: nil, data: Data("hello".utf8))
+            ])
 
         let parser = PrismMultipartStreamParser(boundary: boundary)
         let parts = try parser.parse(body)
@@ -65,10 +70,12 @@ struct PrismMultipartStreamingTests {
     @Test("Parse multiple parts")
     func parseMultipleParts() throws {
         let boundary = "multi-boundary"
-        let body = buildMultipartBody(boundary: boundary, parts: [
-            (name: "name", filename: nil, contentType: nil, data: Data("John".utf8)),
-            (name: "email", filename: nil, contentType: nil, data: Data("john@test.com".utf8))
-        ])
+        let body = buildMultipartBody(
+            boundary: boundary,
+            parts: [
+                (name: "name", filename: nil, contentType: nil, data: Data("John".utf8)),
+                (name: "email", filename: nil, contentType: nil, data: Data("john@test.com".utf8)),
+            ])
 
         let parser = PrismMultipartStreamParser(boundary: boundary)
         let parts = try parser.parse(body)
@@ -82,9 +89,11 @@ struct PrismMultipartStreamingTests {
     func parseFileUpload() throws {
         let boundary = "file-boundary"
         let fileData = Data("file content here".utf8)
-        let body = buildMultipartBody(boundary: boundary, parts: [
-            (name: "avatar", filename: "photo.jpg", contentType: "image/jpeg", data: fileData)
-        ])
+        let body = buildMultipartBody(
+            boundary: boundary,
+            parts: [
+                (name: "avatar", filename: "photo.jpg", contentType: "image/jpeg", data: fileData)
+            ])
 
         let parser = PrismMultipartStreamParser(boundary: boundary)
         let parts = try parser.parse(body)
@@ -100,9 +109,11 @@ struct PrismMultipartStreamingTests {
     func rejectsLargePart() throws {
         let boundary = "size-boundary"
         let largeData = Data(repeating: 0x41, count: 1024)
-        let body = buildMultipartBody(boundary: boundary, parts: [
-            (name: "big", filename: "large.bin", contentType: "application/octet-stream", data: largeData)
-        ])
+        let body = buildMultipartBody(
+            boundary: boundary,
+            parts: [
+                (name: "big", filename: "large.bin", contentType: "application/octet-stream", data: largeData)
+            ])
 
         let parser = PrismMultipartStreamParser(boundary: boundary, maxPartSize: 512)
 
@@ -137,10 +148,12 @@ struct PrismMultipartStreamingTests {
     @Test("Progress callback is called")
     func progressCallback() throws {
         let boundary = "progress-boundary"
-        let body = buildMultipartBody(boundary: boundary, parts: [
-            (name: "a", filename: nil, contentType: nil, data: Data("1".utf8)),
-            (name: "b", filename: nil, contentType: nil, data: Data("2".utf8))
-        ])
+        let body = buildMultipartBody(
+            boundary: boundary,
+            parts: [
+                (name: "a", filename: nil, contentType: nil, data: Data("1".utf8)),
+                (name: "b", filename: nil, contentType: nil, data: Data("2".utf8)),
+            ])
 
         let parser = PrismMultipartStreamParser(boundary: boundary)
         let counter = ProgressCounter()
@@ -155,9 +168,11 @@ struct PrismMultipartStreamingTests {
     @Test("Async stream yields parts")
     func asyncStream() async throws {
         let boundary = "async-boundary"
-        let body = buildMultipartBody(boundary: boundary, parts: [
-            (name: "x", filename: nil, contentType: nil, data: Data("val".utf8))
-        ])
+        let body = buildMultipartBody(
+            boundary: boundary,
+            parts: [
+                (name: "x", filename: nil, contentType: nil, data: Data("val".utf8))
+            ])
 
         let parser = PrismMultipartStreamParser(boundary: boundary)
         var count = 0
@@ -171,10 +186,15 @@ struct PrismMultipartStreamingTests {
     @Test("Mixed text and file parts")
     func mixedParts() throws {
         let boundary = "mixed"
-        let body = buildMultipartBody(boundary: boundary, parts: [
-            (name: "title", filename: nil, contentType: nil, data: Data("My Doc".utf8)),
-            (name: "file", filename: "doc.pdf", contentType: "application/pdf", data: Data(repeating: 0xFF, count: 100))
-        ])
+        let body = buildMultipartBody(
+            boundary: boundary,
+            parts: [
+                (name: "title", filename: nil, contentType: nil, data: Data("My Doc".utf8)),
+                (
+                    name: "file", filename: "doc.pdf", contentType: "application/pdf",
+                    data: Data(repeating: 0xFF, count: 100)
+                ),
+            ])
 
         let parser = PrismMultipartStreamParser(boundary: boundary)
         let parts = try parser.parse(body)
@@ -188,10 +208,12 @@ struct PrismMultipartStreamingTests {
     @Test("Multipart middleware populates userInfo")
     func multipartMiddleware() async throws {
         let boundary = "middleware-test"
-        let body = buildMultipartBody(boundary: boundary, parts: [
-            (name: "field", filename: nil, contentType: nil, data: Data("value".utf8)),
-            (name: "file", filename: "test.txt", contentType: "text/plain", data: Data("content".utf8))
-        ])
+        let body = buildMultipartBody(
+            boundary: boundary,
+            parts: [
+                (name: "field", filename: nil, contentType: nil, data: Data("value".utf8)),
+                (name: "file", filename: "test.txt", contentType: "text/plain", data: Data("content".utf8)),
+            ])
 
         let middleware = PrismMultipartStreamMiddleware()
         var request = PrismHTTPRequest(method: .POST, uri: "/upload")

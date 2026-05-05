@@ -48,46 +48,54 @@ public struct PrismFunnelChart: View {
 
                 VStack(spacing: 0) {
                     ForEach(Array(stages.enumerated()), id: \.element.id) { index, stage in
-                    let currentWidth = maxValue > 0 ? width * (stage.value / maxValue) : 0
-                    let nextWidth: CGFloat = {
-                        if index + 1 < stageCount {
-                            return maxValue > 0 ? width * (stages[index + 1].value / maxValue) : 0
-                        }
-                        return currentWidth * 0.6
-                    }()
-                    let fillColor = stage.color ?? palette[index % palette.count]
-                    let conversionRate: Double? = {
-                        if index + 1 < stageCount, stage.value > 0 {
-                            return stages[index + 1].value / stage.value * 100
-                        }
-                        return nil
-                    }()
+                        let currentWidth = maxValue > 0 ? width * (stage.value / maxValue) : 0
+                        let nextWidth: CGFloat = {
+                            if index + 1 < stageCount {
+                                return maxValue > 0 ? width * (stages[index + 1].value / maxValue) : 0
+                            }
+                            return currentWidth * 0.6
+                        }()
+                        let fillColor = stage.color ?? palette[index % palette.count]
+                        let conversionRate: Double? = {
+                            if index + 1 < stageCount, stage.value > 0 {
+                                return stages[index + 1].value / stage.value * 100
+                            }
+                            return nil
+                        }()
 
-                    ZStack {
-                        trapezoid(topWidth: currentWidth, bottomWidth: nextWidth, containerWidth: width, height: stageHeight)
+                        ZStack {
+                            trapezoid(
+                                topWidth: currentWidth, bottomWidth: nextWidth, containerWidth: width,
+                                height: stageHeight
+                            )
                             .fill(fillColor.opacity(0.85))
-                        trapezoid(topWidth: currentWidth, bottomWidth: nextWidth, containerWidth: width, height: stageHeight)
+                            trapezoid(
+                                topWidth: currentWidth, bottomWidth: nextWidth, containerWidth: width,
+                                height: stageHeight
+                            )
                             .stroke(fillColor, lineWidth: 1)
 
-                        VStack(spacing: 2) {
-                            Text(stage.label)
-                                .font(.caption)
-                                .fontWeight(.medium)
-                                .foregroundStyle(.white)
-                            Text("\(stage.value, specifier: "%.0f")")
-                                .font(.caption2)
-                                .foregroundStyle(.white.opacity(0.8))
-                            if let rate = conversionRate {
-                                Text("\(rate, specifier: "%.1f")%")
+                            VStack(spacing: 2) {
+                                Text(stage.label)
+                                    .font(.caption)
+                                    .fontWeight(.medium)
+                                    .foregroundStyle(.white)
+                                Text("\(stage.value, specifier: "%.0f")")
                                     .font(.caption2)
-                                    .foregroundStyle(.white.opacity(0.6))
+                                    .foregroundStyle(.white.opacity(0.8))
+                                if let rate = conversionRate {
+                                    Text("\(rate, specifier: "%.1f")%")
+                                        .font(.caption2)
+                                        .foregroundStyle(.white.opacity(0.6))
+                                }
                             }
                         }
+                        .frame(height: stageHeight)
+                        .accessibilityElement(children: .ignore)
+                        .accessibilityLabel(
+                            "\(stage.label): \(stage.value, specifier: "%.0f")\(conversionRate.map { ", conversion \($0, specifier: "%.1f")%" } ?? "")"
+                        )
                     }
-                    .frame(height: stageHeight)
-                    .accessibilityElement(children: .ignore)
-                    .accessibilityLabel("\(stage.label): \(stage.value, specifier: "%.0f")\(conversionRate.map { ", conversion \($0, specifier: "%.1f")%" } ?? "")")
-                }
                 }
             }
         }

@@ -41,7 +41,8 @@ public struct PrismTemplate: Sendable {
 
         for match in matches.reversed() {
             guard let keyRange = Range(match.range(at: 1), in: result),
-                  let fullRange = Range(match.range, in: result) else { continue }
+                let fullRange = Range(match.range, in: result)
+            else { continue }
             let key = String(result[keyRange])
             let value = context.resolve(key)
             result.replaceSubrange(fullRange, with: htmlEscape(value))
@@ -57,7 +58,8 @@ public struct PrismTemplate: Sendable {
 
         for match in matches.reversed() {
             guard let keyRange = Range(match.range(at: 1), in: result),
-                  let fullRange = Range(match.range, in: result) else { continue }
+                let fullRange = Range(match.range, in: result)
+            else { continue }
             let key = String(result[keyRange])
             result.replaceSubrange(fullRange, with: context.resolve(key))
         }
@@ -67,14 +69,17 @@ public struct PrismTemplate: Sendable {
     private func processConditionals(_ input: String, context: PrismTemplateContext) throws -> String {
         var result = input
         let pattern = #"\{%\s*if\s+(\w+)\s*%\}(.*?)\{%\s*endif\s*%\}"#
-        guard let regex = try? NSRegularExpression(pattern: pattern, options: .dotMatchesLineSeparators) else { return result }
+        guard let regex = try? NSRegularExpression(pattern: pattern, options: .dotMatchesLineSeparators) else {
+            return result
+        }
 
         var matches = regex.matches(in: result, range: NSRange(result.startIndex..., in: result))
         while !matches.isEmpty {
             for match in matches.reversed() {
                 guard let condRange = Range(match.range(at: 1), in: result),
-                      let bodyRange = Range(match.range(at: 2), in: result),
-                      let fullRange = Range(match.range, in: result) else { continue }
+                    let bodyRange = Range(match.range(at: 2), in: result),
+                    let fullRange = Range(match.range, in: result)
+                else { continue }
 
                 let condition = String(result[condRange])
                 let body = String(result[bodyRange])
@@ -93,15 +98,18 @@ public struct PrismTemplate: Sendable {
     private func processForLoops(_ input: String, context: PrismTemplateContext) throws -> String {
         var result = input
         let pattern = #"\{%\s*for\s+(\w+)\s+in\s+(\w+)\s*%\}(.*?)\{%\s*endfor\s*%\}"#
-        guard let regex = try? NSRegularExpression(pattern: pattern, options: .dotMatchesLineSeparators) else { return result }
+        guard let regex = try? NSRegularExpression(pattern: pattern, options: .dotMatchesLineSeparators) else {
+            return result
+        }
 
         var matches = regex.matches(in: result, range: NSRange(result.startIndex..., in: result))
         while !matches.isEmpty {
             for match in matches.reversed() {
                 guard let itemRange = Range(match.range(at: 1), in: result),
-                      let listRange = Range(match.range(at: 2), in: result),
-                      let bodyRange = Range(match.range(at: 3), in: result),
-                      let fullRange = Range(match.range, in: result) else { continue }
+                    let listRange = Range(match.range(at: 2), in: result),
+                    let bodyRange = Range(match.range(at: 3), in: result),
+                    let fullRange = Range(match.range, in: result)
+                else { continue }
 
                 let itemName = String(result[itemRange])
                 let listName = String(result[listRange])
@@ -129,7 +137,8 @@ public struct PrismTemplate: Sendable {
 
         for match in matches.reversed() {
             guard let nameRange = Range(match.range(at: 1), in: result),
-                  let fullRange = Range(match.range, in: result) else { continue }
+                let fullRange = Range(match.range, in: result)
+            else { continue }
             let name = String(result[nameRange])
             let partial = context.partials[name] ?? ""
             result.replaceSubrange(fullRange, with: partial)
@@ -193,7 +202,9 @@ public struct PrismTemplateContext: Sendable {
 
 extension PrismHTTPResponse {
     /// Creates an HTML response rendered from a template.
-    public static func template(_ source: String, context: PrismTemplateContext, status: PrismHTTPStatus = .ok) -> PrismHTTPResponse {
+    public static func template(_ source: String, context: PrismTemplateContext, status: PrismHTTPStatus = .ok)
+        -> PrismHTTPResponse
+    {
         let template = PrismTemplate(source)
         do {
             let rendered = try template.render(context)

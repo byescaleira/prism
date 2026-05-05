@@ -1,7 +1,8 @@
-import Testing
 import Foundation
-@testable import PrismServer
+import Testing
+
 @testable import PrismFoundation
+@testable import PrismServer
 
 @Suite("PrismLogger Tests")
 struct PrismLoggerTests {

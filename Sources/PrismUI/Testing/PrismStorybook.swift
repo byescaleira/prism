@@ -67,9 +67,9 @@ public struct PrismStorybook: View {
         }
         .navigationTitle("Storybook")
         #if os(iOS) || os(visionOS)
-        .listStyle(.insetGrouped)
+            .listStyle(.insetGrouped)
         #else
-        .listStyle(.sidebar)
+            .listStyle(.sidebar)
         #endif
     }
 
@@ -140,28 +140,34 @@ extension PrismStorybook {
         }
 
         static let buttonStories: [Story] = [
-            Story(id: "button-filled", name: "Button (Variants)", icon: "hand.tap.fill", description: "Primary action button variants.") {
-                AnyView(VStack(spacing: 12) {
-                    PrismButton("Filled", variant: .filled) {}
-                    PrismButton("Tinted", variant: .tinted) {}
-                    PrismButton("Bordered", variant: .bordered) {}
-                    PrismButton("Plain", variant: .plain) {}
-                })
-            },
+            Story(
+                id: "button-filled", name: "Button (Variants)", icon: "hand.tap.fill",
+                description: "Primary action button variants."
+            ) {
+                AnyView(
+                    VStack(spacing: 12) {
+                        PrismButton("Filled", variant: .filled) {}
+                        PrismButton("Tinted", variant: .tinted) {}
+                        PrismButton("Bordered", variant: .bordered) {}
+                        PrismButton("Plain", variant: .plain) {}
+                    })
+            }
         ]
 
         static let inputStories: [Story] = [
             Story(id: "textfield", name: "TextField", icon: "textformat", description: "Themed text input.") {
-                AnyView(VStack(spacing: 12) {
-                    PrismTextField("Email", text: .constant("user@example.com"))
-                    PrismTextField("Empty", text: .constant(""))
-                })
+                AnyView(
+                    VStack(spacing: 12) {
+                        PrismTextField("Email", text: .constant("user@example.com"))
+                        PrismTextField("Empty", text: .constant(""))
+                    })
             },
             Story(id: "toggle", name: "Toggle", icon: "switch.2", description: "Themed toggle switch.") {
-                AnyView(VStack(spacing: 12) {
-                    PrismToggle("Notifications", isOn: .constant(true))
-                    PrismToggle("Dark Mode", isOn: .constant(false))
-                })
+                AnyView(
+                    VStack(spacing: 12) {
+                        PrismToggle("Notifications", isOn: .constant(true))
+                        PrismToggle("Dark Mode", isOn: .constant(false))
+                    })
             },
             Story(id: "slider", name: "Slider", icon: "slider.horizontal.3", description: "Themed range slider.") {
                 AnyView(PrismSlider("Volume", value: .constant(0.6)))
@@ -169,59 +175,68 @@ extension PrismStorybook {
         ]
 
         static let feedbackStories: [Story] = [
-            Story(id: "loading", name: "Loading State", icon: "progress.indicator", description: "Loading spinner with label.") {
-                AnyView(VStack(spacing: 16) {
-                    PrismLoadingState(.loading)
-                    PrismLoadingState(.empty(title: "No Items", message: nil, icon: "tray"))
-                })
+            Story(
+                id: "loading", name: "Loading State", icon: "progress.indicator",
+                description: "Loading spinner with label."
+            ) {
+                AnyView(
+                    VStack(spacing: 16) {
+                        PrismLoadingState(.loading)
+                        PrismLoadingState(.empty(title: "No Items", message: nil, icon: "tray"))
+                    })
             },
             Story(id: "banner", name: "Banner", icon: "flag", description: "Themed alert banner.") {
-                AnyView(VStack(spacing: 12) {
-                    PrismBanner("Info message", style: .info)
-                    PrismBanner("Success!", style: .success)
-                    PrismBanner("Warning", style: .warning)
-                    PrismBanner("Error occurred", style: .error)
-                })
+                AnyView(
+                    VStack(spacing: 12) {
+                        PrismBanner("Info message", style: .info)
+                        PrismBanner("Success!", style: .success)
+                        PrismBanner("Warning", style: .warning)
+                        PrismBanner("Error occurred", style: .error)
+                    })
             },
         ]
 
         static let layoutStories: [Story] = [
             Story(id: "card", name: "Card", icon: "rectangle", description: "Surface container with elevation.") {
-                AnyView(VStack(spacing: 16) {
-                    PrismCard {
-                        VStack(alignment: .leading, spacing: 8) {
-                            Text("Card Title").font(TypographyToken.headline.font)
-                            Text("Card description goes here.").font(TypographyToken.body.font)
+                AnyView(
+                    VStack(spacing: 16) {
+                        PrismCard {
+                            VStack(alignment: .leading, spacing: 8) {
+                                Text("Card Title").font(TypographyToken.headline.font)
+                                Text("Card description goes here.").font(TypographyToken.body.font)
+                            }
+                            .padding()
                         }
-                        .padding()
-                    }
-                })
+                    })
             },
             Story(id: "divider", name: "Divider", icon: "minus", description: "Themed separator.") {
-                AnyView(VStack(spacing: 16) {
-                    Text("Above")
-                    PrismDivider()
-                    Text("Below")
-                })
+                AnyView(
+                    VStack(spacing: 16) {
+                        Text("Above")
+                        PrismDivider()
+                        Text("Below")
+                    })
             },
         ]
 
         static let dataStories: [Story] = [
             Story(id: "tag", name: "Tag", icon: "tag", description: "Labeled tag with semantic colors.") {
-                AnyView(HStack(spacing: 8) {
-                    PrismTag("Default")
-                    PrismTag("Info", style: .info)
-                    PrismTag("Success", style: .success)
-                    PrismTag("Warning", style: .warning)
-                    PrismTag("Error", style: .error)
-                })
+                AnyView(
+                    HStack(spacing: 8) {
+                        PrismTag("Default")
+                        PrismTag("Info", style: .info)
+                        PrismTag("Success", style: .success)
+                        PrismTag("Warning", style: .warning)
+                        PrismTag("Error", style: .error)
+                    })
             },
             Story(id: "avatar", name: "Avatar", icon: "person.circle", description: "Image/initials with status.") {
-                AnyView(HStack(spacing: 16) {
-                    PrismAvatar(initials: "AB", size: .small)
-                    PrismAvatar(initials: "CD", size: .medium, status: .online)
-                    PrismAvatar(initials: "EF", size: .large, status: .busy)
-                })
+                AnyView(
+                    HStack(spacing: 16) {
+                        PrismAvatar(initials: "AB", size: .small)
+                        PrismAvatar(initials: "CD", size: .medium, status: .online)
+                        PrismAvatar(initials: "EF", size: .large, status: .busy)
+                    })
             },
         ]
     }

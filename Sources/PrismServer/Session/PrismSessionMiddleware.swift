@@ -1,6 +1,7 @@
 import Foundation
+
 #if canImport(CryptoKit)
-import CryptoKit
+    import CryptoKit
 #endif
 
 /// Middleware that manages server-side sessions with signed cookies.
@@ -24,7 +25,8 @@ public struct PrismSessionMiddleware: PrismMiddleware {
     }
 
     /// Handles the request and returns a response.
-    public func handle(_ request: PrismHTTPRequest, next: @escaping PrismRouteHandler) async throws -> PrismHTTPResponse {
+    public func handle(_ request: PrismHTTPRequest, next: @escaping PrismRouteHandler) async throws -> PrismHTTPResponse
+    {
         let sessionID: String
         var isNew = false
 
@@ -62,23 +64,23 @@ public struct PrismSessionMiddleware: PrismMiddleware {
     }
 
     #if canImport(CryptoKit)
-    private func sign(_ id: String) -> String {
-        let key = SymmetricKey(data: Data(secret.utf8))
-        let mac = HMAC<SHA256>.authenticationCode(for: Data(id.utf8), using: key)
-        let signature = Data(mac).base64EncodedString()
-        return "\(id).\(signature)"
-    }
+        private func sign(_ id: String) -> String {
+            let key = SymmetricKey(data: Data(secret.utf8))
+            let mac = HMAC<SHA256>.authenticationCode(for: Data(id.utf8), using: key)
+            let signature = Data(mac).base64EncodedString()
+            return "\(id).\(signature)"
+        }
 
-    private func verifySignature(_ value: String) -> Bool {
-        let parts = value.split(separator: ".", maxSplits: 1)
-        guard parts.count == 2 else { return false }
-        let id = String(parts[0])
-        let expected = sign(id)
-        return value == expected
-    }
+        private func verifySignature(_ value: String) -> Bool {
+            let parts = value.split(separator: ".", maxSplits: 1)
+            guard parts.count == 2 else { return false }
+            let id = String(parts[0])
+            let expected = sign(id)
+            return value == expected
+        }
     #else
-    private func sign(_ id: String) -> String { id }
-    private func verifySignature(_ value: String) -> Bool { true }
+        private func sign(_ id: String) -> String { id }
+        private func verifySignature(_ value: String) -> Bool { true }
     #endif
 
     private func extractID(from value: String) -> String {

@@ -35,8 +35,8 @@ public struct PrismPinField: View {
         TextField("", text: $code)
             .focused($isFocused)
             #if canImport(UIKit) && !os(watchOS)
-            .keyboardType(.numberPad)
-            .textContentType(.oneTimeCode)
+                .keyboardType(.numberPad)
+                .textContentType(.oneTimeCode)
             #endif
             .frame(width: 1, height: 1)
             .opacity(0.01)
@@ -85,8 +85,9 @@ public struct PrismPinField: View {
         .overlay(
             RadiusToken.md.shape
                 .stroke(
-                    isCurrentIndex ? theme.color(.interactive) :
-                        (character != nil ? theme.color(.border) : theme.color(.borderSubtle)),
+                    isCurrentIndex
+                        ? theme.color(.interactive)
+                        : (character != nil ? theme.color(.border) : theme.color(.borderSubtle)),
                     lineWidth: isCurrentIndex ? 2 : 1
                 )
         )

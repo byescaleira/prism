@@ -21,13 +21,17 @@ public struct PrismTestClient: Sendable {
     }
 
     /// Sends a POST request with an optional body.
-    public func post(_ path: String, body: Data? = nil, headers: PrismHTTPHeaders = PrismHTTPHeaders()) async throws -> PrismHTTPResponse {
+    public func post(_ path: String, body: Data? = nil, headers: PrismHTTPHeaders = PrismHTTPHeaders()) async throws
+        -> PrismHTTPResponse
+    {
         let request = PrismHTTPRequest(method: .POST, uri: path, headers: headers, body: body)
         return try await send(request)
     }
 
     /// Sends a POST request with a JSON-encoded body.
-    public func postJSON<T: Encodable>(_ path: String, body: T, encoder: JSONEncoder = JSONEncoder()) async throws -> PrismHTTPResponse {
+    public func postJSON<T: Encodable>(_ path: String, body: T, encoder: JSONEncoder = JSONEncoder()) async throws
+        -> PrismHTTPResponse
+    {
         let data = try encoder.encode(body)
         var headers = PrismHTTPHeaders()
         headers.set(name: PrismHTTPHeaders.contentType, value: "application/json")
@@ -36,19 +40,24 @@ public struct PrismTestClient: Sendable {
     }
 
     /// Sends a PUT request with an optional body.
-    public func put(_ path: String, body: Data? = nil, headers: PrismHTTPHeaders = PrismHTTPHeaders()) async throws -> PrismHTTPResponse {
+    public func put(_ path: String, body: Data? = nil, headers: PrismHTTPHeaders = PrismHTTPHeaders()) async throws
+        -> PrismHTTPResponse
+    {
         let request = PrismHTTPRequest(method: .PUT, uri: path, headers: headers, body: body)
         return try await send(request)
     }
 
     /// Sends a PATCH request with an optional body.
-    public func patch(_ path: String, body: Data? = nil, headers: PrismHTTPHeaders = PrismHTTPHeaders()) async throws -> PrismHTTPResponse {
+    public func patch(_ path: String, body: Data? = nil, headers: PrismHTTPHeaders = PrismHTTPHeaders()) async throws
+        -> PrismHTTPResponse
+    {
         let request = PrismHTTPRequest(method: .PATCH, uri: path, headers: headers, body: body)
         return try await send(request)
     }
 
     /// Sends a DELETE request.
-    public func delete(_ path: String, headers: PrismHTTPHeaders = PrismHTTPHeaders()) async throws -> PrismHTTPResponse {
+    public func delete(_ path: String, headers: PrismHTTPHeaders = PrismHTTPHeaders()) async throws -> PrismHTTPResponse
+    {
         let request = PrismHTTPRequest(method: .DELETE, uri: path, headers: headers)
         return try await send(request)
     }
@@ -66,7 +75,9 @@ public final class PrismTestClientBuilder: Sendable {
     }
 
     /// Registers a route handler for the given method and pattern.
-    public func route(_ method: PrismHTTPMethod, _ pattern: String, handler: @escaping PrismRouteHandler) -> PrismTestClientBuilder {
+    public func route(_ method: PrismHTTPMethod, _ pattern: String, handler: @escaping PrismRouteHandler)
+        -> PrismTestClientBuilder
+    {
         _routes.mutate { $0.append(PrismRoute(method: method, pattern: pattern, handler: handler)) }
         return self
     }

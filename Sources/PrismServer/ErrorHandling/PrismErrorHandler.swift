@@ -20,7 +20,7 @@ extension PrismHTTPErrorResponse {
     public func toResponse() -> PrismHTTPResponse {
         var dict: [String: Any] = [
             "error": errorCode,
-            "message": message
+            "message": message,
         ]
         if let details { dict["details"] = details }
         let data = (try? JSONSerialization.data(withJSONObject: dict)) ?? Data()
@@ -56,7 +56,8 @@ public struct PrismAppError: PrismHTTPErrorResponse {
     }
 
     /// Creates a 401 Unauthorized error.
-    public static func unauthorized(_ message: String = "Unauthorized", code: String = "UNAUTHORIZED") -> PrismAppError {
+    public static func unauthorized(_ message: String = "Unauthorized", code: String = "UNAUTHORIZED") -> PrismAppError
+    {
         PrismAppError(status: .unauthorized, code: code, message: message)
     }
 
@@ -76,7 +77,9 @@ public struct PrismAppError: PrismHTTPErrorResponse {
     }
 
     /// Creates a 500 Internal Server Error.
-    public static func internalError(_ message: String = "Internal Server Error", code: String = "INTERNAL_ERROR") -> PrismAppError {
+    public static func internalError(_ message: String = "Internal Server Error", code: String = "INTERNAL_ERROR")
+        -> PrismAppError
+    {
         PrismAppError(status: .internalServerError, code: code, message: message)
     }
 }
@@ -96,7 +99,8 @@ public struct PrismErrorMiddleware: PrismMiddleware, Sendable {
     }
 
     /// Catches errors thrown by downstream handlers and converts them to structured responses.
-    public func handle(_ request: PrismHTTPRequest, next: @escaping PrismRouteHandler) async throws -> PrismHTTPResponse {
+    public func handle(_ request: PrismHTTPRequest, next: @escaping PrismRouteHandler) async throws -> PrismHTTPResponse
+    {
         do {
             return try await next(request)
         } catch let error as PrismHTTPErrorResponse {
@@ -108,7 +112,7 @@ public struct PrismErrorMiddleware: PrismMiddleware, Sendable {
 
             var dict: [String: Any] = [
                 "error": "INTERNAL_ERROR",
-                "message": "An unexpected error occurred"
+                "message": "An unexpected error occurred",
             ]
 
             if includeStackTrace {
@@ -138,7 +142,9 @@ public struct PrismProblemDetails: Sendable {
     public let instance: String?
 
     /// Creates a problem details response with the given fields.
-    public init(type: String = "about:blank", title: String, status: Int, detail: String? = nil, instance: String? = nil) {
+    public init(
+        type: String = "about:blank", title: String, status: Int, detail: String? = nil, instance: String? = nil
+    ) {
         self.type = type
         self.title = title
         self.status = status
@@ -151,7 +157,7 @@ public struct PrismProblemDetails: Sendable {
         var dict: [String: Any] = [
             "type": type,
             "title": title,
-            "status": status
+            "status": status,
         ]
         if let detail { dict["detail"] = detail }
         if let instance { dict["instance"] = instance }
@@ -160,6 +166,7 @@ public struct PrismProblemDetails: Sendable {
         var headers = PrismHTTPHeaders()
         headers.set(name: "Content-Type", value: "application/problem+json")
         headers.set(name: "Content-Length", value: "\(data.count)")
-        return PrismHTTPResponse(status: PrismHTTPStatus(code: status, reason: title), headers: headers, body: .data(data))
+        return PrismHTTPResponse(
+            status: PrismHTTPStatus(code: status, reason: title), headers: headers, body: .data(data))
     }
 }

@@ -36,7 +36,7 @@ public struct PrismOnboarding: View {
                 }
             }
             #if os(iOS) || os(tvOS) || os(watchOS) || os(visionOS)
-            .tabViewStyle(.page(indexDisplayMode: .never))
+                .tabViewStyle(.page(indexDisplayMode: .never))
             #endif
 
             bottomBar
@@ -79,9 +79,11 @@ public struct PrismOnboarding: View {
             HStack(spacing: SpacingToken.sm.rawValue) {
                 ForEach(0..<pages.count, id: \.self) { index in
                     Circle()
-                        .fill(index == currentPage
-                              ? theme.color(.interactive)
-                              : theme.color(.onBackgroundTertiary))
+                        .fill(
+                            index == currentPage
+                                ? theme.color(.interactive)
+                                : theme.color(.onBackgroundTertiary)
+                        )
                         .frame(width: 8, height: 8)
                         .animation(.easeInOut(duration: 0.2), value: currentPage)
                 }

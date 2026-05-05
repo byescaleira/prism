@@ -45,11 +45,12 @@ public struct PrismMediaType: Sendable, Equatable {
                 }
             }
 
-            types.append(PrismMediaType(
-                type: String(mimePieces[0]),
-                subtype: String(mimePieces[1]),
-                quality: quality
-            ))
+            types.append(
+                PrismMediaType(
+                    type: String(mimePieces[0]),
+                    subtype: String(mimePieces[1]),
+                    quality: quality
+                ))
         }
 
         return types.sorted { $0.quality > $1.quality }

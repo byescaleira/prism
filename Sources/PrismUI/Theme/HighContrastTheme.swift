@@ -59,41 +59,41 @@ extension HighContrastTheme {
 
     private var platformBackground: Color {
         #if canImport(UIKit) && !os(watchOS)
-        Color(.systemBackground)
+            Color(.systemBackground)
         #elseif os(macOS)
-        Color(.windowBackgroundColor)
+            Color(.windowBackgroundColor)
         #else
-        .black
+            .black
         #endif
     }
 
     private var platformBackgroundSecondary: Color {
         #if canImport(UIKit) && !os(watchOS)
-        Color(.secondarySystemBackground)
+            Color(.secondarySystemBackground)
         #elseif os(macOS)
-        Color(.controlBackgroundColor)
+            Color(.controlBackgroundColor)
         #else
-        Color(white: 0.08)
+            Color(white: 0.08)
         #endif
     }
 
     private var platformBackgroundTertiary: Color {
         #if canImport(UIKit) && !os(watchOS)
-        Color(.tertiarySystemBackground)
+            Color(.tertiarySystemBackground)
         #elseif os(macOS)
-        Color(.underPageBackgroundColor)
+            Color(.underPageBackgroundColor)
         #else
-        Color(white: 0.14)
+            Color(white: 0.14)
         #endif
     }
 
     private var platformForeground: Color {
         #if canImport(UIKit) && !os(watchOS)
-        Color(.label)
+            Color(.label)
         #elseif os(macOS)
-        Color(.labelColor)
+            Color(.labelColor)
         #else
-        .white
+            .white
         #endif
     }
 }

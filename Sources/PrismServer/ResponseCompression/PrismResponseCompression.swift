@@ -1,5 +1,5 @@
-import Foundation
 import Compression
+import Foundation
 
 /// Supported response body compression algorithms.
 public enum PrismCompressionAlgorithm: String, Sendable {
@@ -47,7 +47,7 @@ public struct PrismResponseCompressionConfig: Sendable {
         "text/html", "text/css", "text/plain", "text/xml", "text/csv",
         "application/json", "application/javascript", "application/xml",
         "application/xhtml+xml", "application/rss+xml", "application/atom+xml",
-        "image/svg+xml", "application/wasm", "text/markdown"
+        "image/svg+xml", "application/wasm", "text/markdown",
     ]
 }
 
@@ -61,7 +61,8 @@ public struct PrismResponseCompressionMiddleware: PrismMiddleware {
     }
 
     /// Handles the request and returns a response.
-    public func handle(_ request: PrismHTTPRequest, next: @escaping PrismRouteHandler) async throws -> PrismHTTPResponse {
+    public func handle(_ request: PrismHTTPRequest, next: @escaping PrismRouteHandler) async throws -> PrismHTTPResponse
+    {
         var response = try await next(request)
 
         for excluded in config.excludedPaths {

@@ -44,9 +44,9 @@ public struct PrismComponentBrowser: View {
                 }
             }
             #if os(iOS) || os(visionOS)
-            .listStyle(.insetGrouped)
+                .listStyle(.insetGrouped)
             #else
-            .listStyle(.sidebar)
+                .listStyle(.sidebar)
             #endif
             .searchable(text: $searchText, prompt: "Search components")
             .navigationTitle("Component Browser")
@@ -92,10 +92,12 @@ enum ComponentCategory: String, CaseIterable, Sendable {
             ]
         case .composites:
             return [
-                ComponentEntry(name: "PrismAlert", icon: "exclamationmark.triangle", summary: "Alert dialog with actions"),
+                ComponentEntry(
+                    name: "PrismAlert", icon: "exclamationmark.triangle", summary: "Alert dialog with actions"),
                 ComponentEntry(name: "PrismBanner", icon: "flag", summary: "Dismissable banner"),
                 ComponentEntry(name: "PrismToast", icon: "bubble.left", summary: "Auto-dismissing notification"),
-                ComponentEntry(name: "PrismBottomSheet", icon: "rectangle.bottomhalf.filled", summary: "Draggable sheet"),
+                ComponentEntry(
+                    name: "PrismBottomSheet", icon: "rectangle.bottomhalf.filled", summary: "Draggable sheet"),
                 ComponentEntry(name: "PrismTooltip", icon: "text.bubble", summary: "Contextual info popup"),
                 ComponentEntry(name: "PrismMenu", icon: "ellipsis.circle", summary: "Context menu"),
                 ComponentEntry(name: "PrismEmptyState", icon: "tray", summary: "Placeholder for empty views"),

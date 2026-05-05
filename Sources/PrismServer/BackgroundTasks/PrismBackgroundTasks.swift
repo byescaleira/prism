@@ -37,7 +37,9 @@ public actor PrismBackgroundTaskManager {
     }
 
     /// Runs a task and returns the Task handle for awaiting its result.
-    public func runWithResult<T: Sendable>(_ name: String, task: @escaping @Sendable () async throws -> T) -> Task<T, Error> {
+    public func runWithResult<T: Sendable>(_ name: String, task: @escaping @Sendable () async throws -> T) -> Task<
+        T, Error
+    > {
         let id = UUID().uuidString
         let info = PrismBackgroundTask(id: id, name: name, startedAt: Date())
         metadata[id] = info

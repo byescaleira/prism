@@ -23,7 +23,9 @@ public struct PrismHTTPResponse: Sendable {
     // MARK: - Convenience Factories
 
     /// Creates a 200 OK response with a JSON-encoded body.
-    public static func json<T: Encodable>(_ value: T, status: PrismHTTPStatus = .ok, encoder: JSONEncoder = JSONEncoder()) -> PrismHTTPResponse {
+    public static func json<T: Encodable>(
+        _ value: T, status: PrismHTTPStatus = .ok, encoder: JSONEncoder = JSONEncoder()
+    ) -> PrismHTTPResponse {
         do {
             let data = try encoder.encode(value)
             var headers = PrismHTTPHeaders()

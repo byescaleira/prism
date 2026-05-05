@@ -14,9 +14,9 @@ private struct PrismTooltipModifier: ViewModifier {
                 isShowing = true
             }
             #if os(macOS) || os(visionOS)
-            .onHover { hovering in
-                isShowing = hovering
-            }
+                .onHover { hovering in
+                    isShowing = hovering
+                }
             #endif
             .popover(isPresented: $isShowing, arrowEdge: edge) {
                 Text(text)

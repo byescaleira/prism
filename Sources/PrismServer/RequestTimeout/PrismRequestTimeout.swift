@@ -36,7 +36,8 @@ public struct PrismRequestTimeoutMiddleware: PrismMiddleware {
     }
 
     /// Handles the request and returns a response.
-    public func handle(_ request: PrismHTTPRequest, next: @escaping PrismRouteHandler) async throws -> PrismHTTPResponse {
+    public func handle(_ request: PrismHTTPRequest, next: @escaping PrismRouteHandler) async throws -> PrismHTTPResponse
+    {
         let timeout = resolveTimeout(for: request)
 
         do {
@@ -72,7 +73,8 @@ public struct PrismRequestTimeoutMiddleware: PrismMiddleware {
 
     private func resolveTimeout(for request: PrismHTTPRequest) -> Duration {
         if let override = request.userInfo["timeout"],
-           let seconds = Double(override) {
+            let seconds = Double(override)
+        {
             return .milliseconds(Int(seconds * 1000))
         }
 

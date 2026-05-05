@@ -156,7 +156,8 @@ public struct PrismActivityGroup: Sendable, Identifiable {
         let grouped = Dictionary(grouping: activities) { activity in
             calendar.startOfDay(for: activity.timestamp)
         }
-        return grouped
+        return
+            grouped
             .sorted { $0.key > $1.key }
             .map { date, items in
                 PrismActivityGroup(

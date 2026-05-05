@@ -32,9 +32,9 @@ public struct PrismNavigationView<Content: View, Route: PrismRoutable, Destinati
             destination(route)
         }
         #if !os(macOS) && !os(watchOS)
-        .fullScreenCover(item: $router.fullScreenRoute) { route in
-            destination(route)
-        }
+            .fullScreenCover(item: $router.fullScreenRoute) { route in
+                destination(route)
+            }
         #endif
     }
 }

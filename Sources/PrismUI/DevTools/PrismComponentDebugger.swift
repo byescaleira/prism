@@ -68,35 +68,35 @@ private struct PrismDebugModifier: ViewModifier {
 
     func body(content: Content) -> some View {
         #if DEBUG
-        content
-            .overlay(
-                GeometryReader { geometry in
-                    Color.clear
-                        .onAppear {
-                            debugger.register(component: name, size: geometry.size)
-                        }
-                        .onChange(of: geometry.size) { _, newSize in
-                            debugger.register(component: name, size: newSize)
-                        }
+            content
+                .overlay(
+                    GeometryReader { geometry in
+                        Color.clear
+                            .onAppear {
+                                debugger.register(component: name, size: geometry.size)
+                            }
+                            .onChange(of: geometry.size) { _, newSize in
+                                debugger.register(component: name, size: newSize)
+                            }
+                    }
+                )
+                .overlay(alignment: .topLeading) {
+                    Text(name)
+                        .font(.system(size: 9, weight: .bold, design: .monospaced))
+                        .foregroundStyle(.white)
+                        .padding(.horizontal, 4)
+                        .padding(.vertical, 2)
+                        .background(.red.opacity(0.85))
+                        .clipShape(RoundedRectangle(cornerRadius: 3, style: .continuous))
+                        .allowsHitTesting(false)
                 }
-            )
-            .overlay(alignment: .topLeading) {
-                Text(name)
-                    .font(.system(size: 9, weight: .bold, design: .monospaced))
-                    .foregroundStyle(.white)
-                    .padding(.horizontal, 4)
-                    .padding(.vertical, 2)
-                    .background(.red.opacity(0.85))
-                    .clipShape(RoundedRectangle(cornerRadius: 3, style: .continuous))
-                    .allowsHitTesting(false)
-            }
-            .overlay(
-                RoundedRectangle(cornerRadius: 4, style: .continuous)
-                    .strokeBorder(.red, lineWidth: 1)
-                    .allowsHitTesting(false)
-            )
+                .overlay(
+                    RoundedRectangle(cornerRadius: 4, style: .continuous)
+                        .strokeBorder(.red, lineWidth: 1)
+                        .allowsHitTesting(false)
+                )
         #else
-        content
+            content
         #endif
     }
 }

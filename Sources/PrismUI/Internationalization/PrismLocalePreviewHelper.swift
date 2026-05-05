@@ -64,7 +64,9 @@ public struct PrismMultiLocalePreview<Content: View>: View {
 extension View {
 
     /// Wraps this view in a multi-locale preview with the specified locales.
-    public func prismPreviewLocales(_ locales: [Locale] = PrismMultiLocalePreview<EmptyView>.defaultLocales) -> some View {
+    public func prismPreviewLocales(_ locales: [Locale] = PrismMultiLocalePreview<EmptyView>.defaultLocales)
+        -> some View
+    {
         PrismMultiLocalePreview(locales: locales) {
             self
         }

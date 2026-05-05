@@ -14,7 +14,9 @@ public struct PrismStreamingPart: Sendable {
     public let data: Data
 
     /// Creates a new `PrismStreamingPart` with the specified configuration.
-    public init(name: String, filename: String? = nil, contentType: String? = nil, headers: [String: String] = [:], data: Data) {
+    public init(
+        name: String, filename: String? = nil, contentType: String? = nil, headers: [String: String] = [:], data: Data
+    ) {
         self.name = name
         self.filename = filename
         self.contentType = contentType
@@ -69,7 +71,9 @@ public struct PrismMultipartStreamParser: Sendable {
     }
 
     /// Parses the input and returns the result.
-    public func parse(_ data: Data, onProgress: (@Sendable (PrismMultipartProgress) -> Void)? = nil) throws -> [PrismStreamingPart] {
+    public func parse(_ data: Data, onProgress: (@Sendable (PrismMultipartProgress) -> Void)? = nil) throws
+        -> [PrismStreamingPart]
+    {
         let delimiter = Data("--\(boundary)".utf8)
         let crlf = Data("\r\n".utf8)
         let doubleCrlf = Data("\r\n\r\n".utf8)
@@ -126,23 +130,25 @@ public struct PrismMultipartStreamParser: Sendable {
             let filename = extractField(from: disposition, field: "filename")
             let contentType = headers["content-type"]
 
-            parts.append(PrismStreamingPart(
-                name: name,
-                filename: filename,
-                contentType: contentType,
-                headers: headers,
-                data: bodyData
-            ))
+            parts.append(
+                PrismStreamingPart(
+                    name: name,
+                    filename: filename,
+                    contentType: contentType,
+                    headers: headers,
+                    data: bodyData
+                ))
 
             guard parts.count <= maxParts else {
                 throw PrismMultipartStreamError.tooManyParts(maxParts: maxParts)
             }
 
-            onProgress?(PrismMultipartProgress(
-                bytesProcessed: nextBoundary.upperBound,
-                totalBytes: totalBytes,
-                partsCompleted: parts.count
-            ))
+            onProgress?(
+                PrismMultipartProgress(
+                    bytesProcessed: nextBoundary.upperBound,
+                    totalBytes: totalBytes,
+                    partsCompleted: parts.count
+                ))
 
             position = nextBoundary.upperBound
         }
@@ -208,11 +214,13 @@ public struct PrismMultipartStreamMiddleware: PrismMiddleware {
     }
 
     /// Handles the request and returns a response.
-    public func handle(_ request: PrismHTTPRequest, next: @escaping PrismRouteHandler) async throws -> PrismHTTPResponse {
+    public func handle(_ request: PrismHTTPRequest, next: @escaping PrismRouteHandler) async throws -> PrismHTTPResponse
+    {
         guard let contentType = request.contentType,
-              contentType.lowercased().contains("multipart/form-data"),
-              let boundary = PrismMultipartStreamParser.extractBoundary(from: contentType),
-              let body = request.body else {
+            contentType.lowercased().contains("multipart/form-data"),
+            let boundary = PrismMultipartStreamParser.extractBoundary(from: contentType),
+            let body = request.body
+        else {
             return try await next(request)
         }
 

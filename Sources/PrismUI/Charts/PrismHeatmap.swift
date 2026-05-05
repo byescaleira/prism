@@ -112,7 +112,8 @@ public struct PrismHeatmap: View {
                         Rectangle()
                             .fill(interpolateColor(from: low, to: high, fraction: normalized))
                             .aspectRatio(1, contentMode: .fit)
-                            .accessibilityLabel("Row \(row), Column \(col), Value \(cell?.value ?? 0, specifier: "%.1f")")
+                            .accessibilityLabel(
+                                "Row \(row), Column \(col), Value \(cell?.value ?? 0, specifier: "%.1f")")
                     }
                 }
             }

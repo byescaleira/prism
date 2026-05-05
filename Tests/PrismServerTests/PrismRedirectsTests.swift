@@ -1,5 +1,6 @@
-import Testing
 import Foundation
+import Testing
+
 @testable import PrismServer
 
 @Suite("PrismRedirects Tests")
@@ -133,7 +134,7 @@ struct PrismRedirectsTests {
     func firstMatchWins() async throws {
         let rules = [
             PrismRedirectRule.permanent(from: "/path", to: "/first"),
-            PrismRedirectRule.permanent(from: "/path", to: "/second")
+            PrismRedirectRule.permanent(from: "/path", to: "/second"),
         ]
         let middleware = PrismRedirectMiddleware(rules: rules)
         let request = PrismHTTPRequest(method: .GET, uri: "/path")

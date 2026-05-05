@@ -123,8 +123,7 @@ public struct PrismSyntaxHighlighter: Sendable {
             // Words (identifiers / keywords)
             if char.isLetter || char == "_" || char == "@" {
                 var word = ""
-                while index < chars.count && (chars[index].isLetter || chars[index].isNumber || chars[index] == "_")
-                {
+                while index < chars.count && (chars[index].isLetter || chars[index].isNumber || chars[index] == "_") {
                     word.append(chars[index])
                     index += 1
                 }
@@ -262,10 +261,10 @@ public struct PrismCodeBlock: View {
 
     private func copyToClipboard() {
         #if canImport(UIKit)
-        UIPasteboard.general.string = code
+            UIPasteboard.general.string = code
         #elseif os(macOS)
-        NSPasteboard.general.clearContents()
-        NSPasteboard.general.setString(code, forType: .string)
+            NSPasteboard.general.clearContents()
+            NSPasteboard.general.setString(code, forType: .string)
         #endif
 
         withAnimation(.easeInOut(duration: 0.2)) {

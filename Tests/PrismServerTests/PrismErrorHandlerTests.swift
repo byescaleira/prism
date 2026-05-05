@@ -1,5 +1,6 @@
-import Testing
 import Foundation
+import Testing
+
 @testable import PrismServer
 
 @Suite("PrismAppError Tests")
@@ -58,7 +59,8 @@ struct PrismAppErrorTests {
 
     @Test("Error with details")
     func withDetails() {
-        let error = PrismAppError(status: .badRequest, code: "VALIDATION", message: "Invalid", details: ["field": "email"])
+        let error = PrismAppError(
+            status: .badRequest, code: "VALIDATION", message: "Invalid", details: ["field": "email"])
         #expect(error.details?["field"] == "email")
     }
 

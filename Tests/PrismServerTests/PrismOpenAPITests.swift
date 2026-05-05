@@ -1,5 +1,6 @@
-import Testing
 import Foundation
+import Testing
+
 @testable import PrismServer
 
 @Suite("PrismOpenAPIGenerator Tests")
@@ -16,7 +17,8 @@ struct PrismOpenAPIGeneratorTests {
                 PrismAPIParameter(name: "id", location: .path, required: true, type: "integer", description: "User ID")
             ],
             responses: [
-                PrismAPIResponse(statusCode: 200, description: "Success", contentType: "application/json", schemaRef: "User")
+                PrismAPIResponse(
+                    statusCode: 200, description: "Success", contentType: "application/json", schemaRef: "User")
             ]
         )
 

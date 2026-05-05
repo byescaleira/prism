@@ -199,7 +199,8 @@ public struct PrismGraphQLSchemaBuilder: Sendable {
         description: String? = nil,
         resolve: @escaping @Sendable (PrismGraphQLResolveInfo) async throws -> (any Sendable)?
     ) {
-        queryFields.append(PrismGraphQLField(name: name, type: type, args: args, description: description, resolve: resolve))
+        queryFields.append(
+            PrismGraphQLField(name: name, type: type, args: args, description: description, resolve: resolve))
     }
 
     /// Registers a mutation field with the given name and resolver.
@@ -210,7 +211,8 @@ public struct PrismGraphQLSchemaBuilder: Sendable {
         description: String? = nil,
         resolve: @escaping @Sendable (PrismGraphQLResolveInfo) async throws -> (any Sendable)?
     ) {
-        mutationFields.append(PrismGraphQLField(name: name, type: type, args: args, description: description, resolve: resolve))
+        mutationFields.append(
+            PrismGraphQLField(name: name, type: type, args: args, description: description, resolve: resolve))
     }
 
     /// Adds a custom object type to the schema.
@@ -221,8 +223,11 @@ public struct PrismGraphQLSchemaBuilder: Sendable {
     /// Builds the GraphQL schema from registered queries, mutations, and types.
     public func build() -> PrismGraphQLSchema {
         let queryType = PrismGraphQLObjectType(name: "Query", fields: queryFields)
-        let mutationType = mutationFields.isEmpty ? nil : PrismGraphQLObjectType(name: "Mutation", fields: mutationFields)
-        let subscriptionType = subscriptionFields.isEmpty ? nil : PrismGraphQLObjectType(name: "Subscription", fields: subscriptionFields)
-        return PrismGraphQLSchema(query: queryType, mutation: mutationType, subscription: subscriptionType, types: objectTypes)
+        let mutationType =
+            mutationFields.isEmpty ? nil : PrismGraphQLObjectType(name: "Mutation", fields: mutationFields)
+        let subscriptionType =
+            subscriptionFields.isEmpty ? nil : PrismGraphQLObjectType(name: "Subscription", fields: subscriptionFields)
+        return PrismGraphQLSchema(
+            query: queryType, mutation: mutationType, subscription: subscriptionType, types: objectTypes)
     }
 }

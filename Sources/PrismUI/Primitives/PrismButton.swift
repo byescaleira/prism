@@ -66,12 +66,13 @@ public struct PrismButton<Label: View>: View {
         case .glassProminent:
             button.buttonStyle(.glassProminent)
         default:
-            button.buttonStyle(PrismButtonStyle(
-                variant: variant,
-                theme: theme,
-                isLoading: isLoading,
-                reduceMotion: reduceMotion
-            ))
+            button.buttonStyle(
+                PrismButtonStyle(
+                    variant: variant,
+                    theme: theme,
+                    isLoading: isLoading,
+                    reduceMotion: reduceMotion
+                ))
         }
     }
 
@@ -97,15 +98,15 @@ public struct PrismButton<Label: View>: View {
 
     private func triggerHaptic() {
         #if canImport(UIKit) && !os(watchOS) && !os(tvOS)
-        switch haptic {
-        case .none: break
-        case .light:
-            UIImpactFeedbackGenerator(style: .light).impactOccurred()
-        case .medium:
-            UIImpactFeedbackGenerator(style: .medium).impactOccurred()
-        case .heavy:
-            UIImpactFeedbackGenerator(style: .heavy).impactOccurred()
-        }
+            switch haptic {
+            case .none: break
+            case .light:
+                UIImpactFeedbackGenerator(style: .light).impactOccurred()
+            case .medium:
+                UIImpactFeedbackGenerator(style: .medium).impactOccurred()
+            case .heavy:
+                UIImpactFeedbackGenerator(style: .heavy).impactOccurred()
+            }
         #endif
     }
 }

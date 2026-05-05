@@ -94,16 +94,20 @@ public struct PrismGraphQLExecutor: Sendable {
         let operation: PrismGraphQLOperation
         if let name = operationName {
             guard let op = document.operation(named: name) else {
-                return PrismGraphQLResult(data: nil, errors: [
-                    PrismGraphQLError(message: "Operation '\(name)' not found")
-                ])
+                return PrismGraphQLResult(
+                    data: nil,
+                    errors: [
+                        PrismGraphQLError(message: "Operation '\(name)' not found")
+                    ])
             }
             operation = op
         } else {
             guard let op = document.firstOperation else {
-                return PrismGraphQLResult(data: nil, errors: [
-                    PrismGraphQLError(message: "No operations in document")
-                ])
+                return PrismGraphQLResult(
+                    data: nil,
+                    errors: [
+                        PrismGraphQLError(message: "No operations in document")
+                    ])
             }
             operation = op
         }
@@ -114,16 +118,20 @@ public struct PrismGraphQLExecutor: Sendable {
             rootType = schema.query
         case .mutation:
             guard let m = schema.mutation else {
-                return PrismGraphQLResult(data: nil, errors: [
-                    PrismGraphQLError(message: "Schema does not define mutations")
-                ])
+                return PrismGraphQLResult(
+                    data: nil,
+                    errors: [
+                        PrismGraphQLError(message: "Schema does not define mutations")
+                    ])
             }
             rootType = m
         case .subscription:
             guard let s = schema.subscription else {
-                return PrismGraphQLResult(data: nil, errors: [
-                    PrismGraphQLError(message: "Schema does not define subscriptions")
-                ])
+                return PrismGraphQLResult(
+                    data: nil,
+                    errors: [
+                        PrismGraphQLError(message: "Schema does not define subscriptions")
+                    ])
             }
             rootType = s
         }
@@ -172,16 +180,20 @@ public struct PrismGraphQLExecutor: Sendable {
                 }
 
                 if fieldSelection.name == "__type" {
-                    let typeName = fieldSelection.arguments.first { $0.name == "name" }?.value.resolveVariables(variables) as? String
-                    result[responseName] = resolveIntrospectionType(schema: schema, typeName: typeName, selection: fieldSelection)
+                    let typeName =
+                        fieldSelection.arguments.first { $0.name == "name" }?.value.resolveVariables(variables)
+                        as? String
+                    result[responseName] = resolveIntrospectionType(
+                        schema: schema, typeName: typeName, selection: fieldSelection)
                     continue
                 }
 
                 guard let field = objectType.fields[fieldSelection.name] else {
-                    errors.append(PrismGraphQLError(
-                        message: "Field '\(fieldSelection.name)' not found on type '\(objectType.name)'",
-                        path: fieldPath
-                    ))
+                    errors.append(
+                        PrismGraphQLError(
+                            message: "Field '\(fieldSelection.name)' not found on type '\(objectType.name)'",
+                            path: fieldPath
+                        ))
                     result[responseName] = NSNull()
                     continue
                 }
@@ -203,7 +215,8 @@ public struct PrismGraphQLExecutor: Sendable {
 
                     if !fieldSelection.selectionSet.isEmpty, let dictValue = value as? [String: Any] {
                         if case .object(let typeName) = unwrapType(field.type),
-                           let nestedType = schema.types[typeName] {
+                            let nestedType = schema.types[typeName]
+                        {
                             let nested = await resolveSelectionSet(
                                 selections: fieldSelection.selectionSet,
                                 objectType: nestedType,
@@ -222,7 +235,8 @@ public struct PrismGraphQLExecutor: Sendable {
                         var resolvedArr: [[String: Any]] = []
                         let innerType = unwrapListType(field.type)
                         if case .object(let typeName) = innerType,
-                           let nestedType = schema.types[typeName] {
+                            let nestedType = schema.types[typeName]
+                        {
                             for (i, item) in arrValue.enumerated() {
                                 let itemPath = fieldPath + ["\(i)"]
                                 let nested = await resolveSelectionSet(
@@ -245,10 +259,11 @@ public struct PrismGraphQLExecutor: Sendable {
                         result[responseName] = value ?? NSNull()
                     }
                 } catch {
-                    errors.append(PrismGraphQLError(
-                        message: error.localizedDescription,
-                        path: fieldPath
-                    ))
+                    errors.append(
+                        PrismGraphQLError(
+                            message: error.localizedDescription,
+                            path: fieldPath
+                        ))
                     result[responseName] = NSNull()
                 }
 
@@ -278,7 +293,9 @@ public struct PrismGraphQLExecutor: Sendable {
 
     // MARK: - Introspection
 
-    private func resolveIntrospectionSchema(schema: PrismGraphQLSchema, selection: PrismGraphQLFieldSelection) -> [String: Any] {
+    private func resolveIntrospectionSchema(schema: PrismGraphQLSchema, selection: PrismGraphQLFieldSelection)
+        -> [String: Any]
+    {
         var result: [String: Any] = [:]
         for sub in selection.selectionSet {
             guard case .field(let f) = sub else { continue }
@@ -300,12 +317,16 @@ public struct PrismGraphQLExecutor: Sendable {
         return result
     }
 
-    private func resolveIntrospectionType(schema: PrismGraphQLSchema, typeName: String?, selection: PrismGraphQLFieldSelection) -> Any {
+    private func resolveIntrospectionType(
+        schema: PrismGraphQLSchema, typeName: String?, selection: PrismGraphQLFieldSelection
+    ) -> Any {
         guard let name = typeName, let type = schema.types[name] else { return NSNull() }
         return introspectObjectType(type, selection: selection)
     }
 
-    private func introspectObjectType(_ type: PrismGraphQLObjectType, selection: PrismGraphQLFieldSelection) -> [String: Any] {
+    private func introspectObjectType(_ type: PrismGraphQLObjectType, selection: PrismGraphQLFieldSelection) -> [String:
+        Any]
+    {
         var result: [String: Any] = [:]
         for sub in selection.selectionSet {
             guard case .field(let f) = sub else { continue }
@@ -329,7 +350,10 @@ public struct PrismGraphQLExecutor: Sendable {
                         case "deprecationReason": fieldDict["deprecationReason"] = field.deprecationReason ?? NSNull()
                         case "args":
                             fieldDict["args"] = field.args.map { arg -> [String: Any] in
-                                ["name": arg.name, "type": ["name": arg.type.typeName], "description": arg.description ?? NSNull()]
+                                [
+                                    "name": arg.name, "type": ["name": arg.type.typeName],
+                                    "description": arg.description ?? NSNull(),
+                                ]
                             }
                         default: break
                         }

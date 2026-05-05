@@ -59,10 +59,11 @@ public actor PrismHealthMonitor {
 
     /// Registers a simple check with a closure returning status.
     public func register(_ name: String, check: @escaping @Sendable () async -> PrismHealthStatus) {
-        checks.append(PrismHealthCheck(name: name) {
-            let status = await check()
-            return PrismHealthCheckResult(name: name, status: status)
-        })
+        checks.append(
+            PrismHealthCheck(name: name) {
+                let status = await check()
+                return PrismHealthCheckResult(name: name, status: status)
+            })
     }
 
     /// Runs all health checks and returns aggregate result.
@@ -74,12 +75,13 @@ public actor PrismHealthMonitor {
             let start = clock.now
             let result = await check.run()
             let elapsed = clock.now - start
-            results.append(PrismHealthCheckResult(
-                name: result.name,
-                status: result.status,
-                message: result.message,
-                duration: elapsed
-            ))
+            results.append(
+                PrismHealthCheckResult(
+                    name: result.name,
+                    status: result.status,
+                    message: result.message,
+                    duration: elapsed
+                ))
         }
 
         let overall: PrismHealthStatus
@@ -126,7 +128,8 @@ public struct PrismHealthMiddleware: PrismMiddleware, Sendable {
     }
 
     /// Handles the request and returns a response.
-    public func handle(_ request: PrismHTTPRequest, next: @escaping PrismRouteHandler) async throws -> PrismHTTPResponse {
+    public func handle(_ request: PrismHTTPRequest, next: @escaping PrismRouteHandler) async throws -> PrismHTTPResponse
+    {
         guard request.path == path && request.method == .GET else {
             return try await next(request)
         }
@@ -158,7 +161,9 @@ public actor PrismMetrics {
         requestCount += 1
         statusCounts[statusCode, default: 0] += 1
         pathCounts[path, default: 0] += 1
-        let nanos = UInt64(duration.components.seconds) * 1_000_000_000 + UInt64(duration.components.attoseconds / 1_000_000_000)
+        let nanos =
+            UInt64(duration.components.seconds) * 1_000_000_000
+            + UInt64(duration.components.attoseconds / 1_000_000_000)
         totalLatencyNanos += nanos
 
         if statusCode >= 400 {
@@ -220,7 +225,7 @@ public struct PrismMetricsSnapshot: Sendable {
             "requestCount": requestCount,
             "errorCount": errorCount,
             "activeRequests": activeRequests,
-            "averageLatencyMs": Double(averageLatencyNanos) / 1_000_000
+            "averageLatencyMs": Double(averageLatencyNanos) / 1_000_000,
         ]
         dict["statusCounts"] = statusCounts.reduce(into: [String: Int]()) { $0["\($1.key)"] = $1.value }
         dict["topPaths"] = topPaths
@@ -240,7 +245,8 @@ public struct PrismMetricsMiddleware: PrismMiddleware, Sendable {
     }
 
     /// Handles the request and returns a response.
-    public func handle(_ request: PrismHTTPRequest, next: @escaping PrismRouteHandler) async throws -> PrismHTTPResponse {
+    public func handle(_ request: PrismHTTPRequest, next: @escaping PrismRouteHandler) async throws -> PrismHTTPResponse
+    {
         if request.path == metricsPath && request.method == .GET {
             let snapshot = await metrics.snapshot()
             let data = snapshot.toJSONData()

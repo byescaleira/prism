@@ -1,5 +1,6 @@
-import Testing
 import SwiftUI
+import Testing
+
 @testable import PrismUI
 
 @MainActor
@@ -144,16 +145,18 @@ struct AdvancedIntegrationTests {
     @Suite("Animation Presets")
     struct AnimationTests {
 
-        @Test("All preset cases exist", arguments: [
-            PrismAnimationPreset.bounce,
-            .wiggle,
-            .pulse,
-            .shake,
-            .fadeIn,
-            .slideUp,
-            .scaleIn,
-            .springIn,
-        ])
+        @Test(
+            "All preset cases exist",
+            arguments: [
+                PrismAnimationPreset.bounce,
+                .wiggle,
+                .pulse,
+                .shake,
+                .fadeIn,
+                .slideUp,
+                .scaleIn,
+                .springIn,
+            ])
         @MainActor func presetCases(preset: PrismAnimationPreset) {
             let view = Text("Animated")
                 .prismAnimate(preset, trigger: false)
@@ -361,62 +364,62 @@ struct AdvancedIntegrationTests {
     // MARK: - Charts (compile-time check only, needs Charts framework)
 
     #if canImport(Charts)
-    @Suite("Chart Components")
-    struct ChartTests {
+        @Suite("Chart Components")
+        struct ChartTests {
 
-        struct ChartItem: Identifiable {
-            let id = UUID()
-            let label: String
-            let value: Double
-        }
+            struct ChartItem: Identifiable {
+                let id = UUID()
+                let label: String
+                let value: Double
+            }
 
-        @Test("PrismBarChart creation")
-        @available(iOS 16.0, macOS 13.0, tvOS 16.0, watchOS 9.0, *)
-        @MainActor func barChart() {
-            let data = [ChartItem(label: "A", value: 10), ChartItem(label: "B", value: 20)]
-            let view = PrismBarChart(data, x: \.label, y: \.value)
-            _ = view.body
-        }
+            @Test("PrismBarChart creation")
+            @available(iOS 16.0, macOS 13.0, tvOS 16.0, watchOS 9.0, *)
+            @MainActor func barChart() {
+                let data = [ChartItem(label: "A", value: 10), ChartItem(label: "B", value: 20)]
+                let view = PrismBarChart(data, x: \.label, y: \.value)
+                _ = view.body
+            }
 
-        @Test("PrismBarChart custom color")
-        @available(iOS 16.0, macOS 13.0, tvOS 16.0, watchOS 9.0, *)
-        @MainActor func barChartColor() {
-            let data = [ChartItem(label: "A", value: 10)]
-            let view = PrismBarChart(data, x: \.label, y: \.value, barColor: .success)
-            _ = view.body
-        }
+            @Test("PrismBarChart custom color")
+            @available(iOS 16.0, macOS 13.0, tvOS 16.0, watchOS 9.0, *)
+            @MainActor func barChartColor() {
+                let data = [ChartItem(label: "A", value: 10)]
+                let view = PrismBarChart(data, x: \.label, y: \.value, barColor: .success)
+                _ = view.body
+            }
 
-        @Test("PrismLineChart creation")
-        @available(iOS 16.0, macOS 13.0, tvOS 16.0, watchOS 9.0, *)
-        @MainActor func lineChart() {
-            let data = [ChartItem(label: "Jan", value: 100), ChartItem(label: "Feb", value: 150)]
-            let view = PrismLineChart(data, x: \.label, y: \.value)
-            _ = view.body
-        }
+            @Test("PrismLineChart creation")
+            @available(iOS 16.0, macOS 13.0, tvOS 16.0, watchOS 9.0, *)
+            @MainActor func lineChart() {
+                let data = [ChartItem(label: "Jan", value: 100), ChartItem(label: "Feb", value: 150)]
+                let view = PrismLineChart(data, x: \.label, y: \.value)
+                _ = view.body
+            }
 
-        @Test("PrismLineChart with area")
-        @available(iOS 16.0, macOS 13.0, tvOS 16.0, watchOS 9.0, *)
-        @MainActor func lineChartArea() {
-            let data = [ChartItem(label: "A", value: 50)]
-            let view = PrismLineChart(data, x: \.label, y: \.value, showArea: true)
-            _ = view.body
-        }
+            @Test("PrismLineChart with area")
+            @available(iOS 16.0, macOS 13.0, tvOS 16.0, watchOS 9.0, *)
+            @MainActor func lineChartArea() {
+                let data = [ChartItem(label: "A", value: 50)]
+                let view = PrismLineChart(data, x: \.label, y: \.value, showArea: true)
+                _ = view.body
+            }
 
-        @Test("PrismDonutChart creation")
-        @available(iOS 17.0, macOS 14.0, tvOS 17.0, watchOS 10.0, *)
-        @MainActor func donutChart() {
-            let data = [ChartItem(label: "Slice A", value: 60), ChartItem(label: "Slice B", value: 40)]
-            let view = PrismDonutChart(data, label: \.label, value: \.value)
-            _ = view.body
-        }
+            @Test("PrismDonutChart creation")
+            @available(iOS 17.0, macOS 14.0, tvOS 17.0, watchOS 10.0, *)
+            @MainActor func donutChart() {
+                let data = [ChartItem(label: "Slice A", value: 60), ChartItem(label: "Slice B", value: 40)]
+                let view = PrismDonutChart(data, label: \.label, value: \.value)
+                _ = view.body
+            }
 
-        @Test("PrismDonutChart custom colors")
-        @available(iOS 17.0, macOS 14.0, tvOS 17.0, watchOS 10.0, *)
-        @MainActor func donutChartColors() {
-            let data = [ChartItem(label: "A", value: 50)]
-            let view = PrismDonutChart(data, label: \.label, value: \.value, colors: [.brand, .success])
-            _ = view.body
+            @Test("PrismDonutChart custom colors")
+            @available(iOS 17.0, macOS 14.0, tvOS 17.0, watchOS 10.0, *)
+            @MainActor func donutChartColors() {
+                let data = [ChartItem(label: "A", value: 50)]
+                let view = PrismDonutChart(data, label: \.label, value: \.value, colors: [.brand, .success])
+                _ = view.body
+            }
         }
-    }
     #endif
 }

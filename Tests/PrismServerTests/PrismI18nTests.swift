@@ -1,5 +1,6 @@
-import Testing
 import Foundation
+import Testing
+
 @testable import PrismServer
 
 @Suite("PrismPluralRule Tests")
@@ -96,14 +97,14 @@ struct PrismTranslationStoreTests {
     func loadJSON() async throws {
         let store = PrismTranslationStore()
         let json = """
-        {
-            "nav": {
-                "home": "Home",
-                "settings": "Settings"
-            },
-            "title": "My App"
-        }
-        """.data(using: .utf8)!
+            {
+                "nav": {
+                    "home": "Home",
+                    "settings": "Settings"
+                },
+                "title": "My App"
+            }
+            """.data(using: .utf8)!
         try await store.loadJSON(locale: "en", data: json)
         #expect(await store.translate(key: "nav.home", locale: "en") == "Home")
         #expect(await store.translate(key: "nav.settings", locale: "en") == "Settings")

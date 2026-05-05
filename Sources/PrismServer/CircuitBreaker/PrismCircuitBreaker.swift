@@ -104,7 +104,9 @@ public actor PrismCircuitBreaker {
     }
 
     /// Registers a callback invoked whenever the circuit state changes.
-    public func onStateChange(_ callback: @escaping @Sendable (String, PrismCircuitState, PrismCircuitState) async -> Void) {
+    public func onStateChange(
+        _ callback: @escaping @Sendable (String, PrismCircuitState, PrismCircuitState) async -> Void
+    ) {
         self.onStateChange = callback
     }
 

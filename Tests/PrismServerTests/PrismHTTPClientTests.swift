@@ -1,5 +1,6 @@
-import Testing
 import Foundation
+import Testing
+
 @testable import PrismServer
 
 private struct TestItem: Codable, Sendable {
@@ -12,7 +13,8 @@ struct PrismClientRequestTests {
     @Test("Stores url, method, headers, body")
     func storesProperties() {
         let body = Data("test".utf8)
-        let req = PrismClientRequest(url: "https://api.test.com/users", method: "POST", headers: ["Auth": "Bearer x"], body: body)
+        let req = PrismClientRequest(
+            url: "https://api.test.com/users", method: "POST", headers: ["Auth": "Bearer x"], body: body)
         #expect(req.url == "https://api.test.com/users")
         #expect(req.method == "POST")
         #expect(req.headers["Auth"] == "Bearer x")
@@ -100,7 +102,7 @@ struct PrismHTTPClientTests {
     @Test("Init with default config")
     func initDefault() {
         let client = PrismHTTPClient()
-        _ = client // compiles and initializes
+        _ = client  // compiles and initializes
     }
 
     @Test("Init with custom config")

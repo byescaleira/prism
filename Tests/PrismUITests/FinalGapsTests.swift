@@ -1,9 +1,10 @@
-import Testing
 import SwiftUI
+import Testing
+
 @testable import PrismUI
 
 #if canImport(TipKit)
-import TipKit
+    import TipKit
 #endif
 
 @MainActor
@@ -232,7 +233,7 @@ struct FinalGapsTests {
             let view = List {
                 Text("Item")
             }
-            .prismRefreshable { }
+            .prismRefreshable {}
             _ = view
         }
     }
@@ -309,24 +310,24 @@ struct FinalGapsTests {
     // MARK: - Table (macOS only)
 
     #if os(macOS)
-    @Suite("Table")
-    struct TableTests {
+        @Suite("Table")
+        struct TableTests {
 
-        struct Person: Identifiable {
-            let id = UUID()
-            let name: String
-        }
-
-        @Test("PrismTable creation")
-        @MainActor func tableCreation() {
-            let data = [Person(name: "Alice"), Person(name: "Bob")]
-            let view = PrismTable(data) { people in
-                Table(people) {
-                    TableColumn("Name", value: \.name)
-                }
+            struct Person: Identifiable {
+                let id = UUID()
+                let name: String
             }
-            _ = view.body
+
+            @Test("PrismTable creation")
+            @MainActor func tableCreation() {
+                let data = [Person(name: "Alice"), Person(name: "Bob")]
+                let view = PrismTable(data) { people in
+                    Table(people) {
+                        TableColumn("Name", value: \.name)
+                    }
+                }
+                _ = view.body
+            }
         }
-    }
     #endif
 }

@@ -46,7 +46,8 @@ public struct PrismMCPHTTPTransport: PrismMiddleware, Sendable {
     }
 
     /// Handles the request and returns a response.
-    public func handle(_ request: PrismHTTPRequest, next: @escaping PrismRouteHandler) async throws -> PrismHTTPResponse {
+    public func handle(_ request: PrismHTTPRequest, next: @escaping PrismRouteHandler) async throws -> PrismHTTPResponse
+    {
         if request.path == basePath && request.method == .POST {
             return await handleJSONRPC(request)
         }
@@ -89,7 +90,7 @@ public struct PrismMCPHTTPTransport: PrismMiddleware, Sendable {
         let errorResp: [String: Any] = [
             "jsonrpc": "2.0",
             "error": ["code": -32700, "message": "Parse error"],
-            "id": NSNull()
+            "id": NSNull(),
         ]
         return (try? JSONSerialization.data(withJSONObject: errorResp)) ?? Data()
     }

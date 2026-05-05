@@ -142,7 +142,8 @@ extension PrismHTTPRequest {
     /// Parses the request body as multipart/form-data.
     public func multipartParts() throws -> [PrismMultipartPart] {
         guard let contentType = headers.value(for: PrismHTTPHeaders.contentType),
-              contentType.lowercased().contains("multipart/form-data") else {
+            contentType.lowercased().contains("multipart/form-data")
+        else {
             throw PrismContentError.unsupportedContentType(headers.value(for: PrismHTTPHeaders.contentType) ?? "none")
         }
 

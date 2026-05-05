@@ -1,5 +1,6 @@
-import Testing
 import Foundation
+import Testing
+
 @testable import PrismServer
 
 @Suite("PrismTestClient Tests")
@@ -41,7 +42,9 @@ struct PrismTestClientTests {
     @Test("Middleware applied in test client")
     func middleware() async throws {
         struct TagMiddleware: PrismMiddleware {
-            func handle(_ request: PrismHTTPRequest, next: @escaping PrismRouteHandler) async throws -> PrismHTTPResponse {
+            func handle(_ request: PrismHTTPRequest, next: @escaping PrismRouteHandler) async throws
+                -> PrismHTTPResponse
+            {
                 var response = try await next(request)
                 response.headers.set(name: "X-Tag", value: "test")
                 return response

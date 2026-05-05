@@ -1,6 +1,7 @@
-import Testing
-@testable import PrismCapabilities
 import Foundation
+import Testing
+
+@testable import PrismCapabilities
 
 // MARK: - Location Permission Tests
 

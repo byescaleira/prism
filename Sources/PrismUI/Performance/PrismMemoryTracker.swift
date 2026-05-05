@@ -49,29 +49,30 @@ public final class PrismMemoryTrackerV2 {
     /// Reads the current process memory via mach_task_basic_info.
     private static func readMemory() -> PrismMemorySnapshot {
         #if canImport(Darwin)
-        var info = mach_task_basic_info()
-        var count = mach_msg_type_number_t(
-            MemoryLayout<mach_task_basic_info>.size
-        ) / 4
-        let result = withUnsafeMutablePointer(to: &info) { infoPtr in
-            infoPtr.withMemoryRebound(
-                to: integer_t.self, capacity: Int(count)
-            ) { ptr in
-                task_info(
-                    mach_task_self_,
-                    task_flavor_t(MACH_TASK_BASIC_INFO),
-                    ptr,
-                    &count
+            var info = mach_task_basic_info()
+            var count =
+                mach_msg_type_number_t(
+                    MemoryLayout<mach_task_basic_info>.size
+                ) / 4
+            let result = withUnsafeMutablePointer(to: &info) { infoPtr in
+                infoPtr.withMemoryRebound(
+                    to: integer_t.self, capacity: Int(count)
+                ) { ptr in
+                    task_info(
+                        mach_task_self_,
+                        task_flavor_t(MACH_TASK_BASIC_INFO),
+                        ptr,
+                        &count
+                    )
+                }
+            }
+            if result == KERN_SUCCESS {
+                return PrismMemorySnapshot(
+                    timestamp: Date(),
+                    usedBytes: UInt64(info.resident_size),
+                    peakBytes: UInt64(info.resident_size_max)
                 )
             }
-        }
-        if result == KERN_SUCCESS {
-            return PrismMemorySnapshot(
-                timestamp: Date(),
-                usedBytes: UInt64(info.resident_size),
-                peakBytes: UInt64(info.resident_size_max)
-            )
-        }
         #endif
         return PrismMemorySnapshot(timestamp: Date(), usedBytes: 0, peakBytes: 0)
     }

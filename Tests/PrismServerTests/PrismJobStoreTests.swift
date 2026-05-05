@@ -1,5 +1,6 @@
-import Testing
 import Foundation
+import Testing
+
 @testable import PrismServer
 
 @Suite("PrismJobStore Protocol Tests")
@@ -97,7 +98,8 @@ struct PrismJobStoreProtocolTests {
     func fifoOrdering() async throws {
         let store = PrismMemoryJobStore()
         try await store.enqueue(PrismJobRecord(id: "first", jobType: "email", createdAt: Date.now))
-        try await store.enqueue(PrismJobRecord(id: "second", jobType: "email", createdAt: Date.now.addingTimeInterval(1)))
+        try await store.enqueue(
+            PrismJobRecord(id: "second", jobType: "email", createdAt: Date.now.addingTimeInterval(1)))
         let dequeued = try await store.dequeue(jobType: "email")
         #expect(dequeued?.id == "first")
     }

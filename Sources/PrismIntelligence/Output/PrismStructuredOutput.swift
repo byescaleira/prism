@@ -103,12 +103,16 @@ public struct PrismOutputValidator: Sendable {
         case .json:
             return parser.extractJSON(text) != nil
         case .list:
-            let lines = text.components(separatedBy: .newlines).filter { !$0.trimmingCharacters(in: .whitespaces).isEmpty }
+            let lines = text.components(separatedBy: .newlines).filter {
+                !$0.trimmingCharacters(in: .whitespaces).isEmpty
+            }
             return !lines.isEmpty
         case .keyValue:
             return !parser.extractKeyValues(text).isEmpty
         case .table:
-            let lines = text.components(separatedBy: .newlines).filter { !$0.trimmingCharacters(in: .whitespaces).isEmpty }
+            let lines = text.components(separatedBy: .newlines).filter {
+                !$0.trimmingCharacters(in: .whitespaces).isEmpty
+            }
             return lines.count >= 2
         }
     }

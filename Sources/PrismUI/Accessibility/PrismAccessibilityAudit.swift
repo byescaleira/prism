@@ -21,11 +21,11 @@ public struct PrismAccessibilityAudit: ViewModifier {
     /// Wraps content and logs accessibility audit warnings in DEBUG builds.
     public func body(content: Content) -> some View {
         #if DEBUG
-        content.onAppear {
-            Self.logger.debug("♿ Accessibility audit active: \(context.isEmpty ? "unnamed view" : context)")
-        }
+            content.onAppear {
+                Self.logger.debug("♿ Accessibility audit active: \(context.isEmpty ? "unnamed view" : context)")
+            }
         #else
-        content
+            content
         #endif
     }
 }

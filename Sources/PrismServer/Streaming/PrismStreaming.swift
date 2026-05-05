@@ -55,7 +55,9 @@ public enum PrismChunkedResponse {
 /// Extension for creating responses from AsyncStream.
 extension PrismHTTPResponse {
     /// Creates a response by collecting all chunks from an AsyncStream and encoding as chunked transfer.
-    public static func streaming(_ stream: AsyncStream<Data>, contentType: String = "application/octet-stream") async -> PrismHTTPResponse {
+    public static func streaming(_ stream: AsyncStream<Data>, contentType: String = "application/octet-stream") async
+        -> PrismHTTPResponse
+    {
         var body = Data()
         for await chunk in stream {
             let sizeHex = String(chunk.count, radix: 16)

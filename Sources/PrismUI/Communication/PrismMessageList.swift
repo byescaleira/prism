@@ -165,22 +165,24 @@ public struct PrismMessageList: View {
                 current.append(message)
             } else {
                 if let first = current.first {
-                    groups.append(PrismMessageGroup(
-                        sender: first.sender,
-                        isOutgoing: first.isOutgoing,
-                        messages: current
-                    ))
+                    groups.append(
+                        PrismMessageGroup(
+                            sender: first.sender,
+                            isOutgoing: first.isOutgoing,
+                            messages: current
+                        ))
                 }
                 current = [message]
             }
         }
 
         if let first = current.first {
-            groups.append(PrismMessageGroup(
-                sender: first.sender,
-                isOutgoing: first.isOutgoing,
-                messages: current
-            ))
+            groups.append(
+                PrismMessageGroup(
+                    sender: first.sender,
+                    isOutgoing: first.isOutgoing,
+                    messages: current
+                ))
         }
 
         return groups

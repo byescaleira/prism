@@ -1,5 +1,6 @@
-import Testing
 import Foundation
+import Testing
+
 @testable import PrismServer
 
 @Suite("PrismSwaggerUI Tests")
@@ -66,10 +67,11 @@ struct PrismSwaggerUITests {
 
     @Test("Request body schema generated")
     func requestBody() throws {
-        let schema = PrismOpenAPISchema.object([
-            ("name", .string("User name")),
-            ("email", .string("Email address"))
-        ], required: ["name", "email"])
+        let schema = PrismOpenAPISchema.object(
+            [
+                ("name", .string("User name")),
+                ("email", .string("Email address")),
+            ], required: ["name", "email"])
         let metadata = PrismRouteMetadata(requestBody: schema)
         let builder = PrismSwaggerBuilder(title: "API")
             .adding(method: "POST", path: "/users", metadata: metadata)
@@ -147,10 +149,11 @@ struct PrismSwaggerUITests {
 
     @Test("OpenAPI schema object")
     func schemaObject() {
-        let schema = PrismOpenAPISchema.object([
-            ("name", .string()),
-            ("age", .integer())
-        ], required: ["name"])
+        let schema = PrismOpenAPISchema.object(
+            [
+                ("name", .string()),
+                ("age", .integer()),
+            ], required: ["name"])
         let dict = schema.toDict()
         #expect(dict["type"] as? String == "object")
         let props = dict["properties"] as? [String: Any]

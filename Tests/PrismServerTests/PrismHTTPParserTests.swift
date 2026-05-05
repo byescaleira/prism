@@ -1,5 +1,6 @@
-import Testing
 import Foundation
+import Testing
+
 @testable import PrismServer
 
 @Suite("PrismHTTPParser Tests")
@@ -21,7 +22,8 @@ struct PrismHTTPParserTests {
     @Test("Parse POST with body")
     func parsePOST() throws {
         let body = "{\"name\":\"test\"}"
-        let raw = "POST /api/users HTTP/1.1\r\nContent-Type: application/json\r\nContent-Length: \(body.count)\r\n\r\n\(body)"
+        let raw =
+            "POST /api/users HTTP/1.1\r\nContent-Type: application/json\r\nContent-Length: \(body.count)\r\n\r\n\(body)"
         let (request, _) = try parser.parse(Data(raw.utf8))
         #expect(request.method == .POST)
         #expect(request.path == "/api/users")

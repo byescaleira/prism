@@ -1,6 +1,6 @@
-import SwiftUI
-import ImageIO
 import CoreGraphics
+import ImageIO
+import SwiftUI
 
 /// Memory-efficient image downsampling using CGImageSource.
 public enum PrismImageDownsampler: Sendable {
@@ -17,11 +17,13 @@ public enum PrismImageDownsampler: Sendable {
         scale: CGFloat
     ) -> CGImage? {
         let sourceOptions: [CFString: Any] = [
-            kCGImageSourceShouldCache: false,
+            kCGImageSourceShouldCache: false
         ]
-        guard let source = CGImageSourceCreateWithURL(
-            url as CFURL, sourceOptions as CFDictionary
-        ) else { return nil }
+        guard
+            let source = CGImageSourceCreateWithURL(
+                url as CFURL, sourceOptions as CFDictionary
+            )
+        else { return nil }
         return createThumbnail(from: source, pointSize: pointSize, scale: scale)
     }
 
@@ -37,11 +39,13 @@ public enum PrismImageDownsampler: Sendable {
         scale: CGFloat
     ) -> CGImage? {
         let sourceOptions: [CFString: Any] = [
-            kCGImageSourceShouldCache: false,
+            kCGImageSourceShouldCache: false
         ]
-        guard let source = CGImageSourceCreateWithData(
-            data as CFData, sourceOptions as CFDictionary
-        ) else { return nil }
+        guard
+            let source = CGImageSourceCreateWithData(
+                data as CFData, sourceOptions as CFDictionary
+            )
+        else { return nil }
         return createThumbnail(from: source, pointSize: pointSize, scale: scale)
     }
 

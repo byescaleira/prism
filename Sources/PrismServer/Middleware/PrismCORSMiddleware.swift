@@ -33,7 +33,8 @@ public struct PrismCORSMiddleware: PrismMiddleware {
     }
 
     /// Handles the request and returns a response.
-    public func handle(_ request: PrismHTTPRequest, next: @escaping PrismRouteHandler) async throws -> PrismHTTPResponse {
+    public func handle(_ request: PrismHTTPRequest, next: @escaping PrismRouteHandler) async throws -> PrismHTTPResponse
+    {
         if request.method == .OPTIONS {
             var response = PrismHTTPResponse(status: .noContent)
             addCORSHeaders(to: &response, request: request)
@@ -47,10 +48,13 @@ public struct PrismCORSMiddleware: PrismMiddleware {
 
     private func addCORSHeaders(to response: inout PrismHTTPResponse, request: PrismHTTPRequest) {
         let origin = request.headers.value(for: "Origin") ?? "*"
-        let allowedOrigin = allowedOrigins.contains("*") ? "*" : (allowedOrigins.contains(origin) ? origin : allowedOrigins.first ?? "*")
+        let allowedOrigin =
+            allowedOrigins.contains("*")
+            ? "*" : (allowedOrigins.contains(origin) ? origin : allowedOrigins.first ?? "*")
 
         response.headers.set(name: "Access-Control-Allow-Origin", value: allowedOrigin)
-        response.headers.set(name: "Access-Control-Allow-Methods", value: allowedMethods.map(\.rawValue).joined(separator: ", "))
+        response.headers.set(
+            name: "Access-Control-Allow-Methods", value: allowedMethods.map(\.rawValue).joined(separator: ", "))
         response.headers.set(name: "Access-Control-Allow-Headers", value: allowedHeaders.joined(separator: ", "))
         response.headers.set(name: "Access-Control-Max-Age", value: "\(maxAge)")
 

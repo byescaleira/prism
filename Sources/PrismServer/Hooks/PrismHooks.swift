@@ -43,7 +43,9 @@ public actor PrismHookRegistry {
     }
 
     /// Runs all response hooks in order, threading the response through each.
-    public func runResponseHooks(_ request: PrismHTTPRequest, response: PrismHTTPResponse) async throws -> PrismHTTPResponse {
+    public func runResponseHooks(_ request: PrismHTTPRequest, response: PrismHTTPResponse) async throws
+        -> PrismHTTPResponse
+    {
         var resp = response
         for hook in responseHooks {
             resp = try await hook(request, resp)
@@ -81,7 +83,8 @@ public struct PrismHooksMiddleware: PrismMiddleware, Sendable {
     }
 
     /// Handles the request and returns a response.
-    public func handle(_ request: PrismHTTPRequest, next: @escaping PrismRouteHandler) async throws -> PrismHTTPResponse {
+    public func handle(_ request: PrismHTTPRequest, next: @escaping PrismRouteHandler) async throws -> PrismHTTPResponse
+    {
         do {
             let modifiedRequest = try await registry.runRequestHooks(request)
             let response = try await next(modifiedRequest)

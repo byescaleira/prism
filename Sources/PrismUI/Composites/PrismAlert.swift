@@ -80,12 +80,13 @@ extension View {
         message: LocalizedStringKey? = nil,
         actions: [PrismAlert.Action]
     ) -> some View {
-        modifier(PrismAlert(
-            isPresented: isPresented,
-            title: title,
-            message: message,
-            actions: actions
-        ))
+        modifier(
+            PrismAlert(
+                isPresented: isPresented,
+                title: title,
+                message: message,
+                actions: actions
+            ))
     }
 
     /// Presents a simple confirmation alert with confirm + cancel.
@@ -97,14 +98,15 @@ extension View {
         confirmRole: ButtonRole? = nil,
         onConfirm: @escaping @MainActor @Sendable () -> Void
     ) -> some View {
-        modifier(PrismAlert(
-            isPresented: isPresented,
-            title: title,
-            message: message,
-            actions: [
-                PrismAlert.Action(confirmTitle, role: confirmRole, handler: onConfirm),
-                .cancel(),
-            ]
-        ))
+        modifier(
+            PrismAlert(
+                isPresented: isPresented,
+                title: title,
+                message: message,
+                actions: [
+                    PrismAlert.Action(confirmTitle, role: confirmRole, handler: onConfirm),
+                    .cancel(),
+                ]
+            ))
     }
 }

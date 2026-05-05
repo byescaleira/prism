@@ -8,7 +8,8 @@ extension View {
         hint: LocalizedStringKey? = nil,
         traits: AccessibilityTraits = []
     ) -> some View {
-        let modified = self
+        let modified =
+            self
             .accessibilityLabel(label)
             .accessibilityAddTraits(traits)
 

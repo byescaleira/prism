@@ -47,45 +47,47 @@ public struct PrismDeviceActivityEvent: Sendable {
 // MARK: - Device Activity Client
 
 #if canImport(DeviceActivity) && os(iOS)
-import DeviceActivity
+    import DeviceActivity
 
-/// Client that wraps the DeviceActivity framework for Screen Time monitoring.
-public final class PrismDeviceActivityClient: Sendable {
-    private nonisolated(unsafe) let center = DeviceActivityCenter()
+    /// Client that wraps the DeviceActivity framework for Screen Time monitoring.
+    public final class PrismDeviceActivityClient: Sendable {
+        private nonisolated(unsafe) let center = DeviceActivityCenter()
 
-    /// Creates a new device activity client.
-    public init() {}
+        /// Creates a new device activity client.
+        public init() {}
 
-    /// Starts monitoring a named activity with the given schedule and events.
-    public func startMonitoring(name: String, schedule: PrismDeviceActivitySchedule, events: [PrismDeviceActivityEvent]) throws {
-        let activityName = DeviceActivityName(rawValue: name)
-        let startComponents = DateComponents(hour: schedule.startHour, minute: schedule.startMinute)
-        let endComponents = DateComponents(hour: schedule.endHour, minute: schedule.endMinute)
-        let activitySchedule = DeviceActivitySchedule(
-            intervalStart: startComponents,
-            intervalEnd: endComponents,
-            repeats: schedule.repeats
-        )
-        let activityEvents: [DeviceActivityEvent.Name: DeviceActivityEvent] = Dictionary(
-            uniqueKeysWithValues: events.map { event in
-                let eventName = DeviceActivityEvent.Name(rawValue: event.name)
-                let activityEvent = DeviceActivityEvent(
-                    threshold: DateComponents(second: Int(event.threshold))
-                )
-                return (eventName, activityEvent)
-            }
-        )
-        try center.startMonitoring(activityName, during: activitySchedule, events: activityEvents)
+        /// Starts monitoring a named activity with the given schedule and events.
+        public func startMonitoring(
+            name: String, schedule: PrismDeviceActivitySchedule, events: [PrismDeviceActivityEvent]
+        ) throws {
+            let activityName = DeviceActivityName(rawValue: name)
+            let startComponents = DateComponents(hour: schedule.startHour, minute: schedule.startMinute)
+            let endComponents = DateComponents(hour: schedule.endHour, minute: schedule.endMinute)
+            let activitySchedule = DeviceActivitySchedule(
+                intervalStart: startComponents,
+                intervalEnd: endComponents,
+                repeats: schedule.repeats
+            )
+            let activityEvents: [DeviceActivityEvent.Name: DeviceActivityEvent] = Dictionary(
+                uniqueKeysWithValues: events.map { event in
+                    let eventName = DeviceActivityEvent.Name(rawValue: event.name)
+                    let activityEvent = DeviceActivityEvent(
+                        threshold: DateComponents(second: Int(event.threshold))
+                    )
+                    return (eventName, activityEvent)
+                }
+            )
+            try center.startMonitoring(activityName, during: activitySchedule, events: activityEvents)
+        }
+
+        /// Stops monitoring the named activity.
+        public func stopMonitoring(name: String) {
+            center.stopMonitoring([DeviceActivityName(rawValue: name)])
+        }
+
+        /// Stops all active monitoring sessions.
+        public func stopAllMonitoring() {
+            center.stopMonitoring()
+        }
     }
-
-    /// Stops monitoring the named activity.
-    public func stopMonitoring(name: String) {
-        center.stopMonitoring([DeviceActivityName(rawValue: name)])
-    }
-
-    /// Stops all active monitoring sessions.
-    public func stopAllMonitoring() {
-        center.stopMonitoring()
-    }
-}
 #endif

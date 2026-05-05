@@ -22,7 +22,7 @@ public struct PrismMCPTool: Sendable {
         return [
             "name": name,
             "description": description,
-            "inputSchema": schema
+            "inputSchema": schema,
         ]
     }
 }
@@ -51,7 +51,7 @@ public struct PrismMCPResource: Sendable {
             "uri": uri,
             "name": name,
             "description": description,
-            "mimeType": mimeType
+            "mimeType": mimeType,
         ]
     }
 }
@@ -76,7 +76,7 @@ public struct PrismMCPPrompt: Sendable {
         [
             "name": name,
             "description": description,
-            "arguments": arguments.map { $0.toJSON() }
+            "arguments": arguments.map { $0.toJSON() },
         ]
     }
 }
@@ -101,7 +101,7 @@ public struct PrismMCPPromptArgument: Sendable {
         [
             "name": name,
             "description": description,
-            "required": required
+            "required": required,
         ]
     }
 }
@@ -184,7 +184,7 @@ public struct PrismMCPMessage: Sendable {
     func toJSON() -> [String: Any] {
         [
             "role": role.rawValue,
-            "content": content.toJSON()
+            "content": content.toJSON(),
         ]
     }
 }

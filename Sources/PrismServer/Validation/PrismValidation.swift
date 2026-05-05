@@ -184,7 +184,8 @@ extension PrismHTTPRequest {
         var validator = PrismValidator()
         configure(&validator)
         guard let body,
-              let dict = try? JSONSerialization.jsonObject(with: body) as? [String: Any] else {
+            let dict = try? JSONSerialization.jsonObject(with: body) as? [String: Any]
+        else {
             return PrismValidationResult(errors: ["_body": ["invalid JSON"]])
         }
         let stringDict = dict.mapValues { "\($0)" }

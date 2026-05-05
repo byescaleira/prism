@@ -1,6 +1,7 @@
-import Testing
-@testable import PrismCapabilities
 import Foundation
+import Testing
+
+@testable import PrismCapabilities
 
 // MARK: - Game Center Tests
 
@@ -73,8 +74,8 @@ struct PrismGameCenterTests {
     func leaderboardScopeDistinct() {
         let global = PrismLeaderboardScope.global
         let friends = PrismLeaderboardScope.friends
-        if case .global = global { } else { #expect(Bool(false), "Expected global") }
-        if case .friends = friends { } else { #expect(Bool(false), "Expected friends") }
+        if case .global = global {} else { #expect(Bool(false), "Expected global") }
+        if case .friends = friends {} else { #expect(Bool(false), "Expected friends") }
     }
 
     @Test("PrismLeaderboardTimeScope has 3 cases")

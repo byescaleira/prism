@@ -20,7 +20,8 @@ public struct PrismAPIVersion: Sendable, Comparable, Hashable, CustomStringConve
 
     /// Parses a version string like "v1", "v1.2", "1", "1.2".
     public static func parse(_ string: String) -> PrismAPIVersion? {
-        let trimmed = string.hasPrefix("v") || string.hasPrefix("V")
+        let trimmed =
+            string.hasPrefix("v") || string.hasPrefix("V")
             ? String(string.dropFirst())
             : string
         let parts = trimmed.split(separator: ".")
@@ -61,7 +62,8 @@ public struct PrismVersioningMiddleware: PrismMiddleware, Sendable {
     }
 
     /// Handles the request and returns a response.
-    public func handle(_ request: PrismHTTPRequest, next: @escaping PrismRouteHandler) async throws -> PrismHTTPResponse {
+    public func handle(_ request: PrismHTTPRequest, next: @escaping PrismRouteHandler) async throws -> PrismHTTPResponse
+    {
         var req = request
         let extracted: PrismAPIVersion?
 
@@ -81,10 +83,12 @@ public struct PrismVersioningMiddleware: PrismMiddleware, Sendable {
         let version = extracted ?? defaultVersion
 
         guard supportedVersions.contains(version) else {
-            let data = (try? JSONSerialization.data(withJSONObject: [
-                "error": "UNSUPPORTED_VERSION",
-                "message": "API version \(version) is not supported. Supported: \(supportedVersions.map(\.description).joined(separator: ", "))"
-            ])) ?? Data()
+            let data =
+                (try? JSONSerialization.data(withJSONObject: [
+                    "error": "UNSUPPORTED_VERSION",
+                    "message":
+                        "API version \(version) is not supported. Supported: \(supportedVersions.map(\.description).joined(separator: ", "))",
+                ])) ?? Data()
             var headers = PrismHTTPHeaders()
             headers.set(name: "Content-Type", value: "application/json; charset=utf-8")
             headers.set(name: "Content-Length", value: "\(data.count)")
@@ -98,7 +102,8 @@ public struct PrismVersioningMiddleware: PrismMiddleware, Sendable {
     private func extractFromURL(_ path: String) -> (PrismAPIVersion?, String) {
         let segments = path.split(separator: "/", omittingEmptySubsequences: true)
         guard let first = segments.first,
-              let version = PrismAPIVersion.parse(String(first)) else {
+            let version = PrismAPIVersion.parse(String(first))
+        else {
             return (nil, path)
         }
         let remaining = "/" + segments.dropFirst().joined(separator: "/")
@@ -115,7 +120,8 @@ extension PrismHTTPRequest {
 
 /// Routes requests to version-specific handlers.
 public struct PrismVersionedRouter: Sendable {
-    private var routes: [(version: PrismAPIVersion, method: PrismHTTPMethod, pattern: String, handler: PrismRouteHandler)]
+    private var routes:
+        [(version: PrismAPIVersion, method: PrismHTTPMethod, pattern: String, handler: PrismRouteHandler)]
 
     /// Creates a new `PrismVersionedRouter`.
     public init() {

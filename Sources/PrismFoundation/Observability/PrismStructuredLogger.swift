@@ -135,32 +135,50 @@ public actor PrismStructuredLogger {
     }
 
     /// Logs a trace-level message.
-    public func trace(_ message: String, category: String = "default", metadata: [String: String] = [:], file: String = #file, line: Int = #line) {
+    public func trace(
+        _ message: String, category: String = "default", metadata: [String: String] = [:], file: String = #file,
+        line: Int = #line
+    ) {
         log(.trace, message, category: category, metadata: metadata, file: file, line: line)
     }
 
     /// Logs a debug-level message.
-    public func debug(_ message: String, category: String = "default", metadata: [String: String] = [:], file: String = #file, line: Int = #line) {
+    public func debug(
+        _ message: String, category: String = "default", metadata: [String: String] = [:], file: String = #file,
+        line: Int = #line
+    ) {
         log(.debug, message, category: category, metadata: metadata, file: file, line: line)
     }
 
     /// Logs an info-level message.
-    public func info(_ message: String, category: String = "default", metadata: [String: String] = [:], file: String = #file, line: Int = #line) {
+    public func info(
+        _ message: String, category: String = "default", metadata: [String: String] = [:], file: String = #file,
+        line: Int = #line
+    ) {
         log(.info, message, category: category, metadata: metadata, file: file, line: line)
     }
 
     /// Logs a warning-level message.
-    public func warning(_ message: String, category: String = "default", metadata: [String: String] = [:], file: String = #file, line: Int = #line) {
+    public func warning(
+        _ message: String, category: String = "default", metadata: [String: String] = [:], file: String = #file,
+        line: Int = #line
+    ) {
         log(.warning, message, category: category, metadata: metadata, file: file, line: line)
     }
 
     /// Logs an error-level message.
-    public func error(_ message: String, category: String = "default", metadata: [String: String] = [:], file: String = #file, line: Int = #line) {
+    public func error(
+        _ message: String, category: String = "default", metadata: [String: String] = [:], file: String = #file,
+        line: Int = #line
+    ) {
         log(.error, message, category: category, metadata: metadata, file: file, line: line)
     }
 
     /// Logs a critical-level message.
-    public func critical(_ message: String, category: String = "default", metadata: [String: String] = [:], file: String = #file, line: Int = #line) {
+    public func critical(
+        _ message: String, category: String = "default", metadata: [String: String] = [:], file: String = #file,
+        line: Int = #line
+    ) {
         log(.critical, message, category: category, metadata: metadata, file: file, line: line)
     }
 }

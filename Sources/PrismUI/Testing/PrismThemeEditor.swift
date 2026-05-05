@@ -45,9 +45,9 @@ public struct PrismThemeEditor: View {
                 exportSection
             }
             #if os(iOS) || os(visionOS)
-            .listStyle(.insetGrouped)
+                .listStyle(.insetGrouped)
             #else
-            .listStyle(.sidebar)
+                .listStyle(.sidebar)
             #endif
             .navigationTitle("Theme Editor")
             .sheet(isPresented: $showExport) {
@@ -217,12 +217,12 @@ public struct PrismThemeEditor: View {
             }
             .navigationTitle("Theme Export")
             #if os(iOS) || os(visionOS)
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .primaryAction) {
-                    Button("Done") { showExport = false }
+                .navigationBarTitleDisplayMode(.inline)
+                .toolbar {
+                    ToolbarItem(placement: .primaryAction) {
+                        Button("Done") { showExport = false }
+                    }
                 }
-            }
             #endif
         }
     }

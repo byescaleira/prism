@@ -101,9 +101,10 @@ public struct PrismTimeline: View {
             VStack(alignment: .leading, spacing: SpacingToken.xxs.rawValue) {
                 Text(event.title)
                     .font(.subheadline.weight(.semibold))
-                    .foregroundStyle(theme.color(
-                        event.status == .upcoming ? .onBackgroundSecondary : .onBackground
-                    ))
+                    .foregroundStyle(
+                        theme.color(
+                            event.status == .upcoming ? .onBackgroundSecondary : .onBackground
+                        ))
                 if let description = event.description {
                     Text(description)
                         .font(.caption)

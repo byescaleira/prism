@@ -1,5 +1,6 @@
-import Testing
 import SwiftUI
+import Testing
+
 @testable import PrismUI
 
 @MainActor
@@ -137,7 +138,8 @@ struct ComponentVariantsV2Tests {
                 suggestions: items
             ) { item in
                 Text(item.name)
-            } onSelect: { _ in }
+            } onSelect: { _ in
+            }
             _ = view.body
         }
 
@@ -149,7 +151,8 @@ struct ComponentVariantsV2Tests {
                 suggestions: items
             ) { item in
                 Text(item.name)
-            } onSelect: { _ in }
+            } onSelect: { _ in
+            }
             _ = view.body
         }
 
@@ -162,7 +165,8 @@ struct ComponentVariantsV2Tests {
                 maxSuggestions: 3
             ) { item in
                 Text(item.name)
-            } onSelect: { _ in }
+            } onSelect: { _ in
+            }
             _ = view.body
         }
     }

@@ -136,11 +136,13 @@ public enum PrismPreviews {
                     .frame(height: 100)
 
                 sectionHeader("Empty")
-                PrismLoadingState(.empty(
-                    title: "No Items",
-                    message: "Add your first item to get started.",
-                    icon: "tray"
-                ))
+                PrismLoadingState(
+                    .empty(
+                        title: "No Items",
+                        message: "Add your first item to get started.",
+                        icon: "tray"
+                    )
+                )
                 .frame(height: 200)
 
                 sectionHeader("Error")

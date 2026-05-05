@@ -53,7 +53,8 @@ public struct PrismProxyMiddleware: PrismMiddleware {
     }
 
     /// Handles the request and returns a response.
-    public func handle(_ request: PrismHTTPRequest, next: @escaping PrismRouteHandler) async throws -> PrismHTTPResponse {
+    public func handle(_ request: PrismHTTPRequest, next: @escaping PrismRouteHandler) async throws -> PrismHTTPResponse
+    {
         guard request.path.hasPrefix(pathPrefix) else {
             return try await next(request)
         }
@@ -128,7 +129,9 @@ public struct PrismProxyMiddleware: PrismMiddleware {
             }
             headers.set(name: PrismHTTPHeaders.contentLength, value: "\(data.count)")
 
-            let status = PrismHTTPStatus(code: httpResponse.statusCode, reason: HTTPURLResponse.localizedString(forStatusCode: httpResponse.statusCode))
+            let status = PrismHTTPStatus(
+                code: httpResponse.statusCode,
+                reason: HTTPURLResponse.localizedString(forStatusCode: httpResponse.statusCode))
 
             return PrismHTTPResponse(status: status, headers: headers, body: .data(data))
         } catch {

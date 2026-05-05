@@ -1,5 +1,6 @@
-import Testing
 import SwiftUI
+import Testing
+
 @testable import PrismUI
 
 @MainActor
@@ -210,29 +211,29 @@ struct QualityDXPlatformTests {
     // MARK: - C11: macOS Menu Bar
 
     #if os(macOS)
-    @Suite("Menu Bar")
-    struct MenuBarTests {
+        @Suite("Menu Bar")
+        struct MenuBarTests {
 
-        @Test("PrismMenuBarContent renders")
-        @MainActor func menuBarContent() {
-            let view = PrismMenuBarContent {
-                Button("Quit") {}
+            @Test("PrismMenuBarContent renders")
+            @MainActor func menuBarContent() {
+                let view = PrismMenuBarContent {
+                    Button("Quit") {}
+                }
+                _ = view.body
             }
-            _ = view.body
-        }
 
-        @Test("PrismMenuBarButton renders")
-        @MainActor func menuBarButton() {
-            let view = PrismMenuBarButton("Settings", systemImage: "gear") {}
-            _ = view.body
-        }
+            @Test("PrismMenuBarButton renders")
+            @MainActor func menuBarButton() {
+                let view = PrismMenuBarButton("Settings", systemImage: "gear") {}
+                _ = view.body
+            }
 
-        @Test("PrismMenuBarButton without icon")
-        @MainActor func menuBarButtonNoIcon() {
-            let view = PrismMenuBarButton("Quit") {}
-            _ = view.body
+            @Test("PrismMenuBarButton without icon")
+            @MainActor func menuBarButtonNoIcon() {
+                let view = PrismMenuBarButton("Quit") {}
+                _ = view.body
+            }
         }
-    }
     #endif
 
     // MARK: - D12: Navigation Path

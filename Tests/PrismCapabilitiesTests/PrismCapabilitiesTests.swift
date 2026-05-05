@@ -1,6 +1,7 @@
-import Testing
-@testable import PrismCapabilities
 import Foundation
+import Testing
+
+@testable import PrismCapabilities
 
 // MARK: - StoreKit Tests
 
@@ -479,9 +480,9 @@ struct PrismPushNotificationsTests {
         let named = PrismNotificationSound.named("chime")
         let critical = PrismNotificationSound.critical
 
-        if case .default_ = default_ { } else { #expect(Bool(false)) }
+        if case .default_ = default_ {} else { #expect(Bool(false)) }
         if case .named(let name) = named { #expect(name == "chime") } else { #expect(Bool(false)) }
-        if case .critical = critical { } else { #expect(Bool(false)) }
+        if case .critical = critical {} else { #expect(Bool(false)) }
     }
 
     @Test("PrismNotificationTrigger cases")
@@ -491,14 +492,16 @@ struct PrismPushNotificationsTests {
         let calendar = PrismNotificationTrigger.calendar(DateComponents(hour: 9))
         let location = PrismNotificationTrigger.location(latitude: 37.0, longitude: -122.0, radius: 100)
 
-        if case .immediate = immediate { } else { #expect(Bool(false)) }
+        if case .immediate = immediate {} else { #expect(Bool(false)) }
         if case .timeInterval(let t) = interval { #expect(t == 60) } else { #expect(Bool(false)) }
         if case .calendar(let c) = calendar { #expect(c.hour == 9) } else { #expect(Bool(false)) }
         if case .location(let lat, let lon, let r) = location {
             #expect(lat == 37.0)
             #expect(lon == -122.0)
             #expect(r == 100)
-        } else { #expect(Bool(false)) }
+        } else {
+            #expect(Bool(false))
+        }
     }
 }
 
@@ -566,7 +569,7 @@ struct PrismCloudKitTests {
         if case .int(let i) = intVal { #expect(i == 42) } else { #expect(Bool(false)) }
         if case .double(let d) = doubleVal { #expect(d == 3.14) } else { #expect(Bool(false)) }
         if case .data(let d) = dataVal { #expect(d == Data([0x01])) } else { #expect(Bool(false)) }
-        if case .date = dateVal { } else { #expect(Bool(false)) }
+        if case .date = dateVal {} else { #expect(Bool(false)) }
         if case .reference(let r) = refVal { #expect(r == "ref-1") } else { #expect(Bool(false)) }
         if case .stringArray(let a) = arrVal { #expect(a == ["a", "b"]) } else { #expect(Bool(false)) }
     }
@@ -675,9 +678,9 @@ struct PrismWidgetKitTests {
         let afterMinutes = PrismWidgetReloadPolicy.afterMinutes(30)
         let never = PrismWidgetReloadPolicy.never
 
-        if case .atEnd = atEnd { } else { #expect(Bool(false)) }
+        if case .atEnd = atEnd {} else { #expect(Bool(false)) }
         if case .afterMinutes(let m) = afterMinutes { #expect(m == 30) } else { #expect(Bool(false)) }
-        if case .never = never { } else { #expect(Bool(false)) }
+        if case .never = never {} else { #expect(Bool(false)) }
     }
 
     @Test("PrismWidgetEntry stores properties correctly")

@@ -174,7 +174,7 @@ struct PrismMultipartFormDataV3Tests {
         // Each part starts with --boundary
         let partHeaders = bodyString.components(separatedBy: "--\(boundary)\r\n")
         // Expecting 3 parts plus the closing delimiter segment
-        #expect(partHeaders.count >= 4) // empty prefix + 3 parts
+        #expect(partHeaders.count >= 4)  // empty prefix + 3 parts
 
         #expect(bodyString.contains("name=\"field1\""))
         #expect(bodyString.contains("name=\"field2\""))
@@ -402,17 +402,19 @@ struct PrismRequestDeduplicatorV3Tests {
         let deduplicator = PrismRequestDeduplicator()
         let callCount = ManagedAtomic(0)
 
-        async let result1: Int = deduplicator.deduplicate({
-            callCount.increment()
-            try await Task.sleep(for: .milliseconds(50))
-            return 42
-        }, key: "same-key")
+        async let result1: Int = deduplicator.deduplicate(
+            {
+                callCount.increment()
+                try await Task.sleep(for: .milliseconds(50))
+                return 42
+            }, key: "same-key")
 
-        async let result2: Int = deduplicator.deduplicate({
-            callCount.increment()
-            try await Task.sleep(for: .milliseconds(50))
-            return 42
-        }, key: "same-key")
+        async let result2: Int = deduplicator.deduplicate(
+            {
+                callCount.increment()
+                try await Task.sleep(for: .milliseconds(50))
+                return 42
+            }, key: "same-key")
 
         let (r1, r2) = try await (result1, result2)
         #expect(r1 == 42)

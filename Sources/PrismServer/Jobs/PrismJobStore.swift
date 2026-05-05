@@ -73,10 +73,12 @@ public actor PrismMemoryJobStore: PrismJobStore {
 
     /// Returns the next pending job of the specified type, marking it as running.
     public func dequeue(jobType: String) async throws -> PrismJobRecord? {
-        guard let record = records.values
-            .filter({ $0.jobType == jobType && $0.status == .pending })
-            .sorted(by: { $0.createdAt < $1.createdAt })
-            .first else { return nil }
+        guard
+            let record = records.values
+                .filter({ $0.jobType == jobType && $0.status == .pending })
+                .sorted(by: { $0.createdAt < $1.createdAt })
+                .first
+        else { return nil }
 
         records[record.id] = PrismJobRecord(
             id: record.id,

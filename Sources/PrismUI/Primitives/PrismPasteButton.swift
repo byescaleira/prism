@@ -1,6 +1,7 @@
 import SwiftUI
+
 #if canImport(UniformTypeIdentifiers)
-import UniformTypeIdentifiers
+    import UniformTypeIdentifiers
 #endif
 
 /// Themed paste button.
@@ -28,19 +29,19 @@ public struct PrismPasteButton: View {
     /// The content and behavior of the paste button.
     public var body: some View {
         #if os(macOS) || os(iOS)
-        PasteButton(payloadType: String.self) { strings in
-            action(strings)
-        }
-        .tint(theme.color(.interactive))
-        .accessibilityLabel(title)
-        .accessibilityAddTraits(.isButton)
+            PasteButton(payloadType: String.self) { strings in
+                action(strings)
+            }
+            .tint(theme.color(.interactive))
+            .accessibilityLabel(title)
+            .accessibilityAddTraits(.isButton)
         #else
-        Button(title) {
-            action([])
-        }
-        .foregroundStyle(theme.color(.interactive))
-        .accessibilityLabel(title)
-        .accessibilityAddTraits(.isButton)
+            Button(title) {
+                action([])
+            }
+            .foregroundStyle(theme.color(.interactive))
+            .accessibilityLabel(title)
+            .accessibilityAddTraits(.isButton)
         #endif
     }
 }

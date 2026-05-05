@@ -23,7 +23,9 @@ extension PrismStrings {
 
 extension String {
     static var prismContinue: String { String(localized: "prism.continue", defaultValue: "Continue", bundle: .module) }
-    static var prismGetStarted: String { String(localized: "prism.getStarted", defaultValue: "Get Started", bundle: .module) }
+    static var prismGetStarted: String {
+        String(localized: "prism.getStarted", defaultValue: "Get Started", bundle: .module)
+    }
     static var prismPaste: String { String(localized: "prism.paste", defaultValue: "Paste", bundle: .module) }
     static var prismSave: String { String(localized: "prism.save", defaultValue: "Save", bundle: .module) }
     static var prismDone: String { String(localized: "prism.done", defaultValue: "Done", bundle: .module) }
@@ -35,9 +37,15 @@ extension String {
     static var prismPrevious: String { String(localized: "prism.previous", defaultValue: "Previous", bundle: .module) }
     static var prismShare: String { String(localized: "prism.share", defaultValue: "Share", bundle: .module) }
     static var prismSettings: String { String(localized: "prism.settings", defaultValue: "Settings", bundle: .module) }
-    static var prismSelectPhoto: String { String(localized: "prism.selectPhoto", defaultValue: "Select Photo", bundle: .module) }
+    static var prismSelectPhoto: String {
+        String(localized: "prism.selectPhoto", defaultValue: "Select Photo", bundle: .module)
+    }
     static var prismUntitled: String { String(localized: "prism.untitled", defaultValue: "Untitled", bundle: .module) }
-    static var prismNoResults: String { String(localized: "prism.noResults", defaultValue: "No Results", bundle: .module) }
+    static var prismNoResults: String {
+        String(localized: "prism.noResults", defaultValue: "No Results", bundle: .module)
+    }
     static var prismTryAgain: String { String(localized: "prism.tryAgain", defaultValue: "Try Again", bundle: .module) }
-    static var prismErrorOccurred: String { String(localized: "prism.errorOccurred", defaultValue: "An error occurred", bundle: .module) }
+    static var prismErrorOccurred: String {
+        String(localized: "prism.errorOccurred", defaultValue: "An error occurred", bundle: .module)
+    }
 }

@@ -18,7 +18,8 @@ public struct PrismGraphQLMiddleware: PrismMiddleware, Sendable {
     }
 
     /// Routes GraphQL requests to the executor and returns JSON results.
-    public func handle(_ request: PrismHTTPRequest, next: @escaping PrismRouteHandler) async throws -> PrismHTTPResponse {
+    public func handle(_ request: PrismHTTPRequest, next: @escaping PrismRouteHandler) async throws -> PrismHTTPResponse
+    {
         guard request.path == path else {
             return try await next(request)
         }
@@ -35,8 +36,9 @@ public struct PrismGraphQLMiddleware: PrismMiddleware, Sendable {
 
     private func handlePost(_ request: PrismHTTPRequest) async -> PrismHTTPResponse {
         guard let body = request.body,
-              let json = try? JSONSerialization.jsonObject(with: body) as? [String: Any],
-              let query = json["query"] as? String else {
+            let json = try? JSONSerialization.jsonObject(with: body) as? [String: Any],
+            let query = json["query"] as? String
+        else {
             return errorResponse("Missing or invalid query in request body")
         }
 
@@ -53,8 +55,9 @@ public struct PrismGraphQLMiddleware: PrismMiddleware, Sendable {
 
         var variables: [String: Any] = [:]
         if let varsString = request.queryParameters["variables"],
-           let varsData = varsString.data(using: .utf8),
-           let parsed = try? JSONSerialization.jsonObject(with: varsData) as? [String: Any] {
+            let varsData = varsString.data(using: .utf8),
+            let parsed = try? JSONSerialization.jsonObject(with: varsData) as? [String: Any]
+        {
             variables = parsed
         }
 
@@ -62,14 +65,18 @@ public struct PrismGraphQLMiddleware: PrismMiddleware, Sendable {
         return await executeQuery(query, variables: variables, operationName: operationName)
     }
 
-    private func executeQuery(_ query: String, variables: [String: Any], operationName: String?) async -> PrismHTTPResponse {
+    private func executeQuery(_ query: String, variables: [String: Any], operationName: String?) async
+        -> PrismHTTPResponse
+    {
         let document: PrismGraphQLDocument
         do {
             document = try parser.parse(query)
         } catch {
-            let result = PrismGraphQLResult(data: nil, errors: [
-                PrismGraphQLError(message: "Parse error: \(error.localizedDescription)")
-            ])
+            let result = PrismGraphQLResult(
+                data: nil,
+                errors: [
+                    PrismGraphQLError(message: "Parse error: \(error.localizedDescription)")
+                ])
             return jsonResponse(result.toJSON())
         }
 
@@ -109,79 +116,80 @@ public struct PrismGraphQLPlayground: PrismMiddleware, Sendable {
     }
 
     /// Serves the GraphiQL playground HTML page for GET requests at the configured path.
-    public func handle(_ request: PrismHTTPRequest, next: @escaping PrismRouteHandler) async throws -> PrismHTTPResponse {
+    public func handle(_ request: PrismHTTPRequest, next: @escaping PrismRouteHandler) async throws -> PrismHTTPResponse
+    {
         guard request.path == path && request.method == .GET else {
             return try await next(request)
         }
 
         let html = """
-        <!DOCTYPE html>
-        <html>
-        <head>
-            <title>PrismServer GraphQL Playground</title>
-            <style>
-                * { margin: 0; padding: 0; box-sizing: border-box; }
-                body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #0d1117; color: #c9d1d9; }
-                .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
-                h1 { font-size: 1.5rem; margin-bottom: 20px; color: #58a6ff; }
-                .editor { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; height: calc(100vh - 140px); }
-                textarea { width: 100%; height: 100%; background: #161b22; color: #c9d1d9; border: 1px solid #30363d;
-                    border-radius: 8px; padding: 16px; font-family: 'SF Mono', 'Fira Code', monospace; font-size: 14px;
-                    resize: none; outline: none; }
-                textarea:focus { border-color: #58a6ff; }
-                #result { background: #161b22; color: #7ee787; }
-                .toolbar { display: flex; gap: 12px; margin-bottom: 16px; align-items: center; }
-                button { background: #238636; color: #fff; border: none; padding: 8px 20px; border-radius: 6px;
-                    font-size: 14px; cursor: pointer; font-weight: 600; }
-                button:hover { background: #2ea043; }
-                input { background: #161b22; color: #c9d1d9; border: 1px solid #30363d; border-radius: 6px;
-                    padding: 8px 12px; font-size: 14px; flex: 1; max-width: 400px; }
-                .label { font-size: 12px; color: #8b949e; margin-bottom: 4px; }
-            </style>
-        </head>
-        <body>
-            <div class="container">
-                <h1>Prism GraphQL Playground</h1>
-                <div class="toolbar">
-                    <button onclick="executeQuery()">Execute</button>
-                    <input id="variables" placeholder='Variables (JSON): {"key": "value"}' />
-                </div>
-                <div class="editor">
-                    <div>
-                        <div class="label">Query</div>
-                        <textarea id="query" placeholder="{ hello }">{ __schema { queryType { name } types { name fields { name type { name } } } } }</textarea>
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <title>PrismServer GraphQL Playground</title>
+                <style>
+                    * { margin: 0; padding: 0; box-sizing: border-box; }
+                    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #0d1117; color: #c9d1d9; }
+                    .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+                    h1 { font-size: 1.5rem; margin-bottom: 20px; color: #58a6ff; }
+                    .editor { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; height: calc(100vh - 140px); }
+                    textarea { width: 100%; height: 100%; background: #161b22; color: #c9d1d9; border: 1px solid #30363d;
+                        border-radius: 8px; padding: 16px; font-family: 'SF Mono', 'Fira Code', monospace; font-size: 14px;
+                        resize: none; outline: none; }
+                    textarea:focus { border-color: #58a6ff; }
+                    #result { background: #161b22; color: #7ee787; }
+                    .toolbar { display: flex; gap: 12px; margin-bottom: 16px; align-items: center; }
+                    button { background: #238636; color: #fff; border: none; padding: 8px 20px; border-radius: 6px;
+                        font-size: 14px; cursor: pointer; font-weight: 600; }
+                    button:hover { background: #2ea043; }
+                    input { background: #161b22; color: #c9d1d9; border: 1px solid #30363d; border-radius: 6px;
+                        padding: 8px 12px; font-size: 14px; flex: 1; max-width: 400px; }
+                    .label { font-size: 12px; color: #8b949e; margin-bottom: 4px; }
+                </style>
+            </head>
+            <body>
+                <div class="container">
+                    <h1>Prism GraphQL Playground</h1>
+                    <div class="toolbar">
+                        <button onclick="executeQuery()">Execute</button>
+                        <input id="variables" placeholder='Variables (JSON): {"key": "value"}' />
                     </div>
-                    <div>
-                        <div class="label">Result</div>
-                        <textarea id="result" readonly></textarea>
+                    <div class="editor">
+                        <div>
+                            <div class="label">Query</div>
+                            <textarea id="query" placeholder="{ hello }">{ __schema { queryType { name } types { name fields { name type { name } } } } }</textarea>
+                        </div>
+                        <div>
+                            <div class="label">Result</div>
+                            <textarea id="result" readonly></textarea>
+                        </div>
                     </div>
                 </div>
-            </div>
-            <script>
-                async function executeQuery() {
-                    const query = document.getElementById('query').value;
-                    const varsText = document.getElementById('variables').value;
-                    let variables = {};
-                    try { if (varsText) variables = JSON.parse(varsText); } catch(e) {}
-                    try {
-                        const res = await fetch('\(graphqlEndpoint)', {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ query, variables })
-                        });
-                        const json = await res.json();
-                        document.getElementById('result').value = JSON.stringify(json, null, 2);
-                    } catch(e) {
-                        document.getElementById('result').value = 'Error: ' + e.message;
+                <script>
+                    async function executeQuery() {
+                        const query = document.getElementById('query').value;
+                        const varsText = document.getElementById('variables').value;
+                        let variables = {};
+                        try { if (varsText) variables = JSON.parse(varsText); } catch(e) {}
+                        try {
+                            const res = await fetch('\(graphqlEndpoint)', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({ query, variables })
+                            });
+                            const json = await res.json();
+                            document.getElementById('result').value = JSON.stringify(json, null, 2);
+                        } catch(e) {
+                            document.getElementById('result').value = 'Error: ' + e.message;
+                        }
                     }
-                }
-                document.getElementById('query').addEventListener('keydown', e => {
-                    if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') executeQuery();
-                });
-            </script>
-        </body>
-        </html>
-        """
+                    document.getElementById('query').addEventListener('keydown', e => {
+                        if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') executeQuery();
+                    });
+                </script>
+            </body>
+            </html>
+            """
 
         let data = Data(html.utf8)
         var headers = PrismHTTPHeaders()

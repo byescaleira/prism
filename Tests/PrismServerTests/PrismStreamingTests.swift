@@ -1,5 +1,6 @@
-import Testing
 import Foundation
+import Testing
+
 @testable import PrismServer
 
 @Suite("PrismStreamWriter Tests")
@@ -79,4 +80,3 @@ struct PrismBodyChunksTests {
         #expect(chunks.isEmpty)
     }
 }
-

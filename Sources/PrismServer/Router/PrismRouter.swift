@@ -46,7 +46,9 @@ public final class PrismRouter: Sendable {
             if path.hasPrefix(group.prefix) || path == group.prefix {
                 let subPath = String(path.dropFirst(group.prefix.count))
                 let normalizedSubPath = subPath.isEmpty ? "/" : subPath
-                if let result = findRoute(method: method, path: normalizedSubPath, in: group.routes, groups: group.subgroups) {
+                if let result = findRoute(
+                    method: method, path: normalizedSubPath, in: group.routes, groups: group.subgroups)
+                {
                     return result
                 }
             }
@@ -61,20 +63,24 @@ public final class PrismRouter: Sendable {
         for group in groups {
             if path.hasPrefix(group.prefix) {
                 result.append(contentsOf: group.middlewares)
-                result.append(contentsOf: collectGroupMiddleware(path: path, groups: group.subgroups, prefix: group.prefix))
+                result.append(
+                    contentsOf: collectGroupMiddleware(path: path, groups: group.subgroups, prefix: group.prefix))
             }
         }
 
         return result
     }
 
-    private func collectGroupMiddleware(path: String, groups: [PrismRouteGroup], prefix: String) -> [any PrismMiddleware] {
+    private func collectGroupMiddleware(path: String, groups: [PrismRouteGroup], prefix: String)
+        -> [any PrismMiddleware]
+    {
         var result: [any PrismMiddleware] = []
         for group in groups {
             let fullPrefix = prefix + group.prefix
             if path.hasPrefix(fullPrefix) {
                 result.append(contentsOf: group.middlewares)
-                result.append(contentsOf: collectGroupMiddleware(path: path, groups: group.subgroups, prefix: fullPrefix))
+                result.append(
+                    contentsOf: collectGroupMiddleware(path: path, groups: group.subgroups, prefix: fullPrefix))
             }
         }
         return result

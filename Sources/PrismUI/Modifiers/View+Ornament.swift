@@ -10,26 +10,26 @@ private struct PrismOrnamentModifier<OrnamentContent: View>: ViewModifier {
 
     func body(content: Content) -> some View {
         #if os(visionOS)
-        content.ornament(attachmentAnchor: .scene(ornamentAnchor)) {
-            ornamentContent
-        }
+            content.ornament(attachmentAnchor: .scene(ornamentAnchor)) {
+                ornamentContent
+            }
         #else
-        content.overlay(alignment: overlayAlignment) {
-            ornamentContent
-                .padding(SpacingToken.sm.rawValue)
-        }
+            content.overlay(alignment: overlayAlignment) {
+                ornamentContent
+                    .padding(SpacingToken.sm.rawValue)
+            }
         #endif
     }
 
     #if os(visionOS)
-    private var ornamentAnchor: UnitPoint {
-        switch edge {
-        case .top: .top
-        case .bottom: .bottom
-        case .leading: .leading
-        case .trailing: .trailing
+        private var ornamentAnchor: UnitPoint {
+            switch edge {
+            case .top: .top
+            case .bottom: .bottom
+            case .leading: .leading
+            case .trailing: .trailing
+            }
         }
-    }
     #endif
 
     private var overlayAlignment: Alignment {

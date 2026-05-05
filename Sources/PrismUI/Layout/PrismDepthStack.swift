@@ -33,9 +33,9 @@ private struct PrismDepthModifier: ViewModifier {
 
     func body(content: Content) -> some View {
         #if os(visionOS)
-        content.offset(z: depth)
+            content.offset(z: depth)
         #else
-        content
+            content
         #endif
     }
 }

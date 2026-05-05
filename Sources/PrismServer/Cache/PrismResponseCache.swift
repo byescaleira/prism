@@ -26,7 +26,8 @@ public struct PrismResponseCacheMiddleware: PrismMiddleware {
     }
 
     /// Serves cached responses for matching requests or caches new ones.
-    public func handle(_ request: PrismHTTPRequest, next: @escaping PrismRouteHandler) async throws -> PrismHTTPResponse {
+    public func handle(_ request: PrismHTTPRequest, next: @escaping PrismRouteHandler) async throws -> PrismHTTPResponse
+    {
         guard cachePredicate(request) else {
             return try await next(request)
         }
@@ -35,7 +36,8 @@ public struct PrismResponseCacheMiddleware: PrismMiddleware {
 
         if let cached = await cache.get(cacheKey) {
             if let ifNoneMatch = request.headers.value(for: PrismHTTPHeaders.ifNoneMatch),
-               ifNoneMatch == cached.etag {
+                ifNoneMatch == cached.etag
+            {
                 return PrismHTTPResponse(status: .notModified)
             }
 

@@ -21,7 +21,8 @@ public struct PrismStaticFileMiddleware: PrismMiddleware {
     }
 
     /// Handles the request and returns a response.
-    public func handle(_ request: PrismHTTPRequest, next: @escaping PrismRouteHandler) async throws -> PrismHTTPResponse {
+    public func handle(_ request: PrismHTTPRequest, next: @escaping PrismRouteHandler) async throws -> PrismHTTPResponse
+    {
         guard request.method == .GET || request.method == .HEAD else {
             return try await next(request)
         }
@@ -63,7 +64,8 @@ public struct PrismStaticFileMiddleware: PrismMiddleware {
             headers.set(name: PrismHTTPHeaders.eTag, value: etag)
 
             if let ifNoneMatch = request.headers.value(for: PrismHTTPHeaders.ifNoneMatch),
-               ifNoneMatch == etag {
+                ifNoneMatch == etag
+            {
                 return PrismHTTPResponse(status: .notModified, headers: headers)
             }
         }

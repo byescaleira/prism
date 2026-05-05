@@ -40,20 +40,30 @@ extension String {
     static var prismFlag: String { String(localized: "prism.flag", defaultValue: "Flag", bundle: .module) }
     static var prismRemove: String { String(localized: "prism.remove", defaultValue: "Remove", bundle: .module) }
     static var prismLoading: String { String(localized: "prism.loading", defaultValue: "Loading", bundle: .module) }
-    static var prismInProgress: String { String(localized: "prism.inProgress", defaultValue: "In progress", bundle: .module) }
+    static var prismInProgress: String {
+        String(localized: "prism.inProgress", defaultValue: "In progress", bundle: .module)
+    }
     static var prismRunning: String { String(localized: "prism.running", defaultValue: "Running", bundle: .module) }
     static var prismComplete: String { String(localized: "prism.complete", defaultValue: "Complete", bundle: .module) }
     static var prismPaused: String { String(localized: "prism.paused", defaultValue: "Paused", bundle: .module) }
     static var prismAvatar: String { String(localized: "prism.avatar", defaultValue: "Avatar", bundle: .module) }
     static var prismOnline: String { String(localized: "prism.status.online", defaultValue: "Online", bundle: .module) }
-    static var prismOffline: String { String(localized: "prism.status.offline", defaultValue: "Offline", bundle: .module) }
+    static var prismOffline: String {
+        String(localized: "prism.status.offline", defaultValue: "Offline", bundle: .module)
+    }
     static var prismBusy: String { String(localized: "prism.status.busy", defaultValue: "Busy", bundle: .module) }
     static var prismAway: String { String(localized: "prism.status.away", defaultValue: "Away", bundle: .module) }
-    static var prismCustomColor: String { String(localized: "prism.customColor", defaultValue: "Custom color", bundle: .module) }
-    static var prismColorSwatch: String { String(localized: "prism.colorSwatch", defaultValue: "Color swatch", bundle: .module) }
+    static var prismCustomColor: String {
+        String(localized: "prism.customColor", defaultValue: "Custom color", bundle: .module)
+    }
+    static var prismColorSwatch: String {
+        String(localized: "prism.colorSwatch", defaultValue: "Color swatch", bundle: .module)
+    }
     static var prismProgress: String { String(localized: "prism.progress", defaultValue: "Progress", bundle: .module) }
     static var prismPinEntry: String { String(localized: "prism.pinEntry", defaultValue: "PIN entry", bundle: .module) }
     static var prismRating: String { String(localized: "prism.rating", defaultValue: "Rating", bundle: .module) }
-    static var prismCountdownTimer: String { String(localized: "prism.countdownTimer", defaultValue: "Countdown timer", bundle: .module) }
+    static var prismCountdownTimer: String {
+        String(localized: "prism.countdownTimer", defaultValue: "Countdown timer", bundle: .module)
+    }
     static var prismEmpty: String { String(localized: "prism.empty", defaultValue: "Empty", bundle: .module) }
 }

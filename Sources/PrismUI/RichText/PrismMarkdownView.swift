@@ -104,8 +104,7 @@ public struct PrismMarkdownView: View {
                 let language = String(trimmed.dropFirst(3)).trimmingCharacters(in: .whitespaces)
                 var codeLines: [String] = []
                 index += 1
-                while index < lines.count && !lines[index].trimmingCharacters(in: .whitespaces).hasPrefix("```")
-                {
+                while index < lines.count && !lines[index].trimmingCharacters(in: .whitespaces).hasPrefix("```") {
                     codeLines.append(lines[index])
                     index += 1
                 }
@@ -145,7 +144,7 @@ public struct PrismMarkdownView: View {
             }
 
             // Ordered list
-            if let _ = trimmed.range(of: #"^\d+\.\s"#, options: .regularExpression) {
+            if trimmed.range(of: #"^\d+\.\s"#, options: .regularExpression) != nil {
                 var items: [String] = []
                 while index < lines.count {
                     let itemLine = lines[index].trimmingCharacters(in: .whitespaces)

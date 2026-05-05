@@ -45,14 +45,14 @@ public actor PrismSwaggerSpec {
     }
 
     private var _routes: [(method: String, path: String, metadata: PrismRouteMetadata)] {
-        get { routes }
+        routes
     }
 
     /// Generates the output.
     public func generateSpec() -> [String: Any] {
         var spec: [String: Any] = [
             "openapi": "3.1.0",
-            "info": buildInfo()
+            "info": buildInfo(),
         ]
 
         if let url = info.serverURL {
@@ -78,7 +78,7 @@ public actor PrismSwaggerSpec {
     private func buildInfo() -> [String: Any] {
         var infoDict: [String: Any] = [
             "title": info.title,
-            "version": info.version
+            "version": info.version,
         ]
         if let desc = info.description {
             infoDict["description"] = desc
@@ -111,7 +111,7 @@ public actor PrismSwaggerSpec {
         if let body = metadata.requestBody {
             op["requestBody"] = [
                 "required": true,
-                "content": ["application/json": ["schema": body.toDict()]]
+                "content": ["application/json": ["schema": body.toDict()]],
             ]
         }
 
@@ -134,17 +134,20 @@ public actor PrismSwaggerSpec {
                 return "{\(segment.dropFirst())}"
             }
             return String(segment)
-        }.joined(separator: "/").hasPrefix("/") ? path.split(separator: "/").map { segment -> String in
-            if segment.hasPrefix(":") {
-                return "{\(segment.dropFirst())}"
-            }
-            return String(segment)
-        }.joined(separator: "/") : "/" + path.split(separator: "/").map { segment -> String in
-            if segment.hasPrefix(":") {
-                return "{\(segment.dropFirst())}"
-            }
-            return String(segment)
-        }.joined(separator: "/")
+        }.joined(separator: "/").hasPrefix("/")
+            ? path.split(separator: "/").map { segment -> String in
+                if segment.hasPrefix(":") {
+                    return "{\(segment.dropFirst())}"
+                }
+                return String(segment)
+            }.joined(separator: "/")
+            : "/"
+                + path.split(separator: "/").map { segment -> String in
+                    if segment.hasPrefix(":") {
+                        return "{\(segment.dropFirst())}"
+                    }
+                    return String(segment)
+                }.joined(separator: "/")
     }
 
     private func collectTags() -> [String] {
@@ -192,14 +195,15 @@ public struct PrismSwaggerBuilder: Sendable {
     public func adding(method: String, path: String, metadata: PrismRouteMetadata) -> PrismSwaggerBuilder {
         var newRoutes = routes
         newRoutes.append((method: method, path: path, metadata: metadata))
-        return PrismSwaggerBuilder(title: title, version: version, description: description, serverURL: serverURL, routes: newRoutes)
+        return PrismSwaggerBuilder(
+            title: title, version: version, description: description, serverURL: serverURL, routes: newRoutes)
     }
 
     /// Generates the output.
     public func generateSpec() -> [String: Any] {
         var spec: [String: Any] = [
             "openapi": "3.1.0",
-            "info": buildInfo()
+            "info": buildInfo(),
         ]
 
         if let url = serverURL {
@@ -225,7 +229,7 @@ public struct PrismSwaggerBuilder: Sendable {
     private func buildInfo() -> [String: Any] {
         var infoDict: [String: Any] = [
             "title": title,
-            "version": version
+            "version": version,
         ]
         if let desc = description { infoDict["description"] = desc }
         return infoDict
@@ -256,7 +260,7 @@ public struct PrismSwaggerBuilder: Sendable {
         if let body = metadata.requestBody {
             op["requestBody"] = [
                 "required": true,
-                "content": ["application/json": ["schema": body.toDict()]]
+                "content": ["application/json": ["schema": body.toDict()]],
             ]
         }
 
@@ -301,14 +305,18 @@ public struct PrismSwaggerUIMiddleware: PrismMiddleware, Sendable {
     private let specProvider: @Sendable () -> [String: Any]
 
     /// Creates a new `PrismSwaggerUIMiddleware` with the specified configuration.
-    public init(path: String = "/docs", specPath: String = "/openapi.json", specProvider: @escaping @Sendable () -> [String: Any]) {
+    public init(
+        path: String = "/docs", specPath: String = "/openapi.json",
+        specProvider: @escaping @Sendable () -> [String: Any]
+    ) {
         self.uiPath = path
         self.specPath = specPath
         self.specProvider = specProvider
     }
 
     /// Handles the request and returns a response.
-    public func handle(_ request: PrismHTTPRequest, next: @escaping PrismRouteHandler) async throws -> PrismHTTPResponse {
+    public func handle(_ request: PrismHTTPRequest, next: @escaping PrismRouteHandler) async throws -> PrismHTTPResponse
+    {
         if request.path == specPath && request.method == .GET {
             let spec = specProvider()
             let data = try JSONSerialization.data(withJSONObject: spec, options: [.prettyPrinted, .sortedKeys])

@@ -55,7 +55,8 @@ public struct PrismCSRFMiddleware: PrismMiddleware {
     }
 
     /// Validates CSRF tokens for unsafe methods and sets tokens for safe methods.
-    public func handle(_ request: PrismHTTPRequest, next: @escaping PrismRouteHandler) async throws -> PrismHTTPResponse {
+    public func handle(_ request: PrismHTTPRequest, next: @escaping PrismRouteHandler) async throws -> PrismHTTPResponse
+    {
         let cookieToken = request.cookies[config.cookieName]
 
         if config.safeMethods.contains(request.method) {
@@ -110,7 +111,8 @@ public struct PrismCSRFMiddleware: PrismMiddleware {
             for pair in bodyString.split(separator: "&") {
                 let kv = pair.split(separator: "=", maxSplits: 1)
                 if kv.count == 2,
-                   String(kv[0]).removingPercentEncoding == config.formFieldName {
+                    String(kv[0]).removingPercentEncoding == config.formFieldName
+                {
                     return String(kv[1]).removingPercentEncoding
                 }
             }

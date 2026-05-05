@@ -28,35 +28,40 @@ struct AccessibilityAuditTests {
     @Test
     func primaryTextOnBackgroundPassesAA() {
         let theme = DefaultTheme()
-        #expect(PrismAccessibilityTest.validateContrastRatio(
-            foreground: .black, background: .white
-        ))
+        #expect(
+            PrismAccessibilityTest.validateContrastRatio(
+                foreground: .black, background: .white
+            ))
     }
 
     @Test
     func darkThemeTextContrast() {
         let theme = DarkTheme()
-        #expect(PrismAccessibilityTest.validateContrastRatio(
-            foreground: .white, background: Color(white: 0.05)
-        ))
+        #expect(
+            PrismAccessibilityTest.validateContrastRatio(
+                foreground: .white, background: Color(white: 0.05)
+            ))
     }
 
     @Test
     func highContrastThemeExceedsAAA() {
-        #expect(PrismAccessibilityTest.validateContrastRatio(
-            foreground: .black, background: .white
-        ))
+        #expect(
+            PrismAccessibilityTest.validateContrastRatio(
+                foreground: .black, background: .white
+            ))
     }
 
     @Test
     func errorAndInfoOnWhitePassLargeText() {
         let theme = DefaultTheme()
-        #expect(PrismAccessibilityTest.validateContrastRatio(
-            foreground: theme.color(.error), background: .white, isLargeText: true
-        ))
-        #expect(PrismAccessibilityTest.validateContrastRatio(
-            foreground: theme.color(.info), background: .white, isLargeText: true
-        ))
+        #expect(
+            PrismAccessibilityTest.validateContrastRatio(
+                foreground: theme.color(.error), background: .white, isLargeText: true
+            ))
+        #expect(
+            PrismAccessibilityTest.validateContrastRatio(
+                foreground: theme.color(.info), background: .white, isLargeText: true
+            ))
     }
 
     @Test
@@ -64,11 +69,12 @@ struct AccessibilityAuditTests {
         let theme = HighContrastTheme()
         let feedbackTokens: [ColorToken] = [.success, .warning, .error, .info]
         for token in feedbackTokens {
-            #expect(PrismAccessibilityTest.validateContrastRatio(
-                foreground: theme.color(token),
-                background: .white,
-                isLargeText: true
-            ))
+            #expect(
+                PrismAccessibilityTest.validateContrastRatio(
+                    foreground: theme.color(token),
+                    background: .white,
+                    isLargeText: true
+                ))
         }
     }
 

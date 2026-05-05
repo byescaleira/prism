@@ -29,12 +29,16 @@ public struct PrismRedirectRule: Sendable {
     }
 
     /// Creates a 301 permanent redirect rule.
-    public static func permanent(from source: String, to destination: String, preserveQuery: Bool = true) -> PrismRedirectRule {
+    public static func permanent(from source: String, to destination: String, preserveQuery: Bool = true)
+        -> PrismRedirectRule
+    {
         PrismRedirectRule(source: source, destination: destination, statusCode: 301, preserveQueryString: preserveQuery)
     }
 
     /// Creates a 302 temporary redirect rule.
-    public static func temporary(from source: String, to destination: String, preserveQuery: Bool = true) -> PrismRedirectRule {
+    public static func temporary(from source: String, to destination: String, preserveQuery: Bool = true)
+        -> PrismRedirectRule
+    {
         PrismRedirectRule(source: source, destination: destination, statusCode: 302, preserveQueryString: preserveQuery)
     }
 
@@ -45,7 +49,8 @@ public struct PrismRedirectRule: Sendable {
 
     /// Creates a regex-based redirect rule.
     public static func pattern(from regex: String, to destination: String, statusCode: Int = 301) -> PrismRedirectRule {
-        PrismRedirectRule(source: regex, destination: destination, statusCode: statusCode, preserveQueryString: true, isRegex: true)
+        PrismRedirectRule(
+            source: regex, destination: destination, statusCode: statusCode, preserveQueryString: true, isRegex: true)
     }
 
     func match(path: String) -> String? {
@@ -115,7 +120,8 @@ public struct PrismRedirectMiddleware: PrismMiddleware {
     }
 
     /// Handles the request and returns a response.
-    public func handle(_ request: PrismHTTPRequest, next: @escaping PrismRouteHandler) async throws -> PrismHTTPResponse {
+    public func handle(_ request: PrismHTTPRequest, next: @escaping PrismRouteHandler) async throws -> PrismHTTPResponse
+    {
         let path = request.path
 
         if let redirect = applyTrailingSlash(path: path, uri: request.uri) {

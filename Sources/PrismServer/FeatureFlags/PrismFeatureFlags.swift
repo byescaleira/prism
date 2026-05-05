@@ -118,11 +118,9 @@ public struct PrismFlagRule: Sendable {
         case .startsWith: matches = attrValue.hasPrefix(value)
         case .endsWith: matches = attrValue.hasSuffix(value)
         case .greaterThan:
-            if let a = Double(attrValue), let b = Double(value) { matches = a > b }
-            else { matches = false }
+            if let a = Double(attrValue), let b = Double(value) { matches = a > b } else { matches = false }
         case .lessThan:
-            if let a = Double(attrValue), let b = Double(value) { matches = a < b }
-            else { matches = false }
+            if let a = Double(attrValue), let b = Double(value) { matches = a < b } else { matches = false }
         }
         return matches ? result : !result
     }
@@ -193,7 +191,9 @@ public actor PrismFeatureFlagStore {
     }
 
     /// Returns the string value of the named flag, or the default if not available.
-    public func getString(_ name: String, context: PrismFlagContext = PrismFlagContext(), default defaultValue: String = "") -> String {
+    public func getString(
+        _ name: String, context: PrismFlagContext = PrismFlagContext(), default defaultValue: String = ""
+    ) -> String {
         guard let value = getValue(name, context: context) else { return defaultValue }
         switch value {
         case .string(let s): return s
@@ -204,7 +204,9 @@ public actor PrismFeatureFlagStore {
     }
 
     /// Returns the integer value of the named flag, or the default if not available.
-    public func getInt(_ name: String, context: PrismFlagContext = PrismFlagContext(), default defaultValue: Int = 0) -> Int {
+    public func getInt(_ name: String, context: PrismFlagContext = PrismFlagContext(), default defaultValue: Int = 0)
+        -> Int
+    {
         guard let value = getValue(name, context: context) else { return defaultValue }
         if case .integer(let i) = value { return i }
         return defaultValue
@@ -287,7 +289,8 @@ public struct PrismFeatureFlagMiddleware: PrismMiddleware, Sendable {
     }
 
     /// Evaluates flags and attaches enabled flag names to the request's userInfo.
-    public func handle(_ request: PrismHTTPRequest, next: @escaping PrismRouteHandler) async throws -> PrismHTTPResponse {
+    public func handle(_ request: PrismHTTPRequest, next: @escaping PrismRouteHandler) async throws -> PrismHTTPResponse
+    {
         var req = request
         let context = contextBuilder(request)
         let allFlags = await store.allFlags()

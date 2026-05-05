@@ -38,7 +38,7 @@ public actor PrismEventBus {
         let busRef = self
         let id = on(type) { event in
             await handler(event)
-            await busRef.off(id: -1) // placeholder — actual removal below
+            await busRef.off(id: -1)  // placeholder — actual removal below
         }
         // Re-register with correct self-removing behavior
         listeners[E.name]?.removeAll { $0.id == id }
@@ -100,7 +100,10 @@ public struct PrismServerStarted: PrismEvent {
     /// The host the server is bound to.
     public let host: String
     /// Creates a server started event.
-    public init(port: UInt16, host: String) { self.port = port; self.host = host }
+    public init(port: UInt16, host: String) {
+        self.port = port
+        self.host = host
+    }
 }
 
 /// Emitted when the server stops.

@@ -49,14 +49,17 @@ public struct PrismRateLimitMiddleware: PrismMiddleware {
     public init(
         maxRequests: Int = 100,
         windowSeconds: Double = 60,
-        keyExtractor: @escaping @Sendable (PrismHTTPRequest) -> String = { $0.headers.value(for: "X-Forwarded-For") ?? "unknown" }
+        keyExtractor: @escaping @Sendable (PrismHTTPRequest) -> String = {
+            $0.headers.value(for: "X-Forwarded-For") ?? "unknown"
+        }
     ) {
         self.limiter = PrismRateLimiter(maxRequests: maxRequests, windowSeconds: windowSeconds)
         self.keyExtractor = keyExtractor
     }
 
     /// Handles the request and returns a response.
-    public func handle(_ request: PrismHTTPRequest, next: @escaping PrismRouteHandler) async throws -> PrismHTTPResponse {
+    public func handle(_ request: PrismHTTPRequest, next: @escaping PrismRouteHandler) async throws -> PrismHTTPResponse
+    {
         let key = keyExtractor(request)
         let allowed = await limiter.shouldAllow(key: key)
 

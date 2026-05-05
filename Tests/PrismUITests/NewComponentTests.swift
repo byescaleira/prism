@@ -76,22 +76,28 @@ struct NewComponentTests {
 
     @Test
     func menuCreatesWithItems() {
-        let menu = PrismMenu("Actions", items: [
-            .button("Edit", icon: "pencil") {},
-            .divider,
-            .destructive("Delete", icon: "trash") {},
-        ])
+        let menu = PrismMenu(
+            "Actions",
+            items: [
+                .button("Edit", icon: "pencil") {},
+                .divider,
+                .destructive("Delete", icon: "trash") {},
+            ])
         #expect(menu != nil)
     }
 
     @Test
     func menuSectionCreatesWithSubItems() {
-        let menu = PrismMenu("Options", items: [
-            .section("Group", items: [
-                .button("Item 1") {},
-                .button("Item 2") {},
-            ]),
-        ])
+        let menu = PrismMenu(
+            "Options",
+            items: [
+                .section(
+                    "Group",
+                    items: [
+                        .button("Item 1") {},
+                        .button("Item 2") {},
+                    ])
+            ])
         #expect(menu != nil)
     }
 

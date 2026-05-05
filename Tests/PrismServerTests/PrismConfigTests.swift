@@ -1,5 +1,6 @@
-import Testing
 import Foundation
+import Testing
+
 @testable import PrismServer
 
 @Suite("PrismConfig Tests")
@@ -171,12 +172,12 @@ struct PrismConfigTests {
         let tempDir = NSTemporaryDirectory()
         let envPath = (tempDir as NSString).appendingPathComponent("test_\(UUID().uuidString).env")
         let content = """
-        APP_NAME=Prism
-        APP_PORT=9090
-        # This is a comment
-        APP_DEBUG="true"
-        APP_SECRET='mysecret'
-        """
+            APP_NAME=Prism
+            APP_PORT=9090
+            # This is a comment
+            APP_DEBUG="true"
+            APP_SECRET='mysecret'
+            """
         try content.write(toFile: envPath, atomically: true, encoding: .utf8)
         defer { try? FileManager.default.removeItem(atPath: envPath) }
 
@@ -192,9 +193,9 @@ struct PrismConfigTests {
         let tempDir = NSTemporaryDirectory()
         let envPath = (tempDir as NSString).appendingPathComponent("test_\(UUID().uuidString).env")
         let content = """
-        # Comment line
-        KEY=value
-        """
+            # Comment line
+            KEY=value
+            """
         try content.write(toFile: envPath, atomically: true, encoding: .utf8)
         defer { try? FileManager.default.removeItem(atPath: envPath) }
 

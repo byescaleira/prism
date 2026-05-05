@@ -70,15 +70,15 @@ public struct PrismFocusSection<Content: View>: View {
             }
 
             #if os(tvOS)
-            ScrollView(.horizontal, showsIndicators: false) {
-                LazyHStack(spacing: SpacingToken.md.rawValue) {
-                    content
+                ScrollView(.horizontal, showsIndicators: false) {
+                    LazyHStack(spacing: SpacingToken.md.rawValue) {
+                        content
+                    }
+                    .padding(.horizontal, SpacingToken.lg.rawValue)
                 }
-                .padding(.horizontal, SpacingToken.lg.rawValue)
-            }
-            .focusSection()
+                .focusSection()
             #else
-            content
+                content
             #endif
         }
     }

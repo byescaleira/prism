@@ -1,6 +1,7 @@
-import Testing
-@testable import PrismCapabilities
 import Foundation
+import Testing
+
+@testable import PrismCapabilities
 
 // MARK: - CallKit Tests
 
@@ -18,9 +19,9 @@ struct PrismCallKitTests {
         let generic = PrismCallType.generic
         let audio = PrismCallType.audio
         let video = PrismCallType.video
-        if case .generic = generic { } else { #expect(Bool(false), "Expected generic") }
-        if case .audio = audio { } else { #expect(Bool(false), "Expected audio") }
-        if case .video = video { } else { #expect(Bool(false), "Expected video") }
+        if case .generic = generic {} else { #expect(Bool(false), "Expected generic") }
+        if case .audio = audio {} else { #expect(Bool(false), "Expected audio") }
+        if case .video = video {} else { #expect(Bool(false), "Expected video") }
     }
 
     @Test("PrismCallEndReason has 5 cases")

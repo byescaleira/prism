@@ -36,7 +36,9 @@ public struct PrismOpenAPISchema: Sendable {
     }
 
     /// Returns the JSON schema representation of an object type.
-    public static func object(_ properties: [(String, PrismOpenAPIProperty)], required: [String] = [], description: String? = nil) -> PrismOpenAPISchema {
+    public static func object(
+        _ properties: [(String, PrismOpenAPIProperty)], required: [String] = [], description: String? = nil
+    ) -> PrismOpenAPISchema {
         PrismOpenAPISchema(type: .object, properties: properties, required: required, description: description)
     }
 
@@ -75,7 +77,10 @@ public struct PrismOpenAPIProperty: Sendable {
     public let nullable: Bool
 
     /// Creates a new `PrismOpenAPIProperty` with the specified configuration.
-    public init(type: PrismOpenAPIType, format: String? = nil, description: String? = nil, enumValues: [String]? = nil, nullable: Bool = false) {
+    public init(
+        type: PrismOpenAPIType, format: String? = nil, description: String? = nil, enumValues: [String]? = nil,
+        nullable: Bool = false
+    ) {
         self.type = type
         self.format = format
         self.description = description
@@ -132,7 +137,10 @@ public struct PrismOpenAPIParameter: Sendable {
     public let type: PrismOpenAPIType
 
     /// Creates a new `Location` with the specified configuration.
-    public init(name: String, in location: Location, description: String? = nil, required: Bool = false, type: PrismOpenAPIType = .string) {
+    public init(
+        name: String, in location: Location, description: String? = nil, required: Bool = false,
+        type: PrismOpenAPIType = .string
+    ) {
         self.name = name
         self.location = location
         self.description = description
@@ -145,7 +153,7 @@ public struct PrismOpenAPIParameter: Sendable {
             "name": name,
             "in": location.rawValue,
             "required": self.required,
-            "schema": ["type": type.rawValue]
+            "schema": ["type": type.rawValue],
         ]
         if let description { dict["description"] = description }
         return dict
@@ -164,7 +172,10 @@ public struct PrismOpenAPIResponseSpec: Sendable {
     public let contentType: String
 
     /// Creates a new `PrismOpenAPIResponseSpec` with the specified configuration.
-    public init(statusCode: Int, description: String, schema: PrismOpenAPISchema? = nil, contentType: String = "application/json") {
+    public init(
+        statusCode: Int, description: String, schema: PrismOpenAPISchema? = nil,
+        contentType: String = "application/json"
+    ) {
         self.statusCode = statusCode
         self.description = description
         self.schema = schema

@@ -110,7 +110,9 @@ public enum PrismAutoTheme {
         let x = c * (1 - abs((h / 60).truncatingRemainder(dividingBy: 2) - 1))
         let m = l - c / 2
 
-        var r = 0.0, g = 0.0, b = 0.0
+        var r = 0.0
+        var g = 0.0
+        var b = 0.0
         switch h {
         case 0..<60: (r, g, b) = (c, x, 0)
         case 60..<120: (r, g, b) = (x, c, 0)

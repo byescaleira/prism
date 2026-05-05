@@ -206,7 +206,7 @@ struct PrismIntelligenceRequestTests {
     @Test("regressFeatures stores the correct associated value")
     func regressFeaturesAssociatedValue() {
         let features: PrismIntelligenceFeatureRow = [
-            "area": .double(120.5),
+            "area": .double(120.5)
         ]
         let request = PrismIntelligenceRequest.regressFeatures(features)
         if case .regressFeatures(let row) = request {

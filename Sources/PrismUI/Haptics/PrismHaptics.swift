@@ -49,18 +49,18 @@ public enum PrismHaptics {
     /// Plays haptic feedback of the given type on the current platform.
     public static func play(_ type: PrismHapticType) {
         #if canImport(UIKit) && !os(watchOS) && !os(tvOS)
-        playUIKit(type)
+            playUIKit(type)
         #elseif os(watchOS)
-        playWatchOS(type)
+            playWatchOS(type)
         #elseif os(macOS)
-        playAppKit(type)
+            playAppKit(type)
         #endif
     }
 
     /// Prepares the haptic engine for low-latency feedback on supported platforms.
     public static func prepare(_ type: PrismHapticType) {
         #if canImport(UIKit) && !os(watchOS) && !os(tvOS)
-        prepareUIKit(type)
+            prepareUIKit(type)
         #endif
     }
 }
@@ -68,111 +68,111 @@ public enum PrismHaptics {
 // MARK: - iOS / iPadOS / visionOS
 
 #if canImport(UIKit) && !os(watchOS) && !os(tvOS)
-import UIKit
+    import UIKit
 
-extension PrismHaptics {
+    extension PrismHaptics {
 
-    private static func playUIKit(_ type: PrismHapticType) {
-        switch type {
-        case .impact(let weight):
-            let generator = UIImpactFeedbackGenerator(style: weight.uiKitStyle)
-            generator.impactOccurred()
-        case .notification(let style):
-            let generator = UINotificationFeedbackGenerator()
-            generator.notificationOccurred(style.uiKitType)
-        case .selection:
-            let generator = UISelectionFeedbackGenerator()
-            generator.selectionChanged()
+        private static func playUIKit(_ type: PrismHapticType) {
+            switch type {
+            case .impact(let weight):
+                let generator = UIImpactFeedbackGenerator(style: weight.uiKitStyle)
+                generator.impactOccurred()
+            case .notification(let style):
+                let generator = UINotificationFeedbackGenerator()
+                generator.notificationOccurred(style.uiKitType)
+            case .selection:
+                let generator = UISelectionFeedbackGenerator()
+                generator.selectionChanged()
+            }
+        }
+
+        private static func prepareUIKit(_ type: PrismHapticType) {
+            switch type {
+            case .impact(let weight):
+                UIImpactFeedbackGenerator(style: weight.uiKitStyle).prepare()
+            case .notification:
+                UINotificationFeedbackGenerator().prepare()
+            case .selection:
+                UISelectionFeedbackGenerator().prepare()
+            }
         }
     }
 
-    private static func prepareUIKit(_ type: PrismHapticType) {
-        switch type {
-        case .impact(let weight):
-            UIImpactFeedbackGenerator(style: weight.uiKitStyle).prepare()
-        case .notification:
-            UINotificationFeedbackGenerator().prepare()
-        case .selection:
-            UISelectionFeedbackGenerator().prepare()
+    extension PrismImpactWeight {
+        var uiKitStyle: UIImpactFeedbackGenerator.FeedbackStyle {
+            switch self {
+            case .light: .light
+            case .medium: .medium
+            case .heavy: .heavy
+            case .soft: .soft
+            case .rigid: .rigid
+            }
         }
     }
-}
 
-extension PrismImpactWeight {
-    var uiKitStyle: UIImpactFeedbackGenerator.FeedbackStyle {
-        switch self {
-        case .light: .light
-        case .medium: .medium
-        case .heavy: .heavy
-        case .soft: .soft
-        case .rigid: .rigid
+    extension PrismNotificationStyle {
+        var uiKitType: UINotificationFeedbackGenerator.FeedbackType {
+            switch self {
+            case .success: .success
+            case .warning: .warning
+            case .error: .error
+            }
         }
     }
-}
-
-extension PrismNotificationStyle {
-    var uiKitType: UINotificationFeedbackGenerator.FeedbackType {
-        switch self {
-        case .success: .success
-        case .warning: .warning
-        case .error: .error
-        }
-    }
-}
 #endif
 
 // MARK: - watchOS
 
 #if os(watchOS)
-import WatchKit
+    import WatchKit
 
-extension PrismHaptics {
+    extension PrismHaptics {
 
-    private static func playWatchOS(_ type: PrismHapticType) {
-        let device = WKInterfaceDevice.current()
-        switch type {
-        case .impact(let weight):
-            switch weight {
-            case .light, .soft: device.play(.click)
-            case .medium: device.play(.directionUp)
-            case .heavy, .rigid: device.play(.directionDown)
+        private static func playWatchOS(_ type: PrismHapticType) {
+            let device = WKInterfaceDevice.current()
+            switch type {
+            case .impact(let weight):
+                switch weight {
+                case .light, .soft: device.play(.click)
+                case .medium: device.play(.directionUp)
+                case .heavy, .rigid: device.play(.directionDown)
+                }
+            case .notification(let style):
+                switch style {
+                case .success: device.play(.success)
+                case .warning: device.play(.retry)
+                case .error: device.play(.failure)
+                }
+            case .selection:
+                device.play(.click)
             }
-        case .notification(let style):
-            switch style {
-            case .success: device.play(.success)
-            case .warning: device.play(.retry)
-            case .error: device.play(.failure)
-            }
-        case .selection:
-            device.play(.click)
         }
     }
-}
 #endif
 
 // MARK: - macOS
 
 #if os(macOS)
-import AppKit
+    import AppKit
 
-extension PrismHaptics {
+    extension PrismHaptics {
 
-    private static func playAppKit(_ type: PrismHapticType) {
-        let performer = NSHapticFeedbackManager.defaultPerformer
-        switch type {
-        case .impact:
-            performer.perform(.alignment, performanceTime: .default)
-        case .notification(let style):
-            switch style {
-            case .success: performer.perform(.levelChange, performanceTime: .default)
-            case .warning: performer.perform(.generic, performanceTime: .default)
-            case .error: performer.perform(.generic, performanceTime: .default)
+        private static func playAppKit(_ type: PrismHapticType) {
+            let performer = NSHapticFeedbackManager.defaultPerformer
+            switch type {
+            case .impact:
+                performer.perform(.alignment, performanceTime: .default)
+            case .notification(let style):
+                switch style {
+                case .success: performer.perform(.levelChange, performanceTime: .default)
+                case .warning: performer.perform(.generic, performanceTime: .default)
+                case .error: performer.perform(.generic, performanceTime: .default)
+                }
+            case .selection:
+                performer.perform(.generic, performanceTime: .default)
             }
-        case .selection:
-            performer.perform(.generic, performanceTime: .default)
         }
     }
-}
 #endif
 
 // MARK: - View Modifier

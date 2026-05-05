@@ -95,7 +95,8 @@ public struct PrismCORSv2Middleware: PrismMiddleware {
     }
 
     /// Applies CORS headers and handles preflight OPTIONS requests.
-    public func handle(_ request: PrismHTTPRequest, next: @escaping PrismRouteHandler) async throws -> PrismHTTPResponse {
+    public func handle(_ request: PrismHTTPRequest, next: @escaping PrismRouteHandler) async throws -> PrismHTTPResponse
+    {
         let activeConfig = resolveConfig(for: request.path)
 
         if request.method == .OPTIONS {
@@ -122,7 +123,9 @@ public struct PrismCORSv2Middleware: PrismMiddleware {
         return config
     }
 
-    private func addCORSHeaders(to response: inout PrismHTTPResponse, request: PrismHTTPRequest, config: PrismCORSv2Config) {
+    private func addCORSHeaders(
+        to response: inout PrismHTTPResponse, request: PrismHTTPRequest, config: PrismCORSv2Config
+    ) {
         let origin = request.headers.value(for: "Origin") ?? ""
 
         if let allowedOrigin = config.allowedOrigins.headerValue(for: origin) {
@@ -138,22 +141,31 @@ public struct PrismCORSv2Middleware: PrismMiddleware {
         }
 
         if !config.exposedHeaders.isEmpty {
-            response.headers.set(name: "Access-Control-Expose-Headers", value: config.exposedHeaders.joined(separator: ", "))
+            response.headers.set(
+                name: "Access-Control-Expose-Headers", value: config.exposedHeaders.joined(separator: ", "))
         }
     }
 
-    private func addPreflightHeaders(to response: inout PrismHTTPResponse, request: PrismHTTPRequest, config: PrismCORSv2Config) {
-        response.headers.set(name: "Access-Control-Allow-Methods", value: config.allowedMethods.map(\.rawValue).joined(separator: ", "))
+    private func addPreflightHeaders(
+        to response: inout PrismHTTPResponse, request: PrismHTTPRequest, config: PrismCORSv2Config
+    ) {
+        response.headers.set(
+            name: "Access-Control-Allow-Methods", value: config.allowedMethods.map(\.rawValue).joined(separator: ", "))
 
         if let requestedHeaders = request.headers.value(for: "Access-Control-Request-Headers") {
-            let requested = requestedHeaders.split(separator: ",").map { $0.trimmingCharacters(in: .whitespaces).lowercased() }
+            let requested = requestedHeaders.split(separator: ",").map {
+                $0.trimmingCharacters(in: .whitespaces).lowercased()
+            }
             let allowed = config.allowedHeaders.map { $0.lowercased() }
             let filtered = requested.filter { allowed.contains($0) || config.allowedHeaders.contains("*") }
             if !filtered.isEmpty || config.allowedHeaders.contains("*") {
-                response.headers.set(name: "Access-Control-Allow-Headers", value: config.allowedHeaders.contains("*") ? requestedHeaders : filtered.joined(separator: ", "))
+                response.headers.set(
+                    name: "Access-Control-Allow-Headers",
+                    value: config.allowedHeaders.contains("*") ? requestedHeaders : filtered.joined(separator: ", "))
             }
         } else {
-            response.headers.set(name: "Access-Control-Allow-Headers", value: config.allowedHeaders.joined(separator: ", "))
+            response.headers.set(
+                name: "Access-Control-Allow-Headers", value: config.allowedHeaders.joined(separator: ", "))
         }
 
         response.headers.set(name: "Access-Control-Max-Age", value: "\(config.maxAge)")

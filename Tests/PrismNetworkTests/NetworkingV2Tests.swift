@@ -53,7 +53,7 @@ struct PrismExponentialBackoffTests {
         )
 
         let delay = backoff.delay(for: 5)
-        #expect(delay.timeInterval <= 5.5) // 5s max + up to 0.5s jitter
+        #expect(delay.timeInterval <= 5.5)  // 5s max + up to 0.5s jitter
     }
 }
 
@@ -111,17 +111,19 @@ struct PrismRequestDeduplicatorTests {
         let callCount = MutableBox(0)
         let key = "test-key"
 
-        async let result1: Int = deduplicator.deduplicate({
-            await callCount.increment()
-            try await Task.sleep(for: .milliseconds(50))
-            return 99
-        }, key: key)
+        async let result1: Int = deduplicator.deduplicate(
+            {
+                await callCount.increment()
+                try await Task.sleep(for: .milliseconds(50))
+                return 99
+            }, key: key)
 
-        async let result2: Int = deduplicator.deduplicate({
-            await callCount.increment()
-            try await Task.sleep(for: .milliseconds(50))
-            return 99
-        }, key: key)
+        async let result2: Int = deduplicator.deduplicate(
+            {
+                await callCount.increment()
+                try await Task.sleep(for: .milliseconds(50))
+                return 99
+            }, key: key)
 
         let r1 = try await result1
         let r2 = try await result2

@@ -25,10 +25,10 @@ private struct PrismBodyCountModifier: ViewModifier {
 
     func body(content: Content) -> some View {
         #if DEBUG
-        let _ = {
-            count += 1
-            performanceLog.debug("\(label) body evaluated \(count) time(s)")
-        }()
+            let _ = {
+                count += 1
+                performanceLog.debug("\(label) body evaluated \(count) time(s)")
+            }()
         #endif
         content
     }

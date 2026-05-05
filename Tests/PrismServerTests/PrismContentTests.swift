@@ -1,5 +1,6 @@
-import Testing
 import Foundation
+import Testing
+
 @testable import PrismServer
 
 @Suite("PrismContentNegotiation Tests")
@@ -7,7 +8,10 @@ struct PrismContentNegotiationTests {
 
     @Test("Decode JSON body")
     func decodeJSON() throws {
-        struct User: Codable, Equatable { let name: String; let age: Int }
+        struct User: Codable, Equatable {
+            let name: String
+            let age: Int
+        }
         let json = #"{"name":"Alice","age":30}"#
         let request = PrismHTTPRequest(method: .POST, uri: "/users", body: Data(json.utf8))
         let user = try request.decodeJSON(User.self)
@@ -75,7 +79,8 @@ struct PrismMultipartTests {
     @Test("Parse simple multipart body")
     func parseSimple() throws {
         let boundary = "testboundary"
-        let body = "--\(boundary)\r\nContent-Disposition: form-data; name=\"field1\"\r\n\r\nvalue1\r\n--\(boundary)\r\nContent-Disposition: form-data; name=\"field2\"\r\n\r\nvalue2\r\n--\(boundary)--\r\n"
+        let body =
+            "--\(boundary)\r\nContent-Disposition: form-data; name=\"field1\"\r\n\r\nvalue1\r\n--\(boundary)\r\nContent-Disposition: form-data; name=\"field2\"\r\n\r\nvalue2\r\n--\(boundary)--\r\n"
 
         let parts = try parser.parse(data: Data(body.utf8), boundary: boundary)
         #expect(parts.count == 2)
@@ -88,7 +93,8 @@ struct PrismMultipartTests {
     @Test("Parse file upload part")
     func parseFileUpload() throws {
         let boundary = "testboundary"
-        let body = "--\(boundary)\r\nContent-Disposition: form-data; name=\"file\"; filename=\"test.txt\"\r\nContent-Type: text/plain\r\n\r\nfile content here\r\n--\(boundary)--\r\n"
+        let body =
+            "--\(boundary)\r\nContent-Disposition: form-data; name=\"file\"; filename=\"test.txt\"\r\nContent-Type: text/plain\r\n\r\nfile content here\r\n--\(boundary)--\r\n"
 
         let parts = try parser.parse(data: Data(body.utf8), boundary: boundary)
         #expect(parts.count == 1)

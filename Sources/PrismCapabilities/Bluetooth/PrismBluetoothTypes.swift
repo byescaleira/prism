@@ -85,7 +85,9 @@ public struct PrismBLECharacteristic: Sendable {
     public let properties: PrismCharacteristicProperties
 
     /// Creates a new BLE characteristic with the given identifier and properties.
-    public init(id: String, value: Data? = nil, isNotifying: Bool = false, properties: PrismCharacteristicProperties = []) {
+    public init(
+        id: String, value: Data? = nil, isNotifying: Bool = false, properties: PrismCharacteristicProperties = []
+    ) {
         self.id = id
         self.value = value
         self.isNotifying = isNotifying

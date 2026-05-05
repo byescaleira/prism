@@ -1,5 +1,5 @@
-import Foundation
 import Compression
+import Foundation
 
 /// Gzip/deflate compression middleware using Apple's built-in compression.
 public struct PrismCompressionMiddleware: PrismMiddleware {
@@ -11,7 +11,8 @@ public struct PrismCompressionMiddleware: PrismMiddleware {
     }
 
     /// Handles the request and returns a response.
-    public func handle(_ request: PrismHTTPRequest, next: @escaping PrismRouteHandler) async throws -> PrismHTTPResponse {
+    public func handle(_ request: PrismHTTPRequest, next: @escaping PrismRouteHandler) async throws -> PrismHTTPResponse
+    {
         var response = try await next(request)
 
         let acceptEncoding = request.headers.value(for: "Accept-Encoding") ?? ""

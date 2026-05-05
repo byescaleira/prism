@@ -129,22 +129,22 @@ struct PrismRAGConfigTests {
 
 #if canImport(Vision)
 
-@Suite("PrismVisionClassifier")
-struct PrismVisionClassifierTests {
-    @Test("Classification result stores label and confidence")
-    func classificationResultStoresLabelAndConfidence() {
-        let result = PrismClassificationResult(label: "cat", confidence: 0.95)
-        #expect(result.label == "cat")
-        #expect(result.confidence == 0.95)
-    }
+    @Suite("PrismVisionClassifier")
+    struct PrismVisionClassifierTests {
+        @Test("Classification result stores label and confidence")
+        func classificationResultStoresLabelAndConfidence() {
+            let result = PrismClassificationResult(label: "cat", confidence: 0.95)
+            #expect(result.label == "cat")
+            #expect(result.confidence == 0.95)
+        }
 
-    @Test("Classification results are equatable")
-    func classificationResultsAreEquatable() {
-        let a = PrismClassificationResult(label: "cat", confidence: 0.95)
-        let b = PrismClassificationResult(label: "cat", confidence: 0.95)
-        #expect(a == b)
+        @Test("Classification results are equatable")
+        func classificationResultsAreEquatable() {
+            let a = PrismClassificationResult(label: "cat", confidence: 0.95)
+            let b = PrismClassificationResult(label: "cat", confidence: 0.95)
+            #expect(a == b)
+        }
     }
-}
 
 #endif
 
@@ -152,40 +152,40 @@ struct PrismVisionClassifierTests {
 
 #if canImport(NaturalLanguage)
 
-@Suite("PrismNLPActions")
-struct PrismNLPActionsTests {
-    @Test("Sentiment has 4 cases")
-    func sentimentHas4Cases() {
-        #expect(PrismSentiment.allCases.count == 4)
-        #expect(PrismSentiment.allCases.contains(.positive))
-        #expect(PrismSentiment.allCases.contains(.negative))
-        #expect(PrismSentiment.allCases.contains(.neutral))
-        #expect(PrismSentiment.allCases.contains(.mixed))
-    }
+    @Suite("PrismNLPActions")
+    struct PrismNLPActionsTests {
+        @Test("Sentiment has 4 cases")
+        func sentimentHas4Cases() {
+            #expect(PrismSentiment.allCases.count == 4)
+            #expect(PrismSentiment.allCases.contains(.positive))
+            #expect(PrismSentiment.allCases.contains(.negative))
+            #expect(PrismSentiment.allCases.contains(.neutral))
+            #expect(PrismSentiment.allCases.contains(.mixed))
+        }
 
-    @Test("Entity type has 4 cases")
-    func entityTypeHas4Cases() {
-        #expect(PrismEntityType.allCases.count == 4)
-        #expect(PrismEntityType.allCases.contains(.person))
-        #expect(PrismEntityType.allCases.contains(.place))
-        #expect(PrismEntityType.allCases.contains(.organization))
-        #expect(PrismEntityType.allCases.contains(.date))
-    }
+        @Test("Entity type has 4 cases")
+        func entityTypeHas4Cases() {
+            #expect(PrismEntityType.allCases.count == 4)
+            #expect(PrismEntityType.allCases.contains(.person))
+            #expect(PrismEntityType.allCases.contains(.place))
+            #expect(PrismEntityType.allCases.contains(.organization))
+            #expect(PrismEntityType.allCases.contains(.date))
+        }
 
-    @Test("NLP actions tokenize")
-    func nlpActionsTokenize() {
-        let tokens = PrismNLPActions.tokenize("Hello world from Swift")
-        #expect(tokens.count == 4)
-        #expect(tokens.contains("Hello"))
-        #expect(tokens.contains("world"))
-    }
+        @Test("NLP actions tokenize")
+        func nlpActionsTokenize() {
+            let tokens = PrismNLPActions.tokenize("Hello world from Swift")
+            #expect(tokens.count == 4)
+            #expect(tokens.contains("Hello"))
+            #expect(tokens.contains("world"))
+        }
 
-    @Test("NLP actions detect language")
-    func nlpActionsDetectLanguage() {
-        let lang = PrismNLPActions.detectLanguage("This is a test sentence in English")
-        #expect(lang == "en")
+        @Test("NLP actions detect language")
+        func nlpActionsDetectLanguage() {
+            let lang = PrismNLPActions.detectLanguage("This is a test sentence in English")
+            #expect(lang == "en")
+        }
     }
-}
 
 #endif
 
@@ -213,10 +213,10 @@ struct PrismStructuredOutputTests {
     func extractKeyValuesFromText() {
         let parser = PrismStructuredParser()
         let text = """
-        Name: Prism
-        Version: 2.7.0
-        Language: Swift
-        """
+            Name: Prism
+            Version: 2.7.0
+            Language: Swift
+            """
         let kv = parser.extractKeyValues(text)
         #expect(kv["Name"] == "Prism")
         #expect(kv["Version"] == "2.7.0")

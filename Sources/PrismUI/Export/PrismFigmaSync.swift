@@ -89,7 +89,7 @@ public enum PrismFigmaSync {
     /// Parses Figma Variables JSON and creates a BrandTheme.
     public static func importTheme(from data: Data) -> BrandTheme? {
         guard let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
-              let collections = json["collections"] as? [[String: Any]]
+            let collections = json["collections"] as? [[String: Any]]
         else { return nil }
 
         var primary: Color?
@@ -100,7 +100,7 @@ public enum PrismFigmaSync {
             guard let variables = collection["variables"] as? [[String: Any]] else { continue }
             for variable in variables {
                 guard let name = variable["name"] as? String,
-                      let value = variable["value"] as? [String: Double]
+                    let value = variable["value"] as? [String: Double]
                 else { continue }
 
                 let color = Color(
