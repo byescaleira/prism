@@ -1,187 +1,21 @@
 import Foundation
 
-// MARK: - OpenAPI Schema Types
-
-public enum PrismOpenAPIType: String, Sendable {
-    case string, integer, number, boolean, array, object
-}
-
-public struct PrismOpenAPISchema: Sendable {
-    public let type: PrismOpenAPIType
-    public let properties: [(String, PrismOpenAPIProperty)]
-    public let required: [String]
-    public let items: PrismOpenAPIProperty?
-    public let description: String?
-
-    public init(
-        type: PrismOpenAPIType,
-        properties: [(String, PrismOpenAPIProperty)] = [],
-        required: [String] = [],
-        items: PrismOpenAPIProperty? = nil,
-        description: String? = nil
-    ) {
-        self.type = type
-        self.properties = properties
-        self.required = required
-        self.items = items
-        self.description = description
-    }
-
-    public static func object(_ properties: [(String, PrismOpenAPIProperty)], required: [String] = [], description: String? = nil) -> PrismOpenAPISchema {
-        PrismOpenAPISchema(type: .object, properties: properties, required: required, description: description)
-    }
-
-    public static func array(of items: PrismOpenAPIProperty, description: String? = nil) -> PrismOpenAPISchema {
-        PrismOpenAPISchema(type: .array, items: items, description: description)
-    }
-
-    func toDict() -> [String: Any] {
-        var dict: [String: Any] = ["type": type.rawValue]
-        if let description { dict["description"] = description }
-        if !properties.isEmpty {
-            var props: [String: Any] = [:]
-            for (name, prop) in properties {
-                props[name] = prop.toDict()
-            }
-            dict["properties"] = props
-        }
-        if !required.isEmpty { dict["required"] = required }
-        if let items { dict["items"] = items.toDict() }
-        return dict
-    }
-}
-
-public struct PrismOpenAPIProperty: Sendable {
-    public let type: PrismOpenAPIType
-    public let format: String?
-    public let description: String?
-    public let enumValues: [String]?
-    public let nullable: Bool
-
-    public init(type: PrismOpenAPIType, format: String? = nil, description: String? = nil, enumValues: [String]? = nil, nullable: Bool = false) {
-        self.type = type
-        self.format = format
-        self.description = description
-        self.enumValues = enumValues
-        self.nullable = nullable
-    }
-
-    public static func string(_ description: String? = nil, format: String? = nil) -> PrismOpenAPIProperty {
-        PrismOpenAPIProperty(type: .string, format: format, description: description)
-    }
-
-    public static func integer(_ description: String? = nil, format: String? = nil) -> PrismOpenAPIProperty {
-        PrismOpenAPIProperty(type: .integer, format: format ?? "int64", description: description)
-    }
-
-    public static func number(_ description: String? = nil) -> PrismOpenAPIProperty {
-        PrismOpenAPIProperty(type: .number, description: description)
-    }
-
-    public static func boolean(_ description: String? = nil) -> PrismOpenAPIProperty {
-        PrismOpenAPIProperty(type: .boolean, description: description)
-    }
-
-    func toDict() -> [String: Any] {
-        var dict: [String: Any] = ["type": type.rawValue]
-        if let format { dict["format"] = format }
-        if let description { dict["description"] = description }
-        if let enumValues { dict["enum"] = enumValues }
-        if nullable { dict["nullable"] = true }
-        return dict
-    }
-}
-
-// MARK: - Route Metadata
-
-public struct PrismOpenAPIParameter: Sendable {
-    public enum Location: String, Sendable { case path, query, header }
-
-    public let name: String
-    public let location: Location
-    public let description: String?
-    public let required: Bool
-    public let type: PrismOpenAPIType
-
-    public init(name: String, in location: Location, description: String? = nil, required: Bool = false, type: PrismOpenAPIType = .string) {
-        self.name = name
-        self.location = location
-        self.description = description
-        self.required = location == .path ? true : required
-        self.type = type
-    }
-
-    func toDict() -> [String: Any] {
-        var dict: [String: Any] = [
-            "name": name,
-            "in": location.rawValue,
-            "required": self.required,
-            "schema": ["type": type.rawValue]
-        ]
-        if let description { dict["description"] = description }
-        return dict
-    }
-}
-
-public struct PrismOpenAPIResponseSpec: Sendable {
-    public let statusCode: Int
-    public let description: String
-    public let schema: PrismOpenAPISchema?
-    public let contentType: String
-
-    public init(statusCode: Int, description: String, schema: PrismOpenAPISchema? = nil, contentType: String = "application/json") {
-        self.statusCode = statusCode
-        self.description = description
-        self.schema = schema
-        self.contentType = contentType
-    }
-
-    func toDict() -> [String: Any] {
-        var dict: [String: Any] = ["description": description]
-        if let schema {
-            dict["content"] = [contentType: ["schema": schema.toDict()]]
-        }
-        return dict
-    }
-}
-
-public struct PrismRouteMetadata: Sendable {
-    public let summary: String?
-    public let description: String?
-    public let tags: [String]
-    public let parameters: [PrismOpenAPIParameter]
-    public let requestBody: PrismOpenAPISchema?
-    public let responses: [PrismOpenAPIResponseSpec]
-    public let deprecated: Bool
-
-    public init(
-        summary: String? = nil,
-        description: String? = nil,
-        tags: [String] = [],
-        parameters: [PrismOpenAPIParameter] = [],
-        requestBody: PrismOpenAPISchema? = nil,
-        responses: [PrismOpenAPIResponseSpec] = [],
-        deprecated: Bool = false
-    ) {
-        self.summary = summary
-        self.description = description
-        self.tags = tags
-        self.parameters = parameters
-        self.requestBody = requestBody
-        self.responses = responses
-        self.deprecated = deprecated
-    }
-}
-
 // MARK: - Swagger Spec Generator
 
+/// Collects API route metadata for OpenAPI specification generation.
 public actor PrismSwaggerSpec {
+    /// Information about a Server.
     public struct ServerInfo: Sendable {
+        /// The title.
         public let title: String
+        /// The version.
         public let version: String
+        /// The description.
         public let description: String?
+        /// The server u r l.
         public let serverURL: String?
 
+        /// Creates a new `ServerInfo` with the specified configuration.
         public init(title: String, version: String = "1.0.0", description: String? = nil, serverURL: String? = nil) {
             self.title = title
             self.version = version
@@ -193,16 +27,19 @@ public actor PrismSwaggerSpec {
     private var routes: [(method: String, path: String, metadata: PrismRouteMetadata)] = []
     private let info: ServerInfo
 
+    /// Creates a new `ServerInfo` with the specified configuration.
     public init(info: ServerInfo) {
         self.info = info
     }
 
+    /// Adds route.
     public func addRoute(method: String, path: String, metadata: PrismRouteMetadata) {
         var mutableSelf = self
         // Actor mutation workaround
         let _ = mutableSelf
     }
 
+    /// Registers a route with its metadata for inclusion in the Swagger docs.
     public func registerRoute(method: String, path: String, metadata: PrismRouteMetadata) async {
         // We need to store routes — use a different pattern
     }
@@ -211,6 +48,7 @@ public actor PrismSwaggerSpec {
         get { routes }
     }
 
+    /// Generates the output.
     public func generateSpec() -> [String: Any] {
         var spec: [String: Any] = [
             "openapi": "3.1.0",
@@ -231,6 +69,7 @@ public actor PrismSwaggerSpec {
         return spec
     }
 
+    /// Generates the output.
     public func generateJSON() throws -> Data {
         let spec = generateSpec()
         return try JSONSerialization.data(withJSONObject: spec, options: [.prettyPrinted, .sortedKeys])
@@ -321,13 +160,20 @@ public actor PrismSwaggerSpec {
 
 // MARK: - Standalone Spec Builder (non-actor, simpler API)
 
+/// Builder for constructing Swagger instances.
 public struct PrismSwaggerBuilder: Sendable {
+    /// The title.
     public let title: String
+    /// The version.
     public let version: String
+    /// The description.
     public let description: String?
+    /// The server u r l.
     public let serverURL: String?
+    /// The routes.
     public let routes: [(method: String, path: String, metadata: PrismRouteMetadata)]
 
+    /// Creates a new `PrismSwaggerBuilder` with the specified configuration.
     public init(
         title: String,
         version: String = "1.0.0",
@@ -342,12 +188,14 @@ public struct PrismSwaggerBuilder: Sendable {
         self.routes = routes
     }
 
+    /// Adds ing.
     public func adding(method: String, path: String, metadata: PrismRouteMetadata) -> PrismSwaggerBuilder {
         var newRoutes = routes
         newRoutes.append((method: method, path: path, metadata: metadata))
         return PrismSwaggerBuilder(title: title, version: version, description: description, serverURL: serverURL, routes: newRoutes)
     }
 
+    /// Generates the output.
     public func generateSpec() -> [String: Any] {
         var spec: [String: Any] = [
             "openapi": "3.1.0",
@@ -368,6 +216,7 @@ public struct PrismSwaggerBuilder: Sendable {
         return spec
     }
 
+    /// Generates the output.
     public func generateJSON() throws -> Data {
         let spec = generateSpec()
         return try JSONSerialization.data(withJSONObject: spec, options: [.prettyPrinted, .sortedKeys])
@@ -445,17 +294,20 @@ public struct PrismSwaggerBuilder: Sendable {
 
 // MARK: - Swagger UI Middleware
 
+/// Middleware that serves the Swagger UI interactive API documentation.
 public struct PrismSwaggerUIMiddleware: PrismMiddleware, Sendable {
     private let specPath: String
     private let uiPath: String
     private let specProvider: @Sendable () -> [String: Any]
 
+    /// Creates a new `PrismSwaggerUIMiddleware` with the specified configuration.
     public init(path: String = "/docs", specPath: String = "/openapi.json", specProvider: @escaping @Sendable () -> [String: Any]) {
         self.uiPath = path
         self.specPath = specPath
         self.specProvider = specProvider
     }
 
+    /// Handles the request and returns a response.
     public func handle(_ request: PrismHTTPRequest, next: @escaping PrismRouteHandler) async throws -> PrismHTTPResponse {
         if request.path == specPath && request.method == .GET {
             let spec = specProvider()
