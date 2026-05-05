@@ -36,6 +36,7 @@ public struct PrismRichTextEditor: View {
         self._text = text
     }
 
+    /// The view body.
     public var body: some View {
         VStack(spacing: 0) {
             PrismFormattingToolbar(
@@ -171,6 +172,7 @@ public struct PrismFormattingToolbar: View {
         self.onFormat = onFormat
     }
 
+    /// The view body.
     public var body: some View {
         ScrollView(.horizontal, showsIndicators: false) {
             HStack(spacing: SpacingToken.xs.rawValue) {

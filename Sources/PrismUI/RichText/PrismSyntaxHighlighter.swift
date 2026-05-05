@@ -1,36 +1,5 @@
 import SwiftUI
 
-/// Programming languages supported by the syntax highlighter.
-public enum PrismSyntaxLanguage: String, Sendable, CaseIterable {
-    /// Swift source code.
-    case swift
-    /// JSON data.
-    case json
-    /// HTML markup.
-    case html
-    /// CSS stylesheets.
-    case css
-    /// JavaScript source code.
-    case javascript
-    /// Python source code.
-    case python
-    /// Unformatted plain text.
-    case plainText
-
-    /// File extension typically associated with this language.
-    public var fileExtension: String {
-        switch self {
-        case .swift: "swift"
-        case .json: "json"
-        case .html: "html"
-        case .css: "css"
-        case .javascript: "js"
-        case .python: "py"
-        case .plainText: "txt"
-        }
-    }
-}
-
 /// Applies token-based syntax coloring to source code strings.
 public struct PrismSyntaxHighlighter: Sendable {
 
@@ -44,81 +13,15 @@ public struct PrismSyntaxHighlighter: Sendable {
         }
 
         let tokens = tokenize(code, language: language)
-        return colorize(tokens)
-    }
-
-    // MARK: - Token Types
-
-    private enum TokenType: Sendable {
-        case keyword
-        case string
-        case comment
-        case number
-        case punctuation
-        case type
-        case plain
-    }
-
-    private struct Token: Sendable {
-        let text: String
-        let type: TokenType
-    }
-
-    // MARK: - Language Keywords
-
-    private func keywords(for language: PrismSyntaxLanguage) -> Set<String> {
-        switch language {
-        case .swift:
-            return [
-                "import", "struct", "class", "enum", "protocol", "func", "var", "let",
-                "if", "else", "guard", "switch", "case", "return", "for", "in", "while",
-                "do", "try", "catch", "throw", "throws", "async", "await", "public",
-                "private", "internal", "fileprivate", "open", "static", "override",
-                "init", "deinit", "self", "Self", "super", "nil", "true", "false",
-                "some", "any", "where", "extension", "typealias", "associatedtype",
-                "@MainActor", "@Sendable", "@State", "@Binding", "@Environment",
-                "@Observable", "@Published",
-            ]
-        case .javascript:
-            return [
-                "const", "let", "var", "function", "return", "if", "else", "for",
-                "while", "do", "switch", "case", "break", "continue", "class",
-                "extends", "import", "export", "default", "from", "async", "await",
-                "try", "catch", "throw", "new", "this", "typeof", "instanceof",
-                "null", "undefined", "true", "false", "of", "in",
-            ]
-        case .python:
-            return [
-                "def", "class", "if", "elif", "else", "for", "while", "return",
-                "import", "from", "as", "try", "except", "finally", "raise", "with",
-                "lambda", "pass", "break", "continue", "and", "or", "not", "is",
-                "in", "True", "False", "None", "self", "yield", "async", "await",
-            ]
-        case .html:
-            return [
-                "html", "head", "body", "div", "span", "p", "a", "img", "ul", "ol",
-                "li", "table", "tr", "td", "th", "form", "input", "button", "script",
-                "style", "link", "meta", "title", "section", "article", "nav", "header",
-                "footer", "main",
-            ]
-        case .css:
-            return [
-                "color", "background", "margin", "padding", "border", "display",
-                "position", "width", "height", "font", "text", "flex", "grid",
-                "align", "justify", "transform", "transition", "animation",
-                "opacity", "overflow", "z-index", "@media", "@keyframes", "important",
-            ]
-        case .json, .plainText:
-            return []
-        }
+        return prismSyntaxColorize(tokens)
     }
 
     // MARK: - Tokenizer
 
-    private func tokenize(_ code: String, language: PrismSyntaxLanguage) -> [Token] {
-        var tokens: [Token] = []
+    private func tokenize(_ code: String, language: PrismSyntaxLanguage) -> [PrismSyntaxToken] {
+        var tokens: [PrismSyntaxToken] = []
         let chars = Array(code)
-        let languageKeywords = keywords(for: language)
+        let languageKeywords = prismSyntaxKeywords(for: language)
         var index = chars.startIndex
 
         while index < chars.count {
@@ -131,7 +34,7 @@ public struct PrismSyntaxHighlighter: Sendable {
                     comment.append(chars[index])
                     index += 1
                 }
-                tokens.append(Token(text: comment, type: .comment))
+                tokens.append(PrismSyntaxToken(text: comment, type: .comment))
                 continue
             }
 
@@ -153,7 +56,7 @@ public struct PrismSyntaxHighlighter: Sendable {
                     comment.append(chars[index])
                     index += 1
                 }
-                tokens.append(Token(text: comment, type: .comment))
+                tokens.append(PrismSyntaxToken(text: comment, type: .comment))
                 continue
             }
 
@@ -164,7 +67,7 @@ public struct PrismSyntaxHighlighter: Sendable {
                     comment.append(chars[index])
                     index += 1
                 }
-                tokens.append(Token(text: comment, type: .comment))
+                tokens.append(PrismSyntaxToken(text: comment, type: .comment))
                 continue
             }
 
@@ -181,7 +84,7 @@ public struct PrismSyntaxHighlighter: Sendable {
                     }
                     index += 1
                 }
-                tokens.append(Token(text: comment, type: .comment))
+                tokens.append(PrismSyntaxToken(text: comment, type: .comment))
                 continue
             }
 
@@ -202,7 +105,7 @@ public struct PrismSyntaxHighlighter: Sendable {
                     str.append(chars[index])
                     index += 1
                 }
-                tokens.append(Token(text: str, type: .string))
+                tokens.append(PrismSyntaxToken(text: str, type: .string))
                 continue
             }
 
@@ -213,7 +116,7 @@ public struct PrismSyntaxHighlighter: Sendable {
                     num.append(chars[index])
                     index += 1
                 }
-                tokens.append(Token(text: num, type: .number))
+                tokens.append(PrismSyntaxToken(text: num, type: .number))
                 continue
             }
 
@@ -225,7 +128,7 @@ public struct PrismSyntaxHighlighter: Sendable {
                     word.append(chars[index])
                     index += 1
                 }
-                let tokenType: TokenType =
+                let tokenType: PrismSyntaxTokenType =
                     if languageKeywords.contains(word) {
                         .keyword
                     } else if word.first?.isUppercase == true {
@@ -233,7 +136,7 @@ public struct PrismSyntaxHighlighter: Sendable {
                     } else {
                         .plain
                     }
-                tokens.append(Token(text: word, type: tokenType))
+                tokens.append(PrismSyntaxToken(text: word, type: tokenType))
                 continue
             }
 
@@ -245,49 +148,17 @@ public struct PrismSyntaxHighlighter: Sendable {
                     attr.append(chars[index])
                     index += 1
                 }
-                let tokenType: TokenType = languageKeywords.contains(attr) ? .keyword : .plain
-                tokens.append(Token(text: attr, type: tokenType))
+                let tokenType: PrismSyntaxTokenType = languageKeywords.contains(attr) ? .keyword : .plain
+                tokens.append(PrismSyntaxToken(text: attr, type: tokenType))
                 continue
             }
 
             // Punctuation / whitespace / other
-            tokens.append(Token(text: String(char), type: char.isPunctuation ? .punctuation : .plain))
+            tokens.append(PrismSyntaxToken(text: String(char), type: char.isPunctuation ? .punctuation : .plain))
             index += 1
         }
 
         return tokens
-    }
-
-    // MARK: - Colorizer
-
-    private func colorize(_ tokens: [Token]) -> AttributedString {
-        var result = AttributedString()
-
-        for token in tokens {
-            var attr = AttributedString(token.text)
-            attr.font = .system(.body, design: .monospaced)
-
-            switch token.type {
-            case .keyword:
-                attr.foregroundColor = .pink
-            case .string:
-                attr.foregroundColor = .red
-            case .comment:
-                attr.foregroundColor = .gray
-            case .number:
-                attr.foregroundColor = .purple
-            case .type:
-                attr.foregroundColor = .cyan
-            case .punctuation:
-                attr.foregroundColor = .secondary
-            case .plain:
-                break
-            }
-
-            result.append(attr)
-        }
-
-        return result
     }
 }
 
@@ -309,6 +180,7 @@ public struct PrismCodeBlock: View {
         self.showLineNumbers = showLineNumbers
     }
 
+    /// The view body.
     public var body: some View {
         VStack(alignment: .leading, spacing: 0) {
             // Header with language label and copy button
