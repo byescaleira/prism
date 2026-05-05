@@ -6,4 +6,5 @@
 @_exported import PrismUI
 @_exported import PrismGamification
 @_exported import PrismSecurity
+@_exported import PrismStorage
 @_exported import PrismVideo

@@ -59,6 +59,10 @@ let package = Package(
             name: "PrismSecurity",
             targets: ["PrismSecurity"],
         ),
+        .library(
+            name: "PrismStorage",
+            targets: ["PrismStorage"],
+        ),
     ],
     dependencies: [
         .package(url: "https://github.com/swiftlang/swift-docc-plugin", from: "1.4.3")
@@ -76,6 +80,7 @@ let package = Package(
                 "PrismCapabilities",
                 "PrismGamification",
                 "PrismSecurity",
+                "PrismStorage",
             ],
             swiftSettings: swiftSettings
         ),
@@ -142,6 +147,11 @@ let package = Package(
             swiftSettings: swiftSettings
         ),
         .target(
+            name: "PrismStorage",
+            dependencies: ["PrismFoundation"],
+            swiftSettings: swiftSettings
+        ),
+        .target(
             name: "PrismPreview",
             dependencies: ["Prism"],
             swiftSettings: swiftSettings
@@ -198,6 +208,10 @@ let package = Package(
         .testTarget(
             name: "PrismSecurityTests",
             dependencies: ["PrismSecurity"],
+        ),
+        .testTarget(
+            name: "PrismStorageTests",
+            dependencies: ["PrismStorage"],
         ),
     ],
     swiftLanguageModes: [.v6],
