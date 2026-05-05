@@ -14,6 +14,7 @@ public struct PrismGameCenterPlayer: Sendable {
     /// Whether the player is currently authenticated with Game Center.
     public let isAuthenticated: Bool
 
+    /// Creates a new Game Center player descriptor with the given identity.
     public init(id: String, displayName: String, alias: String, isAuthenticated: Bool) {
         self.id = id
         self.displayName = displayName
@@ -39,6 +40,7 @@ public struct PrismLeaderboardScore: Sendable {
     /// The date when the score was submitted.
     public let date: Date
 
+    /// Creates a new leaderboard score entry with the given player and score data.
     public init(playerID: String, displayName: String, value: Int, rank: Int, formattedValue: String? = nil, date: Date) {
         self.playerID = playerID
         self.displayName = displayName
@@ -53,7 +55,9 @@ public struct PrismLeaderboardScore: Sendable {
 
 /// The player scope used when querying leaderboard scores.
 public enum PrismLeaderboardScope: Sendable {
+    /// Scores from all players worldwide.
     case global
+    /// Scores from the player's Game Center friends only.
     case friends
 }
 
@@ -61,8 +65,11 @@ public enum PrismLeaderboardScope: Sendable {
 
 /// The time range filter for leaderboard score queries.
 public enum PrismLeaderboardTimeScope: Sendable, CaseIterable {
+    /// Scores submitted today.
     case today
+    /// Scores submitted in the past week.
     case week
+    /// All scores ever submitted.
     case allTime
 }
 
@@ -81,6 +88,7 @@ public struct PrismAchievement: Sendable {
     /// Whether to show a completion banner when the achievement is earned.
     public let showsCompletionBanner: Bool
 
+    /// Creates a new achievement with the given identifier and progress.
     public init(id: String, title: String, percentComplete: Double, isCompleted: Bool, showsCompletionBanner: Bool) {
         self.id = id
         self.title = title
@@ -103,6 +111,7 @@ public struct PrismMatchRequest: Sendable {
     /// The default number of players when presenting the matchmaker UI.
     public let defaultNumberOfPlayers: Int
 
+    /// Creates a new match request with the given player count constraints.
     public init(minPlayers: Int, maxPlayers: Int, playerGroup: Int? = nil, defaultNumberOfPlayers: Int) {
         self.minPlayers = minPlayers
         self.maxPlayers = maxPlayers
@@ -115,9 +124,13 @@ public struct PrismMatchRequest: Sendable {
 
 /// The current status of a Game Center multiplayer match.
 public enum PrismMatchStatus: Sendable, CaseIterable {
+    /// The match status is unknown.
     case unknown
+    /// The match is open and accepting players.
     case open
+    /// The match has ended.
     case ended
+    /// The match is currently looking for players.
     case matching
 }
 
@@ -138,6 +151,7 @@ public final class PrismGameCenterClient {
     /// Whether the local player is currently authenticated with Game Center.
     public private(set) var isAuthenticated: Bool = false
 
+    /// Creates a new Game Center client.
     public init() {}
 
     /// Authenticates the local player with Game Center.

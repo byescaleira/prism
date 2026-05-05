@@ -5,9 +5,13 @@ import StoreKit
 
 /// Represents the type of an in-app purchase product.
 public enum PrismProductType: Sendable, CaseIterable {
+    /// A product that can be purchased multiple times.
     case consumable
+    /// A product that is purchased once and persists permanently.
     case nonConsumable
+    /// A subscription that renews automatically.
     case autoRenewable
+    /// A subscription that does not renew automatically.
     case nonRenewable
 }
 
@@ -26,6 +30,7 @@ public struct PrismProductInfo: Sendable {
     /// The product type classification.
     public let type: PrismProductType
 
+    /// Creates a new product info with the given identifier, name, price, and type.
     public init(id: String, displayName: String, description: String, price: Decimal, type: PrismProductType) {
         self.id = id
         self.displayName = displayName
@@ -52,6 +57,7 @@ public struct PrismTransactionInfo: Sendable {
     /// The date the transaction was revoked, if applicable.
     public let revocationDate: Date?
 
+    /// Creates a new transaction info with the given identifier and purchase details.
     public init(id: UInt64, productID: String, purchaseDate: Date, expirationDate: Date? = nil, isUpgraded: Bool = false, revocationDate: Date? = nil) {
         self.id = id
         self.productID = productID
@@ -66,10 +72,15 @@ public struct PrismTransactionInfo: Sendable {
 
 /// Represents the current state of an auto-renewable subscription.
 public enum PrismSubscriptionStatus: Sendable, CaseIterable {
+    /// The subscription is active and in good standing.
     case subscribed
+    /// The subscription has expired.
     case expired
+    /// The subscription was revoked by the App Store or the user.
     case revoked
+    /// The subscription is in a billing retry period after a failed renewal.
     case inBillingRetry
+    /// The subscription is in a grace period after a billing issue.
     case inGracePeriod
 }
 
@@ -85,6 +96,7 @@ public final class PrismStoreKitClient {
 
     nonisolated(unsafe) private var transactionListener: Task<Void, Never>?
 
+    /// Creates a new StoreKit client.
     public init() {}
 
     deinit {

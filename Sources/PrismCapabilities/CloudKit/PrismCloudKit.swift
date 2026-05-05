@@ -5,12 +5,19 @@ import CloudKit
 
 /// A typed value that can be stored in a CloudKit record field.
 public enum PrismCloudValue: Sendable {
+    /// A string value.
     case string(String)
+    /// An integer value.
     case int(Int)
+    /// A floating-point value.
     case double(Double)
+    /// A binary data value.
     case data(Data)
+    /// A date value.
     case date(Date)
+    /// A reference to another record by its identifier.
     case reference(String)
+    /// An array of string values.
     case stringArray([String])
 }
 
@@ -29,6 +36,7 @@ public struct PrismCloudRecord: Sendable {
     /// When the record was last modified.
     public let modifiedAt: Date?
 
+    /// Creates a new cloud record with the given identifier, type, and fields.
     public init(id: String, recordType: String, fields: [String: PrismCloudValue], createdAt: Date? = nil, modifiedAt: Date? = nil) {
         self.id = id
         self.recordType = recordType
@@ -42,8 +50,11 @@ public struct PrismCloudRecord: Sendable {
 
 /// Which CloudKit database to target.
 public enum PrismCloudDatabase: Sendable {
+    /// The publicly accessible database visible to all users.
     case publicDB
+    /// The private database scoped to the current iCloud account.
     case privateDB
+    /// The shared database containing records shared by other users.
     case sharedDB
 }
 
@@ -51,10 +62,15 @@ public enum PrismCloudDatabase: Sendable {
 
 /// The iCloud account status on this device.
 public enum PrismCloudAccountStatus: Sendable, CaseIterable {
+    /// An iCloud account is available and signed in.
     case available
+    /// No iCloud account is configured on the device.
     case noAccount
+    /// The iCloud account is restricted (e.g., managed device).
     case restricted
+    /// The account status could not be determined.
     case couldNotDetermine
+    /// The iCloud account is temporarily unavailable.
     case temporarilyUnavailable
 }
 
@@ -64,6 +80,7 @@ public enum PrismCloudAccountStatus: Sendable, CaseIterable {
 public actor PrismCloudKitClient {
     private let container: CKContainer
 
+    /// Creates a new CloudKit client targeting the specified container, or the default container if nil.
     public init(containerIdentifier: String? = nil) {
         if let id = containerIdentifier {
             container = CKContainer(identifier: id)

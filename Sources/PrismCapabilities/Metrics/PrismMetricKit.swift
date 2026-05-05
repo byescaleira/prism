@@ -16,6 +16,7 @@ public struct PrismAppMetrics: Sendable {
     /// Total disk writes in megabytes.
     public let diskWrites: Double?
 
+    /// Creates a new app metrics snapshot with the given performance data.
     public init(launchDuration: Double? = nil, hangDuration: Double? = nil, peakMemory: Double? = nil, cpuTime: Double? = nil, diskWrites: Double? = nil) {
         self.launchDuration = launchDuration
         self.hangDuration = hangDuration
@@ -42,6 +43,7 @@ public struct PrismCrashDiagnostic: Sendable {
     /// JSON-encoded call stack tree.
     public let callStackTree: String?
 
+    /// Creates a new crash diagnostic with the given timestamp and crash details.
     public init(id: UUID = UUID(), timestamp: Date, exceptionType: String? = nil, signal: String? = nil, terminationReason: String? = nil, callStackTree: String? = nil) {
         self.id = id
         self.timestamp = timestamp
@@ -62,6 +64,7 @@ public final class PrismMetricKitClient: NSObject, MXMetricManagerSubscriber {
     /// All crash diagnostics received since the client started.
     public private(set) var crashDiagnostics: [PrismCrashDiagnostic] = []
 
+    /// Creates a new MetricKit client.
     public override init() {
         super.init()
     }

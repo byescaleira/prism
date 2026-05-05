@@ -5,13 +5,21 @@ import HealthKit
 
 /// Supported HealthKit data types for reading and writing.
 public enum PrismHealthDataType: Sendable, CaseIterable {
+    /// Number of steps taken.
     case stepCount
+    /// Heart rate in beats per minute.
     case heartRate
+    /// Active energy burned in kilocalories.
     case activeEnergy
+    /// Sleep analysis data.
     case sleepAnalysis
+    /// Body mass in kilograms.
     case bodyMass
+    /// Body height in centimeters.
     case height
+    /// Blood oxygen saturation percentage.
     case bloodOxygen
+    /// Respiratory rate in breaths per minute.
     case respiratoryRate
 }
 
@@ -30,6 +38,7 @@ public struct PrismHealthSample: Sendable {
     /// The end date of the sample period.
     public let endDate: Date
 
+    /// Creates a new health sample with the given type, value, unit, and time range.
     public init(type: PrismHealthDataType, value: Double, unit: String, startDate: Date, endDate: Date) {
         self.type = type
         self.value = value
@@ -56,6 +65,7 @@ public struct PrismHealthStatistics: Sendable {
     /// The unit string for the values.
     public let unit: String
 
+    /// Creates a new health statistics value with the given aggregated data.
     public init(type: PrismHealthDataType, sum: Double? = nil, average: Double? = nil, min: Double? = nil, max: Double? = nil, unit: String) {
         self.type = type
         self.sum = sum
@@ -70,9 +80,13 @@ public struct PrismHealthStatistics: Sendable {
 
 /// How often HealthKit delivers background updates for observed data types.
 public enum PrismHealthDeliveryFrequency: Sendable {
+    /// Deliver updates as soon as new data is available.
     case immediate
+    /// Deliver updates at most once per hour.
     case hourly
+    /// Deliver updates at most once per day.
     case daily
+    /// Deliver updates at most once per week.
     case weekly
 }
 
@@ -82,6 +96,7 @@ public enum PrismHealthDeliveryFrequency: Sendable {
 public actor PrismHealthKitClient {
     private let store = HKHealthStore()
 
+    /// Creates a new HealthKit client.
     public init() {}
 
     /// Returns whether HealthKit is available on this device.

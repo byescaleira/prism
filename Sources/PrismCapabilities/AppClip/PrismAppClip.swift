@@ -11,6 +11,7 @@ public struct PrismAppClipRegion: Sendable {
     /// The radius of the region in meters.
     public let radius: Double
 
+    /// Creates a new App Clip region with the given center and radius.
     public init(latitude: Double, longitude: Double, radius: Double) {
         self.latitude = latitude
         self.longitude = longitude
@@ -29,6 +30,7 @@ public struct PrismAppClipInvocation: Sendable {
     /// The geographic region associated with the invocation.
     public let region: PrismAppClipRegion?
 
+    /// Creates a new App Clip invocation with the given URL and optional payload and region.
     public init(url: URL, payload: String? = nil, region: PrismAppClipRegion? = nil) {
         self.url = url
         self.payload = payload
@@ -40,7 +42,9 @@ public struct PrismAppClipInvocation: Sendable {
 
 /// The type of App Clip experience being presented.
 public enum PrismAppClipExperience: Sendable {
+    /// The default App Clip experience without additional configuration.
     case defaultExperience
+    /// An advanced App Clip experience identified by a custom string.
     case advancedExperience(String)
 }
 
@@ -55,6 +59,7 @@ import StoreKit
 /// Client for handling App Clip invocations, location verification, and full app promotion.
 public final class PrismAppClipClient: Sendable {
 
+    /// Creates a new App Clip client.
     public init() {}
 
     /// Parses an invocation URL into a structured App Clip invocation.

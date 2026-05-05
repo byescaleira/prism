@@ -76,6 +76,7 @@ public struct PrismBiometricResult: Sendable {
     /// The error that occurred during authentication, if any.
     public let error: PrismBiometricError?
 
+    /// Creates a new biometric result with the given success status and optional error.
     public init(success: Bool, error: PrismBiometricError? = nil) {
         self.success = success
         self.error = error
@@ -108,6 +109,7 @@ public struct PrismBiometricResult: Sendable {
 /// ```
 public final class PrismBiometricClient: Sendable {
 
+    /// Creates a new biometric authentication client.
     public init() {}
 
     /// Returns the biometric type available on the current device.

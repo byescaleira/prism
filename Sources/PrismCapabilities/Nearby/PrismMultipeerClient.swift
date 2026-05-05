@@ -13,6 +13,7 @@ public struct PrismPeer: Sendable {
     /// Whether this peer is currently connected.
     public let isConnected: Bool
 
+    /// Creates a new peer with the given identifier, display name, and connection status.
     public init(id: String, displayName: String, isConnected: Bool = false) {
         self.id = id
         self.displayName = displayName
@@ -83,6 +84,7 @@ public final class PrismMultipeerClient: NSObject, MCSessionDelegate, MCNearbySe
     /// Maps peer display names to their MCPeerID for invitation and sending.
     private var knownPeers: [String: MCPeerID] = [:]
 
+    /// Creates a new multipeer connectivity client.
     public override init() {
         super.init()
     }

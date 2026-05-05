@@ -5,7 +5,9 @@ import AuthenticationServices
 
 /// The scope of user information requested during Sign in with Apple.
 public enum PrismAppleIDScope: Sendable, CaseIterable {
+    /// Request the user's email address.
     case email
+    /// Request the user's full name.
     case fullName
 }
 
@@ -24,6 +26,7 @@ public struct PrismAppleIDCredential: Sendable {
     /// A short-lived token for exchanging with your server.
     public let authorizationCode: Data?
 
+    /// Creates a new Apple ID credential with the given user information.
     public init(userID: String, email: String? = nil, fullName: String? = nil, identityToken: Data? = nil, authorizationCode: Data? = nil) {
         self.userID = userID
         self.email = email
@@ -37,9 +40,13 @@ public struct PrismAppleIDCredential: Sendable {
 
 /// The current state of an Apple ID credential.
 public enum PrismAppleIDCredentialState: Sendable, CaseIterable {
+    /// The user's Apple ID credential is valid and authorized.
     case authorized
+    /// The user's Apple ID credential has been revoked.
     case revoked
+    /// No credential was found for the given user identifier.
     case notFound
+    /// The user's credential has been transferred to a different team.
     case transferred
 }
 
@@ -49,6 +56,7 @@ public enum PrismAppleIDCredentialState: Sendable, CaseIterable {
 @MainActor
 public final class PrismSignInWithAppleClient {
 
+    /// Creates a new Sign in with Apple client.
     public init() {}
 
     /// Initiates a Sign in with Apple authorization flow with the requested scopes.

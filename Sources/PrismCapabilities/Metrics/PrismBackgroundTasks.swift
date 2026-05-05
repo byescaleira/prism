@@ -4,7 +4,9 @@ import Foundation
 
 /// The type of background task to register.
 public enum PrismBackgroundTaskType: Sendable {
+    /// A short-lived task for refreshing app content.
     case appRefresh
+    /// A longer-running task for maintenance or data processing.
     case processing
 }
 
@@ -23,6 +25,7 @@ public struct PrismBackgroundTaskConfig: Sendable {
     /// The earliest date the task should begin, if any.
     public let earliestBeginDate: Date?
 
+    /// Creates a new background task configuration with the given identifier and requirements.
     public init(identifier: String, type: PrismBackgroundTaskType, requiresNetwork: Bool = false, requiresCharging: Bool = false, earliestBeginDate: Date? = nil) {
         self.identifier = identifier
         self.type = type
@@ -40,6 +43,7 @@ import BackgroundTasks
 /// Client that wraps BGTaskScheduler for registering and scheduling background tasks.
 public final class PrismBackgroundTaskClient: Sendable {
 
+    /// Creates a new background task client.
     public init() {}
 
     /// Registers a background task handler with the system.

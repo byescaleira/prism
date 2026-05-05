@@ -8,7 +8,9 @@ import AppKit
 
 /// Whether a payment line item amount is final or pending.
 public enum PrismPaymentItemType: Sendable {
+    /// The amount is finalized and will not change.
     case final_
+    /// The amount is not yet determined and may change.
     case pending
 }
 
@@ -23,6 +25,7 @@ public struct PrismPaymentItem: Sendable {
     /// Whether the amount is final or pending.
     public let type: PrismPaymentItemType
 
+    /// Creates a new payment line item with the given label, amount, and type.
     public init(label: String, amount: Decimal, type: PrismPaymentItemType = .final_) {
         self.label = label
         self.amount = amount
@@ -34,9 +37,13 @@ public struct PrismPaymentItem: Sendable {
 
 /// Supported payment card networks for Apple Pay.
 public enum PrismPaymentNetwork: Sendable, CaseIterable {
+    /// Visa card network.
     case visa
+    /// Mastercard card network.
     case mastercard
+    /// American Express card network.
     case amex
+    /// Discover card network.
     case discover
 }
 
@@ -55,6 +62,7 @@ public struct PrismPaymentRequest: Sendable {
     /// The card networks accepted by the merchant.
     public let supportedNetworks: [PrismPaymentNetwork]
 
+    /// Creates a new payment request with the given merchant configuration and line items.
     public init(merchantID: String, countryCode: String, currencyCode: String, items: [PrismPaymentItem], supportedNetworks: [PrismPaymentNetwork]) {
         self.merchantID = merchantID
         self.countryCode = countryCode
@@ -75,6 +83,7 @@ public struct PrismPaymentResult: Sendable {
     /// Whether the payment was authorized successfully.
     public let success: Bool
 
+    /// Creates a new payment result with the given transaction details and success status.
     public init(transactionID: String? = nil, token: Data? = nil, success: Bool) {
         self.transactionID = transactionID
         self.token = token
@@ -88,6 +97,7 @@ public struct PrismPaymentResult: Sendable {
 @MainActor
 public final class PrismApplePayClient {
 
+    /// Creates a new Apple Pay client.
     public init() {}
 
     /// Returns whether Apple Pay is available on this device.

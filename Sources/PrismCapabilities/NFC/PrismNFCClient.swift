@@ -4,11 +4,17 @@ import Foundation
 
 /// The type of NFC tag detected during a reader session.
 public enum PrismNFCTagType: Sendable, CaseIterable {
+    /// An NFC tag that supports NDEF messages.
     case ndefTag
+    /// An ISO 7816-compatible smart card tag.
     case iso7816
+    /// An ISO 15693 vicinity tag.
     case iso15693
+    /// A FeliCa (Sony) tag.
     case felica
+    /// A MIFARE Ultralight tag.
     case mifareUltralight
+    /// A MIFARE DESFire tag.
     case mifareDesfire
 }
 
@@ -16,12 +22,19 @@ public enum PrismNFCTagType: Sendable, CaseIterable {
 
 /// The type name format field of an NDEF record, per the NFC Forum specification.
 public enum PrismNDEFTypeNameFormat: Sendable, CaseIterable {
+    /// An empty record with no type or payload.
     case empty
+    /// An NFC Forum well-known type (e.g., text or URI).
     case wellKnown
+    /// A MIME media type as defined in RFC 2046.
     case media
+    /// An absolute URI as defined in RFC 3986.
     case absoluteURI
+    /// An NFC Forum external type.
     case external
+    /// The type is unknown.
     case unknown
+    /// The payload is an intermediate or final chunk of a chunked record.
     case unchanged
 }
 
@@ -38,6 +51,7 @@ public struct PrismNDEFRecord: Sendable {
     /// An optional identifier for the record.
     public let identifier: Data
 
+    /// Creates a new NDEF record with the given type name format, type, and payload.
     public init(typeNameFormat: PrismNDEFTypeNameFormat, type: Data, payload: Data, identifier: Data = Data()) {
         self.typeNameFormat = typeNameFormat
         self.type = type
@@ -53,6 +67,7 @@ public struct PrismNDEFMessage: Sendable {
     /// The ordered list of NDEF records in this message.
     public let records: [PrismNDEFRecord]
 
+    /// Creates a new NDEF message containing the given records.
     public init(records: [PrismNDEFRecord]) {
         self.records = records
     }
@@ -69,6 +84,7 @@ public struct PrismNFCReadResult: Sendable {
     /// The unique identifier of the tag, if available.
     public let identifier: Data?
 
+    /// Creates a new NFC read result with the given tag type, optional message, and identifier.
     public init(tagType: PrismNFCTagType, message: PrismNDEFMessage? = nil, identifier: Data? = nil) {
         self.tagType = tagType
         self.message = message
@@ -100,6 +116,7 @@ public final class PrismNFCClient {
         NFCNDEFReaderSession.readingAvailable
     }
 
+    /// Creates a new NFC client.
     public init() {}
 
     /// Reads an NDEF message from a nearby NFC tag.

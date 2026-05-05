@@ -8,10 +8,15 @@ import MapKit
 
 /// Authorization status for Core Location services.
 public enum PrismLocationPermission: Sendable, CaseIterable {
+    /// The user has not yet been asked for location access.
     case notDetermined
+    /// Location access is restricted by the system.
     case restricted
+    /// The user has explicitly denied location access.
     case denied
+    /// The user has granted location access while the app is in use.
     case authorizedWhenInUse
+    /// The user has granted location access at all times.
     case authorizedAlways
 }
 
@@ -19,10 +24,15 @@ public enum PrismLocationPermission: Sendable, CaseIterable {
 
 /// Desired accuracy level for location updates.
 public enum PrismLocationAccuracy: Sendable {
+    /// The highest level of accuracy available.
     case best
+    /// Accurate to the nearest ten meters.
     case nearestTenMeters
+    /// Accurate to the nearest hundred meters.
     case hundredMeters
+    /// Accurate to the nearest kilometer.
     case kilometer
+    /// Accurate to the nearest three kilometers.
     case threeKilometers
 }
 
@@ -41,6 +51,7 @@ public struct PrismLocation: Sendable {
     /// The time at which this location was determined.
     public let timestamp: Date
 
+    /// Creates a new location with the given coordinate and optional metadata.
     public init(latitude: Double, longitude: Double, altitude: Double? = nil, horizontalAccuracy: Double = 0, timestamp: Date = Date()) {
         self.latitude = latitude
         self.longitude = longitude
@@ -67,6 +78,7 @@ public struct PrismGeofenceRegion: Sendable {
     /// Whether to trigger notifications on exit.
     public let notifyOnExit: Bool
 
+    /// Creates a new geofence region with the given center, radius, and notification triggers.
     public init(id: String, latitude: Double, longitude: Double, radius: Double, notifyOnEntry: Bool = true, notifyOnExit: Bool = true) {
         self.id = id
         self.latitude = latitude
@@ -94,6 +106,7 @@ public struct PrismGeocodingResult: Sendable {
     /// The coordinate associated with this geocoding result.
     public let coordinate: PrismLocation?
 
+    /// Creates a new geocoding result with the given address components and coordinate.
     public init(name: String? = nil, locality: String? = nil, administrativeArea: String? = nil, country: String? = nil, postalCode: String? = nil, coordinate: PrismLocation? = nil) {
         self.name = name
         self.locality = locality
@@ -119,6 +132,7 @@ public final class PrismLocationClient: NSObject, Sendable {
     private var permissionContinuation: CheckedContinuation<PrismLocationPermission, Never>?
     private var locationContinuation: CheckedContinuation<PrismLocation, any Error>?
 
+    /// Creates a new location client and begins observing authorization changes.
     public override init() {
         super.init()
         manager.delegate = self
@@ -215,6 +229,7 @@ public final class PrismLocationClient: NSObject, Sendable {
 // MARK: - CLLocationManagerDelegate
 
 extension PrismLocationClient: CLLocationManagerDelegate {
+    /// Responds to authorization status changes from the location manager.
     public nonisolated func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {
         let status = manager.authorizationStatus.toPrismPermission()
         MainActor.assumeIsolated {
@@ -224,6 +239,7 @@ extension PrismLocationClient: CLLocationManagerDelegate {
         }
     }
 
+    /// Processes updated locations from the location manager.
     public nonisolated func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         MainActor.assumeIsolated {
             guard let clLocation = locations.last else { return }
@@ -234,6 +250,7 @@ extension PrismLocationClient: CLLocationManagerDelegate {
         }
     }
 
+    /// Handles location manager errors.
     public nonisolated func locationManager(_ manager: CLLocationManager, didFailWithError error: any Error) {
         MainActor.assumeIsolated {
             locationContinuation?.resume(throwing: error)

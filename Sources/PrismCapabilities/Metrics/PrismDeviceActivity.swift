@@ -15,6 +15,7 @@ public struct PrismDeviceActivitySchedule: Sendable {
     /// Whether the schedule repeats daily.
     public let repeats: Bool
 
+    /// Creates a new device activity schedule with the given start and end times.
     public init(startHour: Int, startMinute: Int, endHour: Int, endMinute: Int, repeats: Bool = true) {
         self.startHour = startHour
         self.startMinute = startMinute
@@ -35,6 +36,7 @@ public struct PrismDeviceActivityEvent: Sendable {
     /// Whether the event tracks all app activity or only selected apps.
     public let includesAllActivity: Bool
 
+    /// Creates a new device activity event with the given name and threshold.
     public init(name: String, threshold: TimeInterval, includesAllActivity: Bool = false) {
         self.name = name
         self.threshold = threshold
@@ -51,6 +53,7 @@ import DeviceActivity
 public final class PrismDeviceActivityClient: Sendable {
     private nonisolated(unsafe) let center = DeviceActivityCenter()
 
+    /// Creates a new device activity client.
     public init() {}
 
     /// Starts monitoring a named activity with the given schedule and events.

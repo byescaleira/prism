@@ -17,6 +17,7 @@ public struct PrismNearbyObject: Sendable {
     /// Unit vector pointing toward the peer in the device's coordinate system.
     public let direction: SIMD3<Float>?
 
+    /// Creates a new nearby object with the given peer token and optional spatial measurements.
     public init(peerToken: Data, distance: Float? = nil, direction: SIMD3<Float>? = nil) {
         self.peerToken = peerToken
         self.distance = distance
@@ -70,6 +71,7 @@ public final class PrismNearbyClient: NSObject, NISessionDelegate {
 
     private var session: NISession?
 
+    /// Creates a new nearby interaction client.
     public override init() {
         super.init()
     }

@@ -12,6 +12,7 @@ public struct PrismMapRoute: Sendable {
     /// The localized name of the route.
     public let name: String
 
+    /// Creates a new map route with the given distance, travel time, and name.
     public init(distance: Double, expectedTravelTime: TimeInterval, name: String) {
         self.distance = distance
         self.expectedTravelTime = expectedTravelTime
@@ -23,9 +24,13 @@ public struct PrismMapRoute: Sendable {
 
 /// The mode of transportation for route calculations.
 public enum PrismMapTransportType: Sendable, CaseIterable {
+    /// Driving directions by car.
     case automobile
+    /// Walking directions on foot.
     case walking
+    /// Public transit directions.
     case transit
+    /// Cycling directions by bicycle.
     case cycling
 }
 
@@ -40,6 +45,7 @@ public struct PrismPOI: Sendable {
     /// An optional category describing the point of interest.
     public let category: String?
 
+    /// Creates a new point of interest with the given name, coordinate, and optional category.
     public init(name: String, coordinate: PrismLocation, category: String? = nil) {
         self.name = name
         self.coordinate = coordinate
@@ -52,6 +58,7 @@ public struct PrismPOI: Sendable {
 /// Client for MapKit directions, travel time estimation, and point-of-interest search.
 public struct PrismMapClient: Sendable {
 
+    /// Creates a new map client.
     public init() {}
 
     /// Calculates driving/walking/transit/cycling directions between two locations.

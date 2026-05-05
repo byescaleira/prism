@@ -30,6 +30,7 @@ public struct PrismIntentDonation: Sendable {
     /// Arbitrary key-value metadata attached to the donation.
     public let metadata: [String: String]
 
+    /// Creates a new intent donation with the given type, title, and optional metadata.
     public init(
         id: UUID = UUID(),
         intentType: String,
@@ -64,6 +65,7 @@ public struct PrismShortcutPhrase: Sendable {
     /// The intent type string this phrase maps to.
     public let intentType: String
 
+    /// Creates a new shortcut phrase mapped to the given intent type.
     public init(phrase: String, intentType: String) {
         self.phrase = phrase
         self.intentType = intentType
@@ -92,6 +94,7 @@ public struct PrismIntentPrediction: Sendable {
     /// Parameters that pre-fill the intent when the prediction is selected.
     public let parameters: [String: String]
 
+    /// Creates a new intent prediction with the given type, title, and parameters.
     public init(intentType: String, title: String, parameters: [String: String] = [:]) {
         self.intentType = intentType
         self.title = title
@@ -141,6 +144,7 @@ public final class PrismAppIntentClient {
     /// Tracks suggested shortcut phrases.
     private var suggestedPhrases: [PrismShortcutPhrase] = []
 
+    /// Creates a new App Intent client.
     public init() {}
 
     /// Donates a user interaction so the system can suggest it in the future.
