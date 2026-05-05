@@ -7,6 +7,120 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 
 ## [Unreleased]
 
+### Changed
+
+- Removed redundant `as? String` casts in PrismServer tracing and versioning
+- Replaced force unwrap with safe binding in `PrismTreemap.currentItems`
+- Increased timing tolerance in PrismScheduler test to fix flaky CI
+
+### Refactored
+
+- Extracted types and delegates from `PrismCameraClient` (544 → 274+189+75 lines)
+- Extracted types from `PrismIntelligenceClient` (649 → 416+160 lines)
+- Extracted types and delegates from `PrismBluetoothClient`
+- Extracted types from `PrismMotionClient`
+- Extracted training types and runtime from `PrismIntelligenceLocalTrainer`
+- Extracted HTML templates from `PrismSwaggerUI`
+- Extracted AST types from `PrismGraphQLParser`
+- Extracted renderers and themes from PrismUI RichText
+
+### Documentation
+
+- Added `///` doc comments to all public APIs across all 8 modules (~2000+ APIs)
+
+### Testing
+
+- Added tests for PrismNetwork retry policies, cache, multipart upload, deduplicator, offline queue, and GraphQL types
+- Added tests for PrismIntelligence types, training configurations, and result enums
+- Added tests for PrismCapabilities Bluetooth, Motion, and Camera types
+- Added tests for PrismArchitecture disk and UserDefaults persistence
+- Added PrismVideo downloader status tests and edge cases
+- Total test count: 2207 → 2357 (+150 tests)
+
+## [4.4.0] - 2026-04-28
+
+### Added
+
+- **WebSocket Rooms**: `PrismWebSocketRoom`, `PrismRoomManager` — named rooms with broadcast, join/leave, and room-scoped messaging
+- **Cron Scheduler**: `PrismCronScheduler`, `PrismCronExpression` — cron-style recurring task scheduling with expression parsing
+- **Lifecycle Hooks**: `PrismHooks` — server lifecycle hooks for startup, shutdown, and request pipeline events
+- **Content Negotiation**: `PrismContentNegotiation` — automatic response format selection based on `Accept` header
+- **Relationships**: `PrismRelationship` — declarative model relationship definitions for eager/lazy loading
+- **Rate Limiter v2**: `PrismRateLimitV2` — sliding window and token bucket algorithms with pluggable backends
+- **Body Parser**: `PrismBodyParser` — streaming body parser for JSON, form-urlencoded, and multipart payloads
+- **Cluster**: `PrismCluster` — multi-process clustering for utilizing all CPU cores
+
+## [4.3.0] - 2026-04-28
+
+### Added
+
+- **GraphQL**: `PrismGraphQLSchema`, `PrismGraphQLParser`, `PrismGraphQLExecutor`, `PrismGraphQLMiddleware` — schema-first GraphQL execution engine
+- **MCP (Model Context Protocol)**: `PrismMCPServer` — MCP server implementation for AI tool integration
+- **Streaming**: `PrismStreamingResponse` — chunked transfer encoding and streaming response bodies
+- **SSE (Server-Sent Events)**: `PrismSSE` — server-sent event streams with named events and retry
+- **API Versioning**: `PrismVersioningMiddleware`, `PrismVersionedRouter` — URL prefix, header, and query param version extraction
+- **Distributed Tracing**: `PrismTracingMiddleware`, `PrismTraceContext` — request ID propagation and correlation
+- **Dependency Injection**: `PrismDI`, `PrismServiceContainer` — type-safe service registration and resolution
+- **Background Tasks**: `PrismBackgroundTaskRunner` — async background task execution with lifecycle management
+- **HTTP Client**: `PrismHTTPClient` — server-side HTTP client for service-to-service communication
+- **Testing Utilities**: `PrismTestServer`, `PrismTestRequest` — in-process test helpers for server routes
+
+## [4.2.0] - 2026-04-28
+
+### Added
+
+- **Validation**: `PrismValidator`, `PrismValidationRule` — composable request validation with built-in rules
+- **Event System**: `PrismEventBus`, `PrismEvent` — pub/sub event bus for decoupled communication
+- **Connection Pool**: `PrismConnectionPool` — generic connection pooling with health checks
+- **File Upload**: `PrismFileUpload` — multipart file upload handling with size limits and type validation
+- **Graceful Shutdown**: `PrismGracefulShutdown` — signal handling and in-flight request draining
+- **Health Checks**: `PrismHealthCheck`, `PrismMetrics` — health endpoint and metrics collection
+- **Configuration**: `PrismConfig` — environment-aware configuration loading from files and env vars
+- **Error Handling**: `PrismErrorMiddleware` — structured error responses with custom error pages
+
+## [4.1.0] - 2026-04-28
+
+### Added
+
+- **Cache**: `PrismCacheStore`, `PrismCache` — pluggable caching with in-memory and custom backends
+- **Database**: `PrismDatabaseStore`, `PrismMigrationRunner` — database abstraction with migration support
+- **Session**: `PrismSessionMiddleware`, `PrismSession` — server-side session management with pluggable stores
+- **Template Engine**: `PrismTemplateEngine` — HTML template rendering with variable interpolation
+- **Job Queue**: `PrismJobQueue`, `PrismJobStore` — async background job processing with retry and scheduling
+- **OpenAPI**: `PrismOpenAPIGenerator`, `PrismSwaggerUI` — automatic OpenAPI spec generation with Swagger UI
+- **HTTP/2**: HTTP/2 support via TLS configuration
+- **CLI Scaffold**: `PrismCLI` — command-line interface for server management
+
+## [4.0.0] - 2026-04-28
+
+### Added
+
+- **New Module**: `PrismServer` — fully native Swift 6.3 HTTP server framework with zero external dependencies
+- `PrismHTTPServer` — async/await HTTP server with configurable host, port, and TLS
+- `PrismRouter` — path-based request routing with parameter extraction and middleware support
+- `PrismMiddleware` (server) — composable request/response pipeline
+- `PrismHTTPRequest`, `PrismHTTPResponse` — typed request and response models
+- `PrismWebSocket` — WebSocket upgrade and bidirectional messaging
+- `PrismStaticFiles` — static file serving with MIME type detection
+- `PrismCORS` — configurable CORS middleware
+- `PrismCSRF` — CSRF protection middleware
+- `PrismJWT` — JSON Web Token signing and verification
+- `PrismRateLimit` — request rate limiting with configurable windows
+- `PrismSecurityHeaders` — security header middleware (HSTS, CSP, etc.)
+- `PrismProxy` — reverse proxy middleware
+- `PrismCircuitBreaker` — circuit breaker pattern for resilient service calls
+- `PrismPasswordHashing` — bcrypt and scrypt password hashing
+- `PrismMailer` — SMTP email sending
+- `PrismLogger` (server) — structured JSON logging
+- `PrismI18n` — server-side internationalization
+- `PrismFeatureFlags` — runtime feature flag management
+- `PrismSeeder` — database seeding utilities
+- `PrismRedirects` — URL redirect middleware
+- `PrismRequestTimeout` — request timeout enforcement
+- `PrismResponseCompression` — gzip/deflate response compression
+- `PrismTLS` — TLS certificate configuration
+- 69 test files with comprehensive server test coverage
+
 ## [3.2.0] - 2026-04-28
 
 ### Added
