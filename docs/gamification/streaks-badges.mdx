@@ -1,0 +1,230 @@
+---
+title: "Streaks & Badges"
+description: "Daily streak tracking with break detection, and a tiered badge system with auto-unlock conditions."
+icon: "fire"
+---
+
+# Streaks
+
+Track daily engagement with automatic streak counting, break detection, and longest-streak records.
+
+## Recording Activity
+
+```swift title="Record Streak Activity"
+// Record today's activity for the "daily" streak
+try await manager.recordStreakActivity("daily")
+```
+
+- First call creates the streak record
+- Same-day calls are no-ops (safe to call multiple times)
+- Consecutive-day calls extend the streak
+- Missed days reset the streak to 1 (longest is preserved)
+
+## Querying Streaks
+
+```swift title="Streak Queries"
+// Current streak count
+let current = try await manager.currentStreak("daily")
+
+// Longest streak ever
+let longest = try await manager.longestStreak("daily")
+
+// Full streak record
+let record = try await manager.streakRecord("daily")
+print(record.currentStreak)     // 7
+print(record.longestStreak)     // 14
+print(record.totalActiveDays)   // 42
+print(record.lastActivityDate)  // 2026-05-05
+```
+
+## PrismStreakSnapshot
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `streakID` | `String` | Streak identifier |
+| `currentStreak` | `Int` | Consecutive days |
+| `longestStreak` | `Int` | All-time record |
+| `lastActivityDate` | `Date?` | Last recorded day |
+| `totalActiveDays` | `Int` | Lifetime active days |
+
+## Resetting Streaks
+
+```swift title="Reset Streak"
+try await manager.resetStreak("daily")
+// currentStreak → 0, longestStreak preserved
+```
+
+## Streak Events
+
+The manager emits events when streaks change:
+
+```swift title="Streak Events"
+for await event in manager.events {
+    switch event {
+    case .streakExtended(let id, let count):
+        print("\(id) streak: \(count) days!")
+    case .streakBroken(let id, let previous):
+        print("\(id) streak broken at \(previous) days")
+    case .newStreakRecord(let id, let longest):
+        print("New record for \(id): \(longest) days!")
+    default: break
+    }
+}
+```
+
+---
+
+# Badges
+
+A tiered badge system with automatic unlock evaluation based on challenge completion, points, or streaks.
+
+## The PrismBadge Protocol
+
+```swift title="Protocol"
+public protocol PrismBadge: RawRepresentable, CaseIterable, Hashable, Sendable
+where RawValue == String {
+    var title: String { get }
+    var badgeDescription: String { get }
+    var iconName: String? { get }           // default: nil
+    var tier: PrismBadgeTier { get }
+    var condition: PrismBadgeCondition { get }
+}
+```
+
+## Badge Tiers
+
+Five tiers from lowest to highest — `Comparable` for sorting:
+
+```swift title="Tiers"
+public enum PrismBadgeTier: String, Comparable {
+    case bronze      // Entry level
+    case silver      // Intermediate
+    case gold        // Advanced
+    case platinum    // Expert
+    case diamond     // Elite
+}
+```
+
+## Unlock Conditions
+
+```swift title="Conditions"
+public enum PrismBadgeCondition {
+    case challengeCompleted(challengeID: String)     // Specific challenge done
+    case pointsReached(threshold: Int)               // Total points >= threshold
+    case streakReached(streakID: String, days: Int)  // Streak >= days
+    case custom(id: String)                          // Manual unlock only
+}
+```
+
+## Defining Badges
+
+```swift title="Badge Enum"
+enum AppBadge: String, PrismBadge, CaseIterable {
+    case earlyAdopter
+    case fitnessFreak
+    case streakMaster
+    case vip
+
+    var title: String {
+        switch self {
+        case .earlyAdopter: "Early Adopter"
+        case .fitnessFreak: "Fitness Freak"
+        case .streakMaster: "Streak Master"
+        case .vip: "VIP Member"
+        }
+    }
+
+    var badgeDescription: String {
+        switch self {
+        case .earlyAdopter: "Complete your first challenge"
+        case .fitnessFreak: "Earn 100 points"
+        case .streakMaster: "Maintain a 30-day streak"
+        case .vip: "Exclusive VIP badge"
+        }
+    }
+
+    var tier: PrismBadgeTier {
+        switch self {
+        case .earlyAdopter: .bronze
+        case .fitnessFreak: .silver
+        case .streakMaster: .gold
+        case .vip: .diamond
+        }
+    }
+
+    var condition: PrismBadgeCondition {
+        switch self {
+        case .earlyAdopter: .challengeCompleted(challengeID: "firstLogin")
+        case .fitnessFreak: .pointsReached(threshold: 100)
+        case .streakMaster: .streakReached(streakID: "daily", days: 30)
+        case .vip: .custom(id: "vip")
+        }
+    }
+}
+```
+
+## Registration
+
+```swift title="Register Badges"
+try await manager.registerBadges(AppBadge.self)
+```
+
+## Auto-Evaluation
+
+Evaluate all badges and auto-unlock those whose conditions are met:
+
+```swift title="Evaluate"
+let totalPoints = try await manager.totalPoints(AppChallenge.self)
+let unlocked = try await manager.evaluateBadges(
+    AppBadge.self,
+    currentPoints: totalPoints
+)
+
+for badge in unlocked {
+    print("Unlocked: \(badge.badgeID) (\(badge.tierRawValue))")
+}
+```
+
+<Tip>
+  Call `evaluateBadges` after significant events — challenge completions, point changes, or streak milestones. Badges with `.custom` conditions are never auto-unlocked.
+</Tip>
+
+## Manual Unlock
+
+```swift title="Manual Unlock"
+try await manager.unlockBadge(AppBadge.vip)
+```
+
+## Querying Badges
+
+```swift title="Badge Queries"
+// Check if unlocked
+let unlocked = try await manager.isBadgeUnlocked(AppBadge.earlyAdopter)
+
+// Single badge progress
+let badge = try await manager.badgeProgress(for: AppBadge.fitnessFreak)
+
+// All badges
+let all = try await manager.allBadges()
+let locked = all.filter { !$0.isUnlocked }
+```
+
+## PrismBadgeSnapshot
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `badgeID` | `String` | Badge identifier |
+| `isUnlocked` | `Bool` | Whether unlocked |
+| `tierRawValue` | `String` | Tier name (bronze, silver, etc.) |
+| `unlockedAt` | `Date?` | When unlocked |
+| `createdAt` | `Date` | When registered |
+
+## Badge Events
+
+```swift title="Badge Events"
+for await event in manager.events {
+    if case .badgeUnlocked(let id, let tier) = event {
+        print("\(tier) badge \(id) unlocked!")
+    }
+}
+```

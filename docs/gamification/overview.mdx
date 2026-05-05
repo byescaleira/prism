@@ -1,0 +1,141 @@
+---
+title: "Gamification Overview"
+description: "Duolingo-style gamification system with challenges, streaks, badges, leaderboards, analytics, and AI-powered messages."
+icon: "trophy"
+---
+
+# PrismGamification
+
+PrismGamification brings Duolingo-style engagement mechanics to your app — challenges, streaks, badges, leaderboards, analytics, and AI-powered personalized messages. Built on SwiftData with CloudKit sync.
+
+<CardGroup cols={3}>
+  <Card title="Challenges" icon="bullseye">
+    Define challenges as enums. Track progress with counters or milestones. Earn points on completion.
+  </Card>
+  <Card title="Streaks & Badges" icon="fire">
+    Daily streaks with break detection. Badges with 5 tiers and auto-unlock conditions.
+  </Card>
+  <Card title="AI Messages" icon="brain">
+    Apple Intelligence generates personalized celebrations, motivation, and recommendations — on-device.
+  </Card>
+</CardGroup>
+
+## Architecture
+
+```
+┌─────────────────────────────────────────────────┐
+│            PrismChallengeManager                │  ← single actor
+├──────────┬──────────┬───────────┬───────────────┤
+│Challenges│ Streaks  │  Badges   │ Leaderboards  │
+├──────────┴──────────┴───────────┴───────────────┤
+│              Analytics + Events                  │
+├─────────────────────────────────────────────────┤
+│  PrismGamificationIntelligence (Apple AI)       │
+├─────────────────────────────────────────────────┤
+│          SwiftData + CloudKit Sync              │
+└─────────────────────────────────────────────────┘
+```
+
+## Quick Start
+
+```swift title="Define Challenges"
+import PrismGamification
+
+enum AppChallenge: String, PrismChallenge, CaseIterable {
+    case firstLogin
+    case tenWorkouts
+
+    var title: String {
+        switch self {
+        case .firstLogin: "First Login"
+        case .tenWorkouts: "Ten Workouts"
+        }
+    }
+
+    var type: PrismChallengeType {
+        switch self {
+        case .firstLogin: .milestone
+        case .tenWorkouts: .counter
+        }
+    }
+
+    var goal: Int {
+        switch self {
+        case .firstLogin: 1
+        case .tenWorkouts: 10
+        }
+    }
+
+    var points: Int {
+        switch self {
+        case .firstLogin: 10
+        case .tenWorkouts: 50
+        }
+    }
+
+    var challengeDescription: String { title }
+}
+```
+
+```swift title="Use the Manager"
+let container = try PrismChallengeContainerProvider.makeContainer()
+let manager = PrismChallengeManager(container: container)
+
+// Register all challenge cases
+try await manager.register(AppChallenge.self)
+
+// Track progress
+try await manager.increment(AppChallenge.tenWorkouts, by: 3)
+try await manager.complete(AppChallenge.firstLogin)
+
+// Query
+let progress = try await manager.progress(for: AppChallenge.tenWorkouts)
+let total = try await manager.totalPoints(AppChallenge.self)
+```
+
+## Key Concepts
+
+| Concept | Type | Description |
+|---------|------|-------------|
+| Challenge | `PrismChallenge` protocol | Enum-based challenge definitions with metadata |
+| Manager | `PrismChallengeManager` | Central actor for all gamification operations |
+| Snapshot | `PrismChallengeSnapshot` | Sendable value type for cross-actor data |
+| Event | `PrismChallengeEvent` | Stream of state changes (completed, progressed, etc.) |
+| Container | `PrismChallengeContainerProvider` | SwiftData container with CloudKit sync |
+
+<Tip>
+  All public APIs return **Sendable snapshot types** instead of `@Model` classes. This ensures safe cross-actor data transfer in Swift 6 strict concurrency.
+</Tip>
+
+## CloudKit Sync
+
+Enable CloudKit sync by passing a container ID:
+
+```swift title="CloudKit Configuration"
+let container = try PrismChallengeContainerProvider.makeContainer(
+    containerID: "iCloud.com.myapp.gamification"
+)
+```
+
+For testing, use an in-memory container:
+
+```swift title="In-Memory for Tests"
+let container = try PrismChallengeContainerProvider.makeContainer(inMemory: true)
+```
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Challenges" icon="bullseye" href="/gamification/challenges">
+    Define challenges, track progress, earn points.
+  </Card>
+  <Card title="Streaks & Badges" icon="fire" href="/gamification/streaks-badges">
+    Daily streaks and tiered badge system.
+  </Card>
+  <Card title="Leaderboards" icon="ranking-star" href="/gamification/leaderboards">
+    Multi-period scored leaderboards.
+  </Card>
+  <Card title="AI Messages" icon="brain" href="/gamification/ai-messages">
+    Apple Intelligence personalized messages.
+  </Card>
+</CardGroup>

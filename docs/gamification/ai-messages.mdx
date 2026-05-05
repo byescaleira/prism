@@ -1,0 +1,221 @@
+---
+title: "AI Messages"
+description: "Apple Intelligence generates personalized celebrations, motivation, streak alerts, and recommendations — all on-device."
+icon: "brain"
+---
+
+# AI Messages
+
+`PrismGamificationIntelligence` uses Apple Intelligence (FoundationModels) to generate personalized, context-aware messages — celebrations, motivation, streak alerts, and recommendations. All processing happens on-device.
+
+## Setup
+
+```swift title="Default (Apple Intelligence)"
+let intelligence = PrismGamificationIntelligence()
+```
+
+```swift title="Custom Configuration"
+let intelligence = PrismGamificationIntelligence(
+    configuration: PrismAppleIntelligenceConfiguration(/* ... */)
+)
+```
+
+```swift title="Custom Provider"
+let intelligence = PrismGamificationIntelligence(
+    provider: myCustomProvider // any PrismLanguageIntelligenceProvider
+)
+```
+
+## Availability Check
+
+```swift title="Check Availability"
+let available = await intelligence.isAvailable()
+```
+
+Returns `true` when the underlying language model is ready on the device.
+
+## Message Kinds
+
+Seven message categories for different gamification moments:
+
+| Kind | Description |
+|------|-------------|
+| `.challengeCompleted` | Celebration for completing a challenge |
+| `.challengeProgress` | Motivational nudge for in-progress challenges |
+| `.streakMotivation` | Daily streak encouragement |
+| `.streakAtRisk` | Urgent alert when streak might break |
+| `.badgeUnlocked` | Badge unlock celebration |
+| `.leaderboardUpdate` | Leaderboard position commentary |
+| `.challengeRecommendation` | Personalized next-challenge suggestion |
+
+## Generating Messages
+
+### Single Message
+
+```swift title="Generate"
+let message = try await intelligence.generateMessage(
+    kind: .challengeCompleted,
+    context: PrismGamificationContext(
+        entityID: "tenWorkouts",
+        challengeTitle: "Ten Workouts",
+        points: 50,
+        totalPoints: 120
+    )
+)
+
+print(message.content)
+// "You crushed 10 workouts and earned 50 points! 💪"
+```
+
+### Batch Generation
+
+```swift title="Batch"
+let messages = await intelligence.generateMessages([
+    (kind: .challengeCompleted, context: completionCtx),
+    (kind: .streakMotivation, context: streakCtx),
+    (kind: .badgeUnlocked, context: badgeCtx)
+])
+// Failed generations are silently skipped
+```
+
+### With Automatic Fallback
+
+```swift title="Auto-Fallback"
+let message = await intelligence.messageWithFallback(
+    kind: .streakMotivation,
+    context: PrismGamificationContext(
+        entityID: "daily",
+        currentStreak: 14,
+        longestStreak: 21
+    )
+)
+// AI-generated if available, static fallback otherwise
+```
+
+### Static Fallback Only
+
+```swift title="Fallback"
+let message = await intelligence.fallbackMessage(
+    kind: .badgeUnlocked,
+    context: PrismGamificationContext(
+        entityID: "fitnessFreak",
+        badgeTitle: "Fitness Freak",
+        badgeTier: "silver"
+    )
+)
+// "Silver badge "Fitness Freak" unlocked!"
+```
+
+## PrismGamificationContext
+
+Provide context for richer, more relevant AI messages:
+
+| Property | Type | Used By |
+|----------|------|---------|
+| `entityID` | `String` | All kinds |
+| `challengeTitle` | `String?` | Challenge kinds |
+| `currentValue` | `Int?` | `.challengeProgress` |
+| `goalValue` | `Int?` | `.challengeProgress` |
+| `points` | `Int?` | `.challengeCompleted` |
+| `totalPoints` | `Int?` | `.challengeCompleted`, `.challengeRecommendation` |
+| `currentStreak` | `Int?` | Streak kinds |
+| `longestStreak` | `Int?` | `.streakMotivation` |
+| `badgeTitle` | `String?` | `.badgeUnlocked` |
+| `badgeTier` | `String?` | `.badgeUnlocked` |
+| `rank` | `Int?` | `.leaderboardUpdate` |
+| `previousRank` | `Int?` | `.leaderboardUpdate` |
+| `score` | `Int?` | `.leaderboardUpdate` |
+| `completedChallenges` | `Int?` | `.challengeRecommendation` |
+| `activeCategories` | `[String]?` | `.challengeRecommendation` |
+
+## PrismGamificationMessage
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `id` | `String` | Unique message identifier |
+| `kind` | `PrismGamificationMessageKind` | Message category |
+| `content` | `String` | Generated text |
+| `entityID` | `String` | Related entity |
+| `generatedAt` | `Date` | When generated |
+
+## Prompt Builder
+
+`PrismGamificationPromptBuilder` builds context-aware prompts for each message kind. The system instructions configure the AI as a gamification coach:
+
+- 1–2 sentences max
+- Enthusiastic but not excessive
+- Max 1 emoji
+- References specific achievements
+- Under 100 characters when possible
+
+```swift title="Custom Prompts"
+let builder = PrismGamificationPromptBuilder()
+let prompt = builder.prompt(
+    for: .challengeCompleted,
+    context: myContext
+)
+let system = builder.systemInstructions
+```
+
+## Fallback System
+
+`PrismGamificationFallbacks` provides static messages for every kind — no AI required:
+
+```swift title="Fallbacks"
+let text = PrismGamificationFallbacks.message(
+    for: .streakAtRisk,
+    context: PrismGamificationContext(
+        entityID: "daily",
+        currentStreak: 7
+    )
+)
+// "Your 7-day streak is at risk! Log activity today."
+```
+
+Fallbacks use context data to build meaningful messages without AI processing.
+
+<Tip>
+  Use `messageWithFallback` in production — it tries AI first and falls back gracefully. Reserve `generateMessage` for when you want to handle errors yourself.
+</Tip>
+
+## Integration Pattern
+
+```swift title="Event-Driven Messages"
+for await event in manager.events {
+    switch event {
+    case .completed(let id, let points):
+        let msg = await intelligence.messageWithFallback(
+            kind: .challengeCompleted,
+            context: PrismGamificationContext(
+                entityID: id,
+                challengeTitle: id,
+                points: points
+            )
+        )
+        showToast(msg.content)
+
+    case .streakExtended(let id, let count):
+        let msg = await intelligence.messageWithFallback(
+            kind: .streakMotivation,
+            context: PrismGamificationContext(
+                entityID: id,
+                currentStreak: count
+            )
+        )
+        showToast(msg.content)
+
+    case .badgeUnlocked(let id, let tier):
+        let msg = await intelligence.messageWithFallback(
+            kind: .badgeUnlocked,
+            context: PrismGamificationContext(
+                entityID: id,
+                badgeTitle: id,
+                badgeTier: tier
+            )
+        )
+        showCelebration(msg.content)
+
+    default: break
+    }
+}
+```

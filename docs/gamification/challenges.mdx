@@ -1,0 +1,204 @@
+---
+title: "Challenges"
+description: "Define challenges as enums, track progress with counters and milestones, and earn points on completion."
+icon: "bullseye"
+---
+
+# Challenges
+
+Challenges are the core of PrismGamification. Define them as a Swift enum conforming to `PrismChallenge`, and the manager handles persistence, progress tracking, and events.
+
+## The PrismChallenge Protocol
+
+```swift title="Protocol Definition"
+public protocol PrismChallenge: RawRepresentable, CaseIterable, Hashable, Sendable
+where RawValue == String {
+    var title: String { get }
+    var challengeDescription: String { get }
+    var type: PrismChallengeType { get }
+    var goal: Int { get }
+    var category: String? { get }       // default: nil
+    var iconName: String? { get }       // default: nil
+    var points: Int { get }             // default: 0
+}
+```
+
+## Challenge Types
+
+| Type | Behavior | Example |
+|------|----------|---------|
+| `.counter` | Increments toward a goal | "Complete 10 workouts" |
+| `.milestone` | Binary — done or not | "Create your first post" |
+
+```swift title="Complete Example"
+enum Challenges: String, PrismChallenge, CaseIterable {
+    case firstPost
+    case tenLikes
+    case weeklyStreak
+
+    var title: String {
+        switch self {
+        case .firstPost: "First Post"
+        case .tenLikes: "Ten Likes"
+        case .weeklyStreak: "Weekly Streak"
+        }
+    }
+
+    var challengeDescription: String {
+        switch self {
+        case .firstPost: "Create your very first post"
+        case .tenLikes: "Receive 10 likes on your content"
+        case .weeklyStreak: "Log in every day for a week"
+        }
+    }
+
+    var type: PrismChallengeType {
+        switch self {
+        case .firstPost: .milestone
+        case .tenLikes, .weeklyStreak: .counter
+        }
+    }
+
+    var goal: Int {
+        switch self {
+        case .firstPost: 1
+        case .tenLikes: 10
+        case .weeklyStreak: 7
+        }
+    }
+
+    var points: Int {
+        switch self {
+        case .firstPost: 10
+        case .tenLikes: 25
+        case .weeklyStreak: 50
+        }
+    }
+
+    var category: String? {
+        switch self {
+        case .firstPost: "content"
+        case .tenLikes: "social"
+        case .weeklyStreak: "engagement"
+        }
+    }
+
+    var iconName: String? {
+        switch self {
+        case .firstPost: "square.and.pencil"
+        case .tenLikes: "heart.fill"
+        case .weeklyStreak: "calendar"
+        }
+    }
+}
+```
+
+## Registration
+
+Register all cases of your challenge enum. Idempotent — safe to call on every app launch:
+
+```swift title="Register Challenges"
+let manager = PrismChallengeManager(container: container)
+try await manager.register(Challenges.self)
+```
+
+## Tracking Progress
+
+### Counter Challenges
+
+```swift title="Increment"
+// Increment by 1
+let snapshot = try await manager.increment(Challenges.tenLikes)
+
+// Increment by N
+let snapshot = try await manager.increment(Challenges.tenLikes, by: 5)
+```
+
+Progress auto-completes when `currentValue >= goal`. Values clamp to goal — never overshoot.
+
+<Warning>
+  Calling `increment` on a **milestone** challenge throws `PrismGamificationError.invalidOperation`. Use `complete` instead.
+</Warning>
+
+### Milestone Challenges
+
+```swift title="Complete"
+let snapshot = try await manager.complete(Challenges.firstPost)
+```
+
+<Warning>
+  Calling `complete` or `increment` on an already-completed challenge throws `PrismGamificationError.challengeAlreadyCompleted`.
+</Warning>
+
+## Querying Progress
+
+```swift title="Queries"
+// Single challenge
+let progress = try await manager.progress(for: Challenges.tenLikes)
+print(progress.currentValue)  // 5
+print(progress.goalValue)     // 10
+print(progress.progress)      // 0.5
+print(progress.isCompleted)   // false
+
+// Check completion
+let done = try await manager.isCompleted(Challenges.firstPost)
+
+// All challenges
+let all = try await manager.allProgress()
+
+// Total points from completed challenges
+let points = try await manager.totalPoints(Challenges.self)
+```
+
+## PrismChallengeSnapshot
+
+All queries return `PrismChallengeSnapshot` — a Sendable value type:
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `challengeID` | `String` | The raw value of the challenge enum case |
+| `currentValue` | `Int` | Current progress |
+| `goalValue` | `Int` | Target value |
+| `isCompleted` | `Bool` | Whether completed |
+| `typeRawValue` | `String` | "counter" or "milestone" |
+| `progress` | `Double` | 0.0 to 1.0 (computed) |
+| `createdAt` | `Date` | When registered |
+| `updatedAt` | `Date` | Last modification |
+| `completedAt` | `Date?` | When completed |
+
+## Resetting
+
+```swift title="Reset"
+// Reset single challenge
+try await manager.reset(Challenges.tenLikes)
+
+// Reset all challenges of a type
+try await manager.resetAll(Challenges.self)
+```
+
+## Events
+
+Subscribe to challenge events via `AsyncStream`:
+
+```swift title="Event Stream"
+for await event in manager.events {
+    switch event {
+    case .completed(let id, let points):
+        print("\(id) completed! +\(points)")
+    case .progressed(let id, let current, let goal):
+        print("\(id): \(current)/\(goal)")
+    default:
+        break
+    }
+}
+```
+
+## Error Handling
+
+| Error | When |
+|-------|------|
+| `challengeNotFound` | Query/update a challenge that wasn't registered |
+| `challengeAlreadyCompleted` | Increment or complete a finished challenge |
+| `invalidOperation` | Increment a milestone (use `complete` instead) |
+
+All errors are `PrismGamificationError` — equatable and localized.

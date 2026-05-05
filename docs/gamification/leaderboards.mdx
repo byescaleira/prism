@@ -1,0 +1,134 @@
+---
+title: "Leaderboards"
+description: "Multi-period scored leaderboards with automatic ranking, score updates, and snapshot queries."
+icon: "ranking-star"
+---
+
+# Leaderboards
+
+Compete across daily, weekly, monthly, and all-time periods. Submit scores, query rankings, and get sorted snapshots — all backed by SwiftData with CloudKit sync.
+
+## Periods
+
+```swift title="PrismLeaderboardPeriod"
+public enum PrismLeaderboardPeriod: String, Codable, Sendable, CaseIterable {
+    case daily      // Reset every 24 hours
+    case weekly     // Reset every 7 days
+    case monthly    // Reset every calendar month
+    case allTime    // Never reset
+}
+```
+
+## Submitting Scores
+
+```swift title="Submit Score"
+let entry = try await manager.submitScore(
+    userID: "user-42",
+    displayName: "Alice",
+    score: 1500,
+    period: .weekly
+)
+print(entry.rank) // 1
+```
+
+- Creates a new record if none exists for the user/period pair
+- Updates the existing record if one exists
+- Returns the entry with its computed rank
+
+## Updating Scores
+
+```swift title="Update Score"
+let entry = try await manager.updateScore(
+    userID: "user-42",
+    score: 2000,
+    period: .weekly
+)
+```
+
+<Warning>
+  Throws `PrismGamificationError.leaderboardEntryNotFound` if no record exists for the user in that period. Use `submitScore` for upsert behavior.
+</Warning>
+
+## Querying the Leaderboard
+
+```swift title="Leaderboard Snapshot"
+let snapshot = try await manager.leaderboard(
+    period: .weekly,
+    limit: 50
+)
+
+for entry in snapshot.entries {
+    print("#\(entry.rank) \(entry.displayName): \(entry.score)")
+}
+```
+
+Default limit is 100. Entries are sorted by score descending and ranked automatically.
+
+## Rank Lookup
+
+```swift title="Single User Rank"
+let entry = try await manager.rank(for: "user-42", period: .weekly)
+print("#\(entry.rank) — \(entry.score) pts")
+```
+
+## PrismLeaderboardEntry
+
+`Sendable`, `Comparable` (by rank ascending), and `Identifiable`:
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `id` | `String` | User identifier |
+| `displayName` | `String` | Display name |
+| `score` | `Int` | Score for the period |
+| `rank` | `Int` | Computed rank (1 = first) |
+
+```swift title="Sorting"
+let entries = snapshot.entries.sorted() // rank 1, 2, 3...
+```
+
+## PrismLeaderboardSnapshot
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `entries` | `[PrismLeaderboardEntry]` | Ranked entries |
+| `period` | `PrismLeaderboardPeriod` | Period covered |
+| `generatedAt` | `Date` | When snapshot was generated |
+
+## Resetting
+
+```swift title="Reset Period"
+try await manager.resetLeaderboard(period: .daily)
+```
+
+Deletes all entries for the given period. Other periods are unaffected.
+
+## Leaderboard Events
+
+```swift title="Events"
+for await event in manager.events {
+    if case .leaderboardUpdated(let userID, let newRank) = event {
+        print("\(userID) moved to rank #\(newRank)")
+    }
+}
+```
+
+Events fire on both `submitScore` and `updateScore`.
+
+## Multi-Period Pattern
+
+```swift title="Submit to Multiple Periods"
+let periods: [PrismLeaderboardPeriod] = [.daily, .weekly, .monthly, .allTime]
+
+for period in periods {
+    try await manager.submitScore(
+        userID: currentUser.id,
+        displayName: currentUser.name,
+        score: currentUser.totalScore,
+        period: period
+    )
+}
+```
+
+<Tip>
+  Submit scores to all relevant periods after each scoring event. Each period maintains its own independent rankings.
+</Tip>

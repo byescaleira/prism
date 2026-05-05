@@ -1,0 +1,148 @@
+---
+title: "Analytics"
+description: "Track gamification events, aggregate metrics, and query engagement data with time-period snapshots."
+icon: "chart-mixed"
+---
+
+# Analytics
+
+Record structured gamification events and query aggregated metrics — completion rates, streak trends, badge unlocks, and more.
+
+## Event Types
+
+Seven event types cover all gamification activity:
+
+```swift title="PrismGamificationAnalyticsEvent"
+public enum PrismGamificationAnalyticsEvent: Sendable {
+    case challengeStarted(challengeID: String, at: Date)
+    case challengeCompleted(challengeID: String, at: Date, duration: TimeInterval?)
+    case challengeProgressed(challengeID: String, progress: Double)
+    case streakExtended(streakID: String, currentStreak: Int)
+    case streakBroken(streakID: String, previousStreak: Int)
+    case badgeUnlocked(badgeID: String, tier: String)
+    case leaderboardScoreSubmitted(userID: String, score: Int)
+}
+```
+
+Each event exposes `eventType` (storage key) and `entityID` (related entity).
+
+## Recording Events
+
+```swift title="Record Events"
+// Challenge lifecycle
+try await manager.recordAnalyticsEvent(
+    .challengeStarted(challengeID: "tenWorkouts", at: .now)
+)
+
+try await manager.recordAnalyticsEvent(
+    .challengeCompleted(
+        challengeID: "tenWorkouts",
+        at: .now,
+        duration: 86400 * 5 // 5 days
+    )
+)
+
+// Streak activity
+try await manager.recordAnalyticsEvent(
+    .streakExtended(streakID: "daily", currentStreak: 14)
+)
+
+// Badge unlock
+try await manager.recordAnalyticsEvent(
+    .badgeUnlocked(badgeID: "fitnessFreak", tier: "silver")
+)
+```
+
+## Aggregated Snapshots
+
+Query aggregated metrics for any time period:
+
+```swift title="Analytics Snapshot"
+let snapshot = try await manager.analyticsSnapshot(
+    from: Calendar.current.date(byAdding: .day, value: -30, to: .now)!,
+    to: .now
+)
+
+print(snapshot.totalChallengesStarted)    // 12
+print(snapshot.totalChallengesCompleted)  // 8
+print(snapshot.completionRate)            // 0.666...
+print(snapshot.averageTimeToComplete)     // 172800.0 (2 days)
+print(snapshot.totalStreakDays)           // 25
+print(snapshot.totalBadgesUnlocked)      // 3
+print(snapshot.eventCount)               // 48
+```
+
+## PrismAnalyticsSnapshot
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `totalChallengesStarted` | `Int` | Challenges started in period |
+| `totalChallengesCompleted` | `Int` | Challenges completed in period |
+| `completionRate` | `Double` | Completion ratio (0.0–1.0) |
+| `averageTimeToComplete` | `TimeInterval?` | Mean completion time |
+| `totalStreakDays` | `Int` | Streak-extended events |
+| `totalBadgesUnlocked` | `Int` | Badges unlocked in period |
+| `eventCount` | `Int` | Total events in period |
+| `periodStart` | `Date` | Period start date |
+| `periodEnd` | `Date` | Period end date |
+
+## Querying Events
+
+Fetch events for a specific entity:
+
+```swift title="Entity Events"
+let events = try await manager.analyticsEvents(
+    for: "tenWorkouts",
+    limit: 50
+)
+
+for event in events {
+    print("\(event.eventType) at \(event.timestamp)")
+}
+```
+
+Returns `[PrismAnalyticsRecordSnapshot]` sorted by timestamp descending. Default limit is 100.
+
+## PrismAnalyticsRecordSnapshot
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `recordID` | `String` | Record identifier |
+| `eventType` | `String` | Event type key |
+| `entityID` | `String` | Related entity |
+| `timestamp` | `Date` | When event occurred |
+| `metadata` | `String` | JSON-encoded extra data |
+| `completionDuration` | `Double?` | Duration for completion events |
+
+## Cleanup
+
+Remove old analytics data to manage storage:
+
+```swift title="Clear Old Data"
+let cutoff = Calendar.current.date(byAdding: .month, value: -6, to: .now)!
+try await manager.clearAnalytics(before: cutoff)
+```
+
+<Tip>
+  Schedule periodic cleanup — analytics records accumulate over time. Keep recent data for dashboards and clear older records that are no longer needed.
+</Tip>
+
+## Dashboard Pattern
+
+```swift title="Weekly Dashboard"
+func weeklyDashboard() async throws -> String {
+    let weekAgo = Calendar.current.date(
+        byAdding: .day, value: -7, to: .now
+    )!
+    let stats = try await manager.analyticsSnapshot(
+        from: weekAgo, to: .now
+    )
+
+    return """
+    This Week:
+    • \(stats.totalChallengesCompleted)/\(stats.totalChallengesStarted) challenges (\(Int(stats.completionRate * 100))%)
+    • \(stats.totalStreakDays) streak days
+    • \(stats.totalBadgesUnlocked) badges unlocked
+    """
+}
+```
