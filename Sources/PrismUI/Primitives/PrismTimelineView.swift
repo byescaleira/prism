@@ -2,9 +2,13 @@ import SwiftUI
 
 /// Named timeline schedules.
 public enum PrismTimelineSchedule: Sendable {
+    /// Represents a continuous animation frame schedule.
     case animation
+    /// Represents a one-second interval periodic schedule.
     case everySecond
+    /// Represents a custom interval periodic schedule.
     case every(TimeInterval)
+    /// Represents a schedule with explicit date triggers.
     case explicit([Date])
 }
 
@@ -21,6 +25,7 @@ public struct PrismTimelineView<Content: View>: View {
     private let schedule: PrismTimelineSchedule
     private let content: (Date) -> Content
 
+    /// Creates a timeline view with a schedule and content builder receiving the current date.
     public init(
         _ schedule: PrismTimelineSchedule,
         @ViewBuilder content: @escaping (Date) -> Content
@@ -29,6 +34,7 @@ public struct PrismTimelineView<Content: View>: View {
         self.content = content
     }
 
+    /// The content and behavior of the timeline view.
     public var body: some View {
         switch schedule {
         case .animation:

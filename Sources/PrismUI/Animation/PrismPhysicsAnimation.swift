@@ -17,6 +17,7 @@ public struct PrismGravityDrop<Content: View>: View {
     let bounce: CGFloat
     let content: Content
 
+    /// Creates a gravity drop with configurable gravity strength and bounce amount.
     public init(
         isActive: Bool = true,
         gravity: CGFloat = 1.0,
@@ -29,6 +30,7 @@ public struct PrismGravityDrop<Content: View>: View {
         self.content = content()
     }
 
+    /// The gravity drop view body that animates content from above on appear.
     public var body: some View {
         content
             .offset(y: hasAppeared ? 0 : offset)
@@ -56,6 +58,7 @@ public struct PrismMomentumScroll<Content: View>: View {
     let axis: Axis
     let content: Content
 
+    /// Creates a momentum scroll with configurable friction and axis.
     public init(
         friction: CGFloat = 0.95,
         axis: Axis = .vertical,
@@ -66,6 +69,7 @@ public struct PrismMomentumScroll<Content: View>: View {
         self.content = content()
     }
 
+    /// The momentum scroll view body with velocity-based decay on drag end.
     public var body: some View {
         content
             .offset(
@@ -100,6 +104,7 @@ public struct PrismFloat<Content: View>: View {
     let frequency: Double
     let content: Content
 
+    /// Creates a floating animation with configurable amplitude and frequency.
     public init(
         amplitude: CGFloat = 8,
         frequency: Double = 1.5,
@@ -110,6 +115,7 @@ public struct PrismFloat<Content: View>: View {
         self.content = content()
     }
 
+    /// The floating view body with continuous sinusoidal offset.
     public var body: some View {
         TimelineView(.animation) { timeline in
             let time = timeline.date.timeIntervalSinceReferenceDate
@@ -128,12 +134,14 @@ public struct PrismParticleEffect: View {
     let isActive: Bool
     let color: Color
 
+    /// Creates a particle effect with the given count, activation state, and color.
     public init(count: Int = 20, isActive: Bool, color: Color = .blue) {
         self.count = count
         self.isActive = isActive
         self.color = color
     }
 
+    /// The particle effect view body that emits and scatters circles when activated.
     public var body: some View {
         ZStack {
             ForEach(particles) { particle in

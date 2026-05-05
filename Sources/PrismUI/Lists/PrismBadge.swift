@@ -7,11 +7,13 @@ public struct PrismBadge: ViewModifier {
     private let count: Int
     private let maxDisplay: Int
 
+    /// Creates a badge modifier with a notification count and optional max display value.
     public init(count: Int, maxDisplay: Int = 99) {
         self.count = count
         self.maxDisplay = maxDisplay
     }
 
+    /// Overlays the badge on the content view.
     public func body(content: Content) -> some View {
         content.overlay(alignment: .topTrailing) {
             if count > 0 {

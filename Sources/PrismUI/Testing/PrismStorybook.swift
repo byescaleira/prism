@@ -17,8 +17,10 @@ public struct PrismStorybook: View {
     @State private var isLargeText = false
     @State private var selectedTheme: ThemeChoice = .default
 
+    /// Creates a storybook explorer instance.
     public init() {}
 
+    /// The view body.
     public var body: some View {
         NavigationSplitView {
             sidebar

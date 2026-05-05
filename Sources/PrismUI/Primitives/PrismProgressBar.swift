@@ -29,6 +29,7 @@ public struct PrismProgressBar: View {
         self.label = label
     }
 
+    /// The content and behavior of the progress bar.
     public var body: some View {
         VStack(alignment: .leading, spacing: SpacingToken.xs.rawValue) {
             if let label {

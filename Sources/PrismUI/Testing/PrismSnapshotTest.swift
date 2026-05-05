@@ -18,11 +18,16 @@ public enum PrismSnapshotTest {
 
     /// Configuration for snapshot rendering.
     public struct Configuration: Sendable {
+        /// The rendering frame size.
         public let size: CGSize
+        /// The color scheme used for rendering.
         public let colorScheme: ColorScheme
+        /// The Dynamic Type size used for rendering.
         public let dynamicTypeSize: DynamicTypeSize
+        /// The theme applied during rendering.
         public let theme: any PrismTheme
 
+        /// Creates a snapshot configuration with the given rendering parameters.
         @MainActor
         public init(
             size: CGSize = CGSize(width: 375, height: 200),
@@ -36,9 +41,13 @@ public enum PrismSnapshotTest {
             self.theme = theme
         }
 
+        /// Light mode configuration with default settings.
         @MainActor public static let light = Configuration()
+        /// Dark mode configuration.
         @MainActor public static let dark = Configuration(colorScheme: .dark)
+        /// Large Dynamic Type configuration.
         @MainActor public static let largeText = Configuration(dynamicTypeSize: .xxxLarge)
+        /// High-contrast theme configuration.
         @MainActor public static let highContrast = Configuration(theme: HighContrastTheme())
     }
 

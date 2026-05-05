@@ -16,6 +16,7 @@ public struct PrismFlexibleHeader<Content: View>: View {
     private let minHeight: CGFloat
     private let content: Content
 
+    /// Creates a flexible header with the given minimum height and content.
     public init(
         minHeight: CGFloat = 250,
         @ViewBuilder content: () -> Content
@@ -24,6 +25,7 @@ public struct PrismFlexibleHeader<Content: View>: View {
         self.content = content()
     }
 
+    /// The header body that stretches on overscroll and clips on scroll.
     public var body: some View {
         GeometryReader { geometry in
             let offset = geometry.frame(in: .global).minY
@@ -46,6 +48,7 @@ public struct PrismParallaxHeader<Content: View, Overlay: View>: View {
     private let content: Content
     private let overlay: Overlay
 
+    /// Creates a parallax header with content and an overlay that fades on scroll.
     public init(
         minHeight: CGFloat = 300,
         @ViewBuilder content: () -> Content,
@@ -56,6 +59,7 @@ public struct PrismParallaxHeader<Content: View, Overlay: View>: View {
         self.overlay = overlay()
     }
 
+    /// The parallax header body with stretching content and fading overlay.
     public var body: some View {
         GeometryReader { geometry in
             let offset = geometry.frame(in: .global).minY
@@ -79,6 +83,7 @@ public struct PrismParallaxHeader<Content: View, Overlay: View>: View {
 
 extension PrismParallaxHeader where Overlay == EmptyView {
 
+    /// Creates a parallax header without an overlay.
     public init(
         minHeight: CGFloat = 300,
         @ViewBuilder content: () -> Content

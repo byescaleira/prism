@@ -9,6 +9,7 @@ public struct PrismFocusOrderItem: Sendable, Hashable, Identifiable {
     /// Sort priority — higher values are focused first by VoiceOver.
     public let priority: Int
 
+    /// Creates a focus order item with an identifier, label, and priority.
     public init(id: String, label: String, priority: Int) {
         self.id = id
         self.label = label
@@ -23,6 +24,7 @@ public struct PrismFocusOrderValidationResult: Sendable, Hashable {
     /// Warnings for out-of-order items.
     public let warnings: [String]
 
+    /// Creates a validation result with validity flag and warning messages.
     public init(isValid: Bool, warnings: [String]) {
         self.isValid = isValid
         self.warnings = warnings

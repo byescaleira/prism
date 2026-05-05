@@ -49,6 +49,7 @@ public struct PrismSparkline: View {
         return theme.color(.interactive)
     }
 
+    /// The sparkline view body rendering the selected chart style.
     public var body: some View {
         GeometryReader { geo in
             let rect = geo.frame(in: .local)

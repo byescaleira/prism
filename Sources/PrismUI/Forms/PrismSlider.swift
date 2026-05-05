@@ -11,6 +11,7 @@ public struct PrismSlider: View {
     private let showValue: Bool
     private let format: (Double) -> String
 
+    /// Creates a themed slider with title, range, and optional step and value display.
     public init(
         _ title: LocalizedStringKey,
         value: Binding<Double>,
@@ -27,6 +28,7 @@ public struct PrismSlider: View {
         self.format = format
     }
 
+    /// The slider view body with title, value label, and themed track.
     public var body: some View {
         VStack(alignment: .leading, spacing: SpacingToken.xs.rawValue) {
             HStack {

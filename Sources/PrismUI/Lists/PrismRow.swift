@@ -10,6 +10,7 @@ public struct PrismRow<Trailing: View>: View {
     private let iconColor: ColorToken
     private let trailing: Trailing
 
+    /// Creates a row with title, optional subtitle, icon, and trailing accessory.
     public init(
         _ title: LocalizedStringKey,
         subtitle: LocalizedStringKey? = nil,
@@ -24,6 +25,7 @@ public struct PrismRow<Trailing: View>: View {
         self.trailing = trailing()
     }
 
+    /// The content and behavior of the row.
     public var body: some View {
         HStack(spacing: SpacingToken.md.rawValue) {
             if let icon {
@@ -58,6 +60,7 @@ public struct PrismRow<Trailing: View>: View {
 
 extension PrismRow where Trailing == EmptyView {
 
+    /// Creates a row with title, optional subtitle, and icon but no trailing accessory.
     public init(
         _ title: LocalizedStringKey,
         subtitle: LocalizedStringKey? = nil,
@@ -79,6 +82,7 @@ public struct PrismDisclosureRow: View {
     private let icon: String?
     private let iconColor: ColorToken
 
+    /// Creates a disclosure row with title, optional subtitle, and icon.
     public init(
         _ title: LocalizedStringKey,
         subtitle: LocalizedStringKey? = nil,
@@ -91,6 +95,7 @@ public struct PrismDisclosureRow: View {
         self.iconColor = iconColor
     }
 
+    /// The content and behavior of the disclosure row.
     public var body: some View {
         PrismRow(
             title,

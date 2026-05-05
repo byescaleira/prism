@@ -10,11 +10,13 @@ public struct PrismSecureField: View {
 
     @State private var isRevealed = false
 
+    /// Creates a secure field with title and password visibility toggle.
     public init(_ title: LocalizedStringKey, text: Binding<String>) {
         self.title = title
         self._text = text
     }
 
+    /// The secure field view body with reveal toggle and focus border.
     public var body: some View {
         HStack(spacing: SpacingToken.sm.rawValue) {
             Group {

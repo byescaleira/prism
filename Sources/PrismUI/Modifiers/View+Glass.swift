@@ -37,6 +37,7 @@ public struct PrismGlassContainer<Content: View>: View {
     private let spacing: CGFloat
     private let content: Content
 
+    /// Creates a glass effect container with the given spacing between children.
     public init(
         spacing: CGFloat = SpacingToken.sm.rawValue,
         @ViewBuilder content: () -> Content
@@ -45,6 +46,7 @@ public struct PrismGlassContainer<Content: View>: View {
         self.content = content()
     }
 
+    /// The content and behavior of the glass container.
     public var body: some View {
         GlassEffectContainer(spacing: spacing) {
             content

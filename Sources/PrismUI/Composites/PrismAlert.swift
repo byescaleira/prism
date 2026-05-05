@@ -7,6 +7,7 @@ public struct PrismAlert: ViewModifier {
     private let message: LocalizedStringKey?
     private let actions: [Action]
 
+    /// Creates a themed alert modifier with the given title, message, and actions.
     public init(
         isPresented: Binding<Bool>,
         title: LocalizedStringKey,
@@ -19,6 +20,7 @@ public struct PrismAlert: ViewModifier {
         self.actions = actions
     }
 
+    /// Presents the themed alert on the wrapped content.
     public func body(content: Content) -> some View {
         content.alert(title, isPresented: $isPresented) {
             ForEach(Array(actions.enumerated()), id: \.offset) { _, action in
@@ -36,11 +38,13 @@ public struct PrismAlert: ViewModifier {
 
 extension PrismAlert {
 
+    /// A single alert action with title, optional role, and handler.
     public struct Action: @unchecked Sendable {
         let title: LocalizedStringKey
         let role: ButtonRole?
         let handler: @MainActor @Sendable () -> Void
 
+        /// Creates an alert action with the given title, role, and handler.
         public init(
             _ title: LocalizedStringKey,
             role: ButtonRole? = nil,
@@ -51,6 +55,7 @@ extension PrismAlert {
             self.handler = handler
         }
 
+        /// Creates a destructive-role alert action.
         public static func destructive(
             _ title: LocalizedStringKey,
             handler: @escaping @MainActor @Sendable () -> Void
@@ -58,6 +63,7 @@ extension PrismAlert {
             Action(title, role: .destructive, handler: handler)
         }
 
+        /// Creates a cancel-role alert action.
         public static func cancel(_ title: LocalizedStringKey = "Cancel") -> Action {
             Action(title, role: .cancel)
         }

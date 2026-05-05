@@ -10,6 +10,7 @@ public struct PrismDatePicker: View {
     private let components: DatePickerComponents
     private let range: ClosedRange<Date>?
 
+    /// Creates a date picker with title, icon, components, and optional range.
     public init(
         _ title: LocalizedStringKey,
         selection: Binding<Date>,
@@ -24,6 +25,7 @@ public struct PrismDatePicker: View {
         self.range = range
     }
 
+    /// The date picker view body with themed label and tint.
     public var body: some View {
         Group {
             if let range {

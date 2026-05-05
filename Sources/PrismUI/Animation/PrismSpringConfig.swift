@@ -8,16 +8,21 @@ import SwiftUI
 /// }
 /// ```
 public struct PrismSpringConfig: Sendable, Hashable {
+    /// Duration in seconds for the spring to settle.
     public let response: Double
+    /// Damping ratio controlling oscillation (0 = undamped, 1 = critically damped).
     public let dampingFraction: Double
+    /// Duration over which the spring blends with preceding animations.
     public let blendDuration: Double
 
+    /// Creates a spring configuration with the given response, damping, and blend values.
     public init(response: Double, dampingFraction: Double, blendDuration: Double = 0) {
         self.response = response
         self.dampingFraction = dampingFraction
         self.blendDuration = blendDuration
     }
 
+    /// SwiftUI animation built from this spring configuration.
     public var animation: Animation {
         .spring(response: response, dampingFraction: dampingFraction, blendDuration: blendDuration)
     }

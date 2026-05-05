@@ -26,6 +26,7 @@ public struct PrismLazyView<Content: View>: View {
         self.content = content
     }
 
+    /// The content and behavior of the lazy view.
     public var body: some View {
         if shouldLoad {
             content()
@@ -48,6 +49,7 @@ public struct PrismLazyNavigationDestination<Content: View>: View {
         self.content = content
     }
 
+    /// The content and behavior of the lazy navigation destination.
     public var body: some View {
         if shouldLoad {
             content()

@@ -11,8 +11,10 @@ import SwiftUI
 /// ```
 public struct HighContrastTheme: PrismTheme, Sendable {
 
+    /// Creates a high-contrast theme instance.
     public init() {}
 
+    /// Resolves a color token to a concrete color using the high-contrast palette.
     public func color(_ token: ColorToken) -> Color {
         switch token {
         case .brand: .accentColor

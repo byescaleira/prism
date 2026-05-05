@@ -13,6 +13,7 @@ public struct PrismGroupBox<Label: View, Content: View>: View {
     private let label: Label
     private let content: Content
 
+    /// Creates a group box with custom content and label views.
     public init(
         @ViewBuilder content: () -> Content,
         @ViewBuilder label: () -> Label
@@ -21,6 +22,7 @@ public struct PrismGroupBox<Label: View, Content: View>: View {
         self.content = content()
     }
 
+    /// The content and behavior of the group box.
     public var body: some View {
         GroupBox {
             content
@@ -34,6 +36,7 @@ public struct PrismGroupBox<Label: View, Content: View>: View {
 
 extension PrismGroupBox where Label == Text {
 
+    /// Creates a group box with a text title and content.
     public init(
         _ title: LocalizedStringKey,
         @ViewBuilder content: () -> Content
@@ -46,6 +49,7 @@ extension PrismGroupBox where Label == Text {
 
 extension PrismGroupBox where Label == EmptyView {
 
+    /// Creates a group box with content only, omitting the label.
     public init(@ViewBuilder content: () -> Content) {
         self.label = EmptyView()
         self.content = content()

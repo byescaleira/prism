@@ -2,11 +2,17 @@ import SwiftUI
 
 /// Available component templates for code generation.
 public enum PrismComponentTemplate: String, Sendable, CaseIterable {
+    /// Button component template.
     case button
+    /// Card container template.
     case card
+    /// Form with validation template.
     case form
+    /// Scrollable list template.
     case list
+    /// Detail page template.
     case detail
+    /// Settings screen template.
     case settings
 }
 

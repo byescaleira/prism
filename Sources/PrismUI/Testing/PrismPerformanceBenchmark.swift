@@ -20,10 +20,12 @@ public struct PrismPerformanceBenchmark: ViewModifier {
     private let label: String
     @State private var renderCount = 0
 
+    /// Creates a benchmark modifier with the given label for log output.
     public init(_ label: String) {
         self.label = label
     }
 
+    /// Wraps the content with performance measurement.
     public func body(content: Content) -> some View {
         #if DEBUG
         let _ = Self.signposter.emitEvent("body", "\(label)")
@@ -43,6 +45,7 @@ public struct PrismPerformanceBenchmark: ViewModifier {
 /// Tracks memory footprint for DEBUG profiling.
 public enum PrismMemoryTracker: Sendable {
     #if DEBUG
+    /// Logs the current resident memory footprint for the given label.
     public static func logFootprint(_ label: String) {
         var info = mach_task_basic_info()
         var count = mach_msg_type_number_t(MemoryLayout<mach_task_basic_info>.size) / 4

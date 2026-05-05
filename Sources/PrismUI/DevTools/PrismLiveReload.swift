@@ -17,6 +17,7 @@ public final class PrismLiveReloadServer {
 
     private var reloadables: [any PrismLiveReloadable] = []
 
+    /// Creates a live reload server.
     public init() {}
 
     /// Registers a reloadable object for future reload events.
@@ -51,6 +52,7 @@ public struct PrismLiveReloadBanner: View {
         self.server = server
     }
 
+    /// The banner view body with connection indicator and last reload time.
     public var body: some View {
         HStack(spacing: SpacingToken.sm.rawValue) {
             Circle()

@@ -2,13 +2,21 @@ import SwiftUI
 
 /// Pre-built animation presets using MotionToken values.
 public enum PrismAnimationPreset: Sendable {
+    /// Represents a spring bounce scale effect.
     case bounce
+    /// Represents a rotational wiggle effect.
     case wiggle
+    /// Represents a pulsing opacity effect.
     case pulse
+    /// Represents a horizontal shake effect.
     case shake
+    /// Represents a fade-in opacity transition.
     case fadeIn
+    /// Represents an upward slide with fade.
     case slideUp
+    /// Represents a scale-in with fade transition.
     case scaleIn
+    /// Represents a spring-driven scale-in with fade.
     case springIn
 }
 

@@ -42,8 +42,10 @@ public struct PrismUndoButtons: View {
     @Environment(\.undoManager) private var undoManager
     @Environment(\.prismTheme) private var theme
 
+    /// Creates undo/redo toolbar buttons.
     public init() {}
 
+    /// The content and behavior of the undo buttons.
     public var body: some View {
         HStack(spacing: SpacingToken.sm.rawValue) {
             Button {

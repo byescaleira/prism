@@ -17,6 +17,7 @@ public enum TypographyToken: Sendable, CaseIterable {
     case caption
     case caption2
 
+    /// The corresponding Dynamic Type text style.
     public var textStyle: Font.TextStyle {
         switch self {
         case .largeTitle: .largeTitle
@@ -33,6 +34,7 @@ public enum TypographyToken: Sendable, CaseIterable {
         }
     }
 
+    /// The default font weight for this typography level.
     public var defaultWeight: Font.Weight {
         switch self {
         case .largeTitle: .bold
@@ -49,22 +51,27 @@ public enum TypographyToken: Sendable, CaseIterable {
         }
     }
 
+    /// A system font using this token's text style and default weight.
     public var font: Font {
         .system(textStyle, weight: defaultWeight)
     }
 
+    /// Returns a font with the given weight override.
     public func font(weight: Font.Weight) -> Font {
         .system(textStyle, weight: weight)
     }
 
+    /// Returns a font with the given weight and design.
     public func font(weight: Font.Weight, design: Font.Design) -> Font {
         .system(textStyle, design: design, weight: weight)
     }
 
+    /// Returns a font with the given weight and width.
     public func font(weight: Font.Weight, width: Font.Width) -> Font {
         .system(textStyle, weight: weight).width(width)
     }
 
+    /// Returns a font with the given weight, design, and width.
     public func font(weight: Font.Weight, design: Font.Design, width: Font.Width) -> Font {
         .system(textStyle, design: design, weight: weight).width(width)
     }

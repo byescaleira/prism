@@ -16,6 +16,7 @@ public struct PrismTypingIndicator: View {
         self.color = color
     }
 
+    /// The typing indicator view body with bouncing dot animation.
     public var body: some View {
         HStack(spacing: dotSize * 0.6) {
             ForEach(0..<3, id: \.self) { index in
@@ -57,6 +58,7 @@ public struct PrismTypingBubble: View {
         self.color = color
     }
 
+    /// The typing bubble view body with sender label and animated dots.
     public var body: some View {
         HStack {
             VStack(alignment: .leading, spacing: 4) {

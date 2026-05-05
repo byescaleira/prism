@@ -2,9 +2,13 @@ import SwiftUI
 
 /// Focus style tokens for themed focus rings.
 public enum PrismFocusStyle: Sendable {
+    /// Represents a visible focus ring outline.
     case ring
+    /// Represents a background highlight on focus.
     case highlight
+    /// Represents a subtle scale-up on focus.
     case scale
+    /// Represents a subtle opacity change on focus.
     case subtle
 }
 
@@ -47,6 +51,7 @@ public struct PrismFocusSection<Content: View>: View {
     private let title: LocalizedStringKey?
     private let content: Content
 
+    /// Creates a focus section with an optional title and content.
     public init(
         _ title: LocalizedStringKey? = nil,
         @ViewBuilder content: () -> Content
@@ -55,6 +60,7 @@ public struct PrismFocusSection<Content: View>: View {
         self.content = content()
     }
 
+    /// The content and behavior of the focus section.
     public var body: some View {
         VStack(alignment: .leading, spacing: SpacingToken.sm.rawValue) {
             if let title {

@@ -2,10 +2,15 @@ import SwiftUI
 
 /// Stagger animation style.
 public enum PrismStaggerStyle: Sendable {
+    /// Items slide up from below.
     case slideUp
+    /// Items slide in from the right.
     case slideLeft
+    /// Items fade in without movement.
     case fadeIn
+    /// Items scale up from a smaller size.
     case scaleIn
+    /// Items slide in from the left.
     case slideRight
 }
 
@@ -24,6 +29,7 @@ public struct PrismStaggeredList<Item: Identifiable, Content: View>: View {
     let animation: PrismStaggerStyle
     let content: (Item, Int) -> Content
 
+    /// Creates a staggered list with configurable delay, spring, and animation style.
     public init(
         items: [Item],
         staggerDelay: Double = 0.05,
@@ -38,6 +44,7 @@ public struct PrismStaggeredList<Item: Identifiable, Content: View>: View {
         self.content = content
     }
 
+    /// The staggered list body rendering items with delayed entrance animations.
     public var body: some View {
         ForEach(Array(items.enumerated()), id: \.element.id) { index, item in
             StaggeredItemView(

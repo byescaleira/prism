@@ -14,8 +14,10 @@ public struct PrismComponentBrowser: View {
     @State private var searchText = ""
     @State private var selectedCategory: ComponentCategory?
 
+    /// Creates a component browser instance.
     public init() {}
 
+    /// The view body.
     public var body: some View {
         NavigationStack {
             List {

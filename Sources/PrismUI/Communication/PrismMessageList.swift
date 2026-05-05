@@ -80,6 +80,7 @@ public struct PrismMessageList: View {
         self.bubbleStyle = bubbleStyle
     }
 
+    /// The message list view body with date separators and auto-scroll.
     public var body: some View {
         ScrollViewReader { proxy in
             ScrollView {

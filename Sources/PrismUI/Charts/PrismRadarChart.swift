@@ -51,6 +51,7 @@ public struct PrismRadarChart: View {
         self.gridLevels = max(gridLevels, 1)
     }
 
+    /// The radar chart view body with polygon grid, data overlays, and legend.
     public var body: some View {
         VStack(spacing: SpacingToken.sm.rawValue) {
             GeometryReader { geo in

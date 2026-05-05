@@ -82,6 +82,7 @@ public struct PrismDownsampledImage: View {
         self.scale = scale
     }
 
+    /// The content and behavior of the downsampled image view.
     public var body: some View {
         Group {
             if let cgImage {

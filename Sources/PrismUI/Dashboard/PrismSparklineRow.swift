@@ -10,6 +10,7 @@ public struct PrismSparklineRow: View {
     private let trend: PrismTrend?
     private let subtitle: String?
 
+    /// Creates a sparkline row with label, value, data points, and optional trend.
     public init(
         label: String,
         value: String,
@@ -24,6 +25,7 @@ public struct PrismSparklineRow: View {
         self.subtitle = subtitle
     }
 
+    /// The sparkline row view body with label, value, trend arrow, and inline chart.
     public var body: some View {
         HStack(spacing: SpacingToken.md.rawValue) {
             VStack(alignment: .leading, spacing: SpacingToken.xxs.rawValue) {

@@ -14,6 +14,7 @@ public struct PrismSearchBar: View {
     @State private var debouncedText = ""
     @State private var debounceTask: Task<Void, Never>?
 
+    /// Creates a search bar with debounced text binding and submit callback.
     public init(
         text: Binding<String>,
         placeholder: LocalizedStringKey = "Search",
@@ -26,6 +27,7 @@ public struct PrismSearchBar: View {
         self.onSubmit = onSubmit
     }
 
+    /// The search bar view body with icon, text field, and clear button.
     public var body: some View {
         HStack(spacing: SpacingToken.sm.rawValue) {
             Image(systemName: "magnifyingglass")

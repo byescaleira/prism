@@ -10,6 +10,7 @@ public struct PrismIcon: View {
     private let renderingMode: SymbolRenderingMode
     private let variableValue: Double?
 
+    /// Creates an icon from an SF Symbol name with size, color, and rendering options.
     public init(
         _ systemName: String,
         size: Size = .medium,
@@ -24,6 +25,7 @@ public struct PrismIcon: View {
         self.variableValue = variableValue
     }
 
+    /// The content and behavior of the icon.
     public var body: some View {
         image
             .symbolRenderingMode(renderingMode)
@@ -45,11 +47,17 @@ public struct PrismIcon: View {
 
 extension PrismIcon {
 
+    /// Predefined icon sizes.
     public enum Size: Sendable {
+        /// Represents a 14pt icon.
         case small
+        /// Represents an 18pt icon.
         case medium
+        /// Represents a 24pt icon.
         case large
+        /// Represents a 32pt icon.
         case xLarge
+        /// Represents a custom-sized icon.
         case custom(CGFloat)
 
         var points: CGFloat {

@@ -42,6 +42,7 @@ public struct PrismThreadView: View {
         self._isExpanded = State(initialValue: expanded)
     }
 
+    /// The thread view body with root message and collapsible replies.
     public var body: some View {
         VStack(alignment: .leading, spacing: SpacingToken.sm.rawValue) {
             PrismChatBubble(

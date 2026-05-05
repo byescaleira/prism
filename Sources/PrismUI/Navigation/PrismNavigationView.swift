@@ -11,6 +11,7 @@ public struct PrismNavigationView<Content: View, Route: PrismRoutable, Destinati
     private let content: Content
     private let destination: (Route) -> Destination
 
+    /// Creates a navigation view bound to a router with content and destination builders.
     public init(
         router: PrismRouter<Route>,
         @ViewBuilder content: () -> Content,
@@ -21,6 +22,7 @@ public struct PrismNavigationView<Content: View, Route: PrismRoutable, Destinati
         self.destination = destination
     }
 
+    /// The content and behavior of the navigation view.
     public var body: some View {
         NavigationStack(path: $router.path) {
             content

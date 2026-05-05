@@ -13,6 +13,7 @@ public struct PrismBarChart<Data: RandomAccessCollection>: View where Data.Eleme
     private let yValue: KeyPath<Data.Element, Double>
     private let barColor: ColorToken
 
+    /// Creates a bar chart from data with key paths for the x label and y value.
     public init(
         _ data: Data,
         x: KeyPath<Data.Element, String>,
@@ -25,6 +26,7 @@ public struct PrismBarChart<Data: RandomAccessCollection>: View where Data.Eleme
         self.barColor = barColor
     }
 
+    /// The bar chart view body with themed axis styling.
     public var body: some View {
         Chart(data) { item in
             BarMark(
@@ -62,6 +64,7 @@ public struct PrismLineChart<Data: RandomAccessCollection>: View where Data.Elem
     private let lineColor: ColorToken
     private let showArea: Bool
 
+    /// Creates a line chart from data with key paths for x and y, and optional area fill.
     public init(
         _ data: Data,
         x: KeyPath<Data.Element, String>,
@@ -76,6 +79,7 @@ public struct PrismLineChart<Data: RandomAccessCollection>: View where Data.Elem
         self.showArea = showArea
     }
 
+    /// The line chart view body with optional gradient area fill.
     public var body: some View {
         Chart(data) { item in
             LineMark(
@@ -127,6 +131,7 @@ public struct PrismDonutChart<Data: RandomAccessCollection>: View where Data.Ele
     private let value: KeyPath<Data.Element, Double>
     private let colors: [ColorToken]
 
+    /// Creates a donut chart from data with key paths for label and value.
     public init(
         _ data: Data,
         label: KeyPath<Data.Element, String>,
@@ -139,6 +144,7 @@ public struct PrismDonutChart<Data: RandomAccessCollection>: View where Data.Ele
         self.colors = colors
     }
 
+    /// The donut chart view body with golden-ratio inner radius.
     public var body: some View {
         Chart(data) { item in
             SectorMark(

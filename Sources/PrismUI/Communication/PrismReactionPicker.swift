@@ -38,6 +38,7 @@ public struct PrismReactionPicker: View {
         self.onSelect = onSelect
     }
 
+    /// The reaction picker view body with staggered pop-in animation.
     public var body: some View {
         HStack(spacing: SpacingToken.sm.rawValue) {
             ForEach(Array(emojis.enumerated()), id: \.offset) { index, emoji in
@@ -79,6 +80,7 @@ public struct PrismReactionBar: View {
         self.onLongPress = onLongPress
     }
 
+    /// The reaction bar view body with toggleable emoji chips.
     public var body: some View {
         if !reactions.isEmpty {
             HStack(spacing: SpacingToken.xs.rawValue) {

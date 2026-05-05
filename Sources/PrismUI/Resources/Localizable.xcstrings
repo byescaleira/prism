@@ -4,16 +4,332 @@
     "" : {
 
     },
-    "Adjust" : {
+    ", conversion %.1f%%" : {
 
     },
-    "Amount" : {
+    "#%lld" : {
 
     },
-    "Button" : {
+    "%.0f" : {
 
     },
-    "Carousel" : {
+    "%.1f%%" : {
+
+    },
+    "%.2f" : {
+
+    },
+    "%@ — %lldpt" : {
+      "localizations" : {
+        "pt" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@ — %2$lldpt"
+          }
+        }
+      }
+    },
+    "%@ (%lldpt)" : {
+      "localizations" : {
+        "pt" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@ (%2$lldpt)"
+          }
+        }
+      }
+    },
+    "%@ %@ %@" : {
+      "localizations" : {
+        "pt" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@ %2$@ %3$@"
+          }
+        }
+      }
+    },
+    "%@ color token" : {
+
+    },
+    "%@ elevation shadow" : {
+
+    },
+    "%@ out of %lld stars" : {
+      "localizations" : {
+        "pt" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@ out of %2$lld stars"
+          }
+        }
+      }
+    },
+    "%@ radius %lld points" : {
+      "localizations" : {
+        "pt" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@ radius %2$lld points"
+          }
+        }
+      }
+    },
+    "%@ spacing %lld points" : {
+      "localizations" : {
+        "pt" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@ spacing %2$lld points"
+          }
+        }
+      }
+    },
+    "%@ typography sample" : {
+
+    },
+    "%@, %@" : {
+      "localizations" : {
+        "pt" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@, %2$@"
+          }
+        }
+      }
+    },
+    "%@, %lld reactions%@" : {
+      "localizations" : {
+        "pt" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@, %2$lld reactions%3$@"
+          }
+        }
+      }
+    },
+    "%@, rendered %lld times" : {
+      "localizations" : {
+        "pt" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@, rendered %2$lld times"
+          }
+        }
+      }
+    },
+    "%@: %.0f%@" : {
+      "localizations" : {
+        "pt" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@: %2$.0f%3$@"
+          }
+        }
+      }
+    },
+    "%@: %.1f" : {
+      "localizations" : {
+        "pt" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@: %2$.1f"
+          }
+        }
+      }
+    },
+    "%@: %@" : {
+      "localizations" : {
+        "pt" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@: %2$@"
+          }
+        }
+      }
+    },
+    "%@: max %.0f" : {
+      "localizations" : {
+        "pt" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@: max %2$.0f"
+          }
+        }
+      }
+    },
+    "%lld" : {
+
+    },
+    "%lld %@" : {
+      "localizations" : {
+        "pt" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$lld %2$@"
+          }
+        }
+      }
+    },
+    "%lld notifications" : {
+
+    },
+    "%lld replies, %@" : {
+      "localizations" : {
+        "pt" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$lld replies, %2$@"
+          }
+        }
+      }
+    },
+    "%lld seconds remaining" : {
+
+    },
+    "%lld star%@" : {
+      "localizations" : {
+        "pt" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$lld star%2$@"
+          }
+        }
+      }
+    },
+    "%lld." : {
+
+    },
+    "%lld/%lld" : {
+      "localizations" : {
+        "pt" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$lld/%2$lld"
+          }
+        }
+      }
+    },
+    "%lld%%" : {
+
+    },
+    "%lldms" : {
+
+    },
+    "%lldpt" : {
+
+    },
+    "%lldx" : {
+
+    },
+    "%lldx%lld" : {
+      "localizations" : {
+        "pt" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$lldx%2$lld"
+          }
+        }
+      }
+    },
+    "•" : {
+
+    },
+    "Aa — %@" : {
+
+    },
+    "Above" : {
+
+    },
+    "Accent / Interactive" : {
+
+    },
+    "Accessibility" : {
+
+    },
+    "Action" : {
+
+    },
+    "Activity feed" : {
+
+    },
+    "Activity feed grouped by date" : {
+
+    },
+    "Add filter" : {
+
+    },
+    "Add item" : {
+
+    },
+    "Add screen" : {
+
+    },
+    "Add your first item to get started." : {
+
+    },
+    "Below" : {
+
+    },
+    "Blockquote: %@" : {
+
+    },
+    "Body text using your theme configuration." : {
+
+    },
+    "Bordered" : {
+
+    },
+    "Brand Colors" : {
+
+    },
+    "Breadcrumb: %@" : {
+
+    },
+    "Cancel" : {
+
+    },
+    "Candle: O %.2f H %.2f L %.2f C %.2f" : {
+      "localizations" : {
+        "pt" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Candle: O %1$.2f H %2$.2f L %3$.2f C %4$.2f"
+          }
+        }
+      }
+    },
+    "Card A" : {
+
+    },
+    "Card B" : {
+
+    },
+    "Card C" : {
+
+    },
+    "Card content" : {
+
+    },
+    "Card description goes here." : {
+
+    },
+    "Card Title" : {
+
+    },
+    "Category" : {
+
+    },
+    "Choose from the sidebar" : {
+
+    },
+    "Clear search" : {
+
+    },
+    "Code block" : {
+
+    },
+    "Code block in %@" : {
 
     },
     "coffeeDrivenDescription" : {
@@ -50,7 +366,49 @@
         }
       }
     },
-    "Collapse" : {
+    "Color blindness simulation: %@" : {
+
+    },
+    "Color picker" : {
+
+    },
+    "Colors" : {
+
+    },
+    "Comparison table" : {
+
+    },
+    "Component Browser" : {
+
+    },
+    "Confirm" : {
+
+    },
+    "Continue" : {
+
+    },
+    "Controls" : {
+
+    },
+    "Copied" : {
+
+    },
+    "Copied to clipboard" : {
+
+    },
+    "Copy" : {
+
+    },
+    "Copy code" : {
+
+    },
+    "Corner Radius" : {
+
+    },
+    "Countdown timer" : {
+
+    },
+    "Dark Mode" : {
 
     },
     "debugPrintDescription" : {
@@ -87,13 +445,82 @@
         }
       }
     },
+    "Default" : {
+
+    },
     "Delete" : {
 
     },
-    "Edit" : {
+    "Description text" : {
 
     },
-    "Expand" : {
+    "Destructive" : {
+
+    },
+    "Disabled" : {
+
+    },
+    "Document" : {
+
+    },
+    "Done" : {
+
+    },
+    "Double tap to collapse" : {
+
+    },
+    "Double tap to expand" : {
+
+    },
+    "Double-tap to %@ replies" : {
+
+    },
+    "Elevation" : {
+
+    },
+    "Email" : {
+
+    },
+    "Empty" : {
+
+    },
+    "Environment" : {
+
+    },
+    "Environment debugger" : {
+
+    },
+    "Error" : {
+
+    },
+    "Error occurred" : {
+
+    },
+    "Export Theme as JSON" : {
+
+    },
+    "Failed to generate JSON" : {
+
+    },
+    "Feature" : {
+
+    },
+    "Feedback Colors" : {
+
+    },
+    "Field" : {
+
+    },
+    "Filled" : {
+
+    },
+    "Filter field" : {
+
+    },
+    "Filter operator" : {
+
+    },
+    "Filter value" : {
 
     },
     "forceUnwrapDescription" : {
@@ -130,6 +557,9 @@
         }
       }
     },
+    "Formatting toolbar" : {
+
+    },
     "fridayDeployDescription" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -163,6 +593,24 @@
           }
         }
       }
+    },
+    "Get Started" : {
+
+    },
+    "Glass" : {
+
+    },
+    "Glass Prominent" : {
+
+    },
+    "Hide password" : {
+
+    },
+    "High elevation" : {
+
+    },
+    "https://example.com" : {
+
     },
     "Image" : {
 
@@ -201,6 +649,21 @@
         }
       }
     },
+    "Info" : {
+
+    },
+    "Info message" : {
+
+    },
+    "Insert" : {
+
+    },
+    "Insert Link" : {
+
+    },
+    "Large Text" : {
+
+    },
     "legacyCodeDescription" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -235,7 +698,25 @@
         }
       }
     },
-    "Menu" : {
+    "Live Preview" : {
+
+    },
+    "Live reload connected" : {
+
+    },
+    "Live Reload Connected" : {
+
+    },
+    "Live reload disconnected" : {
+
+    },
+    "Live Reload Disconnected" : {
+
+    },
+    "Loading" : {
+
+    },
+    "Markdown content" : {
 
     },
     "mergeConflictDescription" : {
@@ -272,6 +753,39 @@
         }
       }
     },
+    "Message list, %lld messages" : {
+
+    },
+    "Min Length" : {
+
+    },
+    "Motion" : {
+
+    },
+    "navigates to next screen" : {
+
+    },
+    "No items" : {
+
+    },
+    "No Items" : {
+
+    },
+    "Notes" : {
+
+    },
+    "Notifications" : {
+
+    },
+    "Operator" : {
+
+    },
+    "Password" : {
+
+    },
+    "Paste" : {
+
+    },
     "placeholderEmail" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -289,7 +803,599 @@
         }
       }
     },
-    "R$ 0,00" : {
+    "Plain" : {
+
+    },
+    "Preview" : {
+
+    },
+    "Preview Duration" : {
+
+    },
+    "Preview Elevation" : {
+
+    },
+    "Preview Radius" : {
+
+    },
+    "Preview Spacing" : {
+
+    },
+    "Primary" : {
+
+    },
+    "Primary / Brand" : {
+
+    },
+    "Primary Action" : {
+
+    },
+    "prism.add" : {
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "pt" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Add"
+          }
+        }
+      }
+    },
+    "prism.archive" : {
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "pt" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Archive"
+          }
+        }
+      }
+    },
+    "prism.avatar" : {
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "pt" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Avatar"
+          }
+        }
+      }
+    },
+    "prism.back" : {
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "pt" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Back"
+          }
+        }
+      }
+    },
+    "prism.cancel" : {
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "pt" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Cancel"
+          }
+        }
+      }
+    },
+    "prism.close" : {
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "pt" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Close"
+          }
+        }
+      }
+    },
+    "prism.colorSwatch" : {
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "pt" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Color swatch"
+          }
+        }
+      }
+    },
+    "prism.complete" : {
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "pt" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Complete"
+          }
+        }
+      }
+    },
+    "prism.continue" : {
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "pt" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Continue"
+          }
+        }
+      }
+    },
+    "prism.countdownTimer" : {
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "pt" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Countdown timer"
+          }
+        }
+      }
+    },
+    "prism.customColor" : {
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "pt" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Custom color"
+          }
+        }
+      }
+    },
+    "prism.delete" : {
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "pt" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Delete"
+          }
+        }
+      }
+    },
+    "prism.dismiss" : {
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "pt" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Dismiss"
+          }
+        }
+      }
+    },
+    "prism.done" : {
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "pt" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Done"
+          }
+        }
+      }
+    },
+    "prism.edit" : {
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "pt" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Edit"
+          }
+        }
+      }
+    },
+    "prism.empty" : {
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "pt" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Empty"
+          }
+        }
+      }
+    },
+    "prism.errorOccurred" : {
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "pt" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "An error occurred"
+          }
+        }
+      }
+    },
+    "prism.flag" : {
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "pt" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Flag"
+          }
+        }
+      }
+    },
+    "prism.getStarted" : {
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "pt" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Get Started"
+          }
+        }
+      }
+    },
+    "prism.inProgress" : {
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "pt" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "In progress"
+          }
+        }
+      }
+    },
+    "prism.loading" : {
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "pt" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Loading"
+          }
+        }
+      }
+    },
+    "prism.next" : {
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "pt" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Next"
+          }
+        }
+      }
+    },
+    "prism.noResults" : {
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "pt" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "No Results"
+          }
+        }
+      }
+    },
+    "prism.paste" : {
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "pt" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Paste"
+          }
+        }
+      }
+    },
+    "prism.paused" : {
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "pt" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Paused"
+          }
+        }
+      }
+    },
+    "prism.pin" : {
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "pt" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Pin"
+          }
+        }
+      }
+    },
+    "prism.pinEntry" : {
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "pt" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "PIN entry"
+          }
+        }
+      }
+    },
+    "prism.previous" : {
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "pt" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Previous"
+          }
+        }
+      }
+    },
+    "prism.progress" : {
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "pt" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Progress"
+          }
+        }
+      }
+    },
+    "prism.rating" : {
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "pt" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Rating"
+          }
+        }
+      }
+    },
+    "prism.remove" : {
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "pt" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Remove"
+          }
+        }
+      }
+    },
+    "prism.retry" : {
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "pt" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Retry"
+          }
+        }
+      }
+    },
+    "prism.running" : {
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "pt" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Running"
+          }
+        }
+      }
+    },
+    "prism.save" : {
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "pt" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Save"
+          }
+        }
+      }
+    },
+    "prism.search" : {
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "pt" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Search"
+          }
+        }
+      }
+    },
+    "prism.selectPhoto" : {
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "pt" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Select Photo"
+          }
+        }
+      }
+    },
+    "prism.settings" : {
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "pt" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Settings"
+          }
+        }
+      }
+    },
+    "prism.share" : {
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "pt" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Share"
+          }
+        }
+      }
+    },
+    "prism.status.away" : {
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "pt" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Away"
+          }
+        }
+      }
+    },
+    "prism.status.busy" : {
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "pt" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Busy"
+          }
+        }
+      }
+    },
+    "prism.status.offline" : {
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "pt" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Offline"
+          }
+        }
+      }
+    },
+    "prism.status.online" : {
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "pt" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Online"
+          }
+        }
+      }
+    },
+    "prism.tryAgain" : {
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "pt" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Try Again"
+          }
+        }
+      }
+    },
+    "prism.untitled" : {
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "pt" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Untitled"
+          }
+        }
+      }
+    },
+    "Progress" : {
+
+    },
+    "Prototype flow with %lld screens" : {
+
+    },
+    "Prototyper" : {
+
+    },
+    "Radius" : {
+
+    },
+    "radius: %lld, y: %lld" : {
+      "localizations" : {
+        "pt" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "radius: %1$lld, y: %2$lld"
+          }
+        }
+      }
+    },
+    "Rating" : {
+
+    },
+    "React with %@" : {
+
+    },
+    "Reaction picker" : {
+
+    },
+    "Reactions: %@" : {
+
+    },
+    "Read by %lld" : {
+
+    },
+    "Read by %lld people, %@" : {
+      "localizations" : {
+        "pt" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Read by %1$lld people, %2$@"
+          }
+        }
+      }
+    },
+    "Registered Components (%lld)" : {
+
+    },
+    "Remove filter" : {
+
+    },
+    "Render Profiler" : {
+
+    },
+    "Reorder screens" : {
+
+    },
+    "Required" : {
+
+    },
+    "Rich text editor" : {
+
+    },
+    "Root" : {
+
+    },
+    "Row %lld, Column %lld, Value %.1f" : {
+      "localizations" : {
+        "pt" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Row %1$lld, Column %2$lld, Value %3$.1f"
+          }
+        }
+      }
+    },
+    "Row 1" : {
+
+    },
+    "Row 2" : {
 
     },
     "rubberDuckDescription" : {
@@ -325,6 +1431,57 @@
           }
         }
       }
+    },
+    "Sample Heading" : {
+
+    },
+    "Save" : {
+
+    },
+    "Screen: %@" : {
+
+    },
+    "Screens (%lld)" : {
+
+    },
+    "Search" : {
+
+    },
+    "Search components" : {
+
+    },
+    "Secondary" : {
+
+    },
+    "Secondary background" : {
+
+    },
+    "Select %@" : {
+
+    },
+    "Select a Component" : {
+
+    },
+    "Selection" : {
+
+    },
+    "Settings" : {
+
+    },
+    "Share" : {
+
+    },
+    "Show password" : {
+
+    },
+    "Someone is typing" : {
+
+    },
+    "Something went wrong" : {
+
+    },
+    "Spacing" : {
+
     },
     "spaghettiCodeDescription" : {
       "extractionState" : "manual",
@@ -394,6 +1551,54 @@
         }
       }
     },
+    "Statistics grid" : {
+
+    },
+    "Storybook" : {
+
+    },
+    "Success" : {
+
+    },
+    "Success!" : {
+
+    },
+    "Sync status: %@" : {
+
+    },
+    "Tag" : {
+
+    },
+    "Theme" : {
+
+    },
+    "Theme Editor" : {
+
+    },
+    "Theme Export" : {
+
+    },
+    "Thread with %lld replies" : {
+
+    },
+    "Timeline" : {
+
+    },
+    "Tinted" : {
+
+    },
+    "Token Inspector" : {
+
+    },
+    "Too short" : {
+
+    },
+    "Typography" : {
+
+    },
+    "URL" : {
+
+    },
     "validateEmailFailureReason" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -427,6 +1632,27 @@
           }
         }
       }
+    },
+    "Value" : {
+
+    },
+    "Volume" : {
+
+    },
+    "Warning" : {
+
+    },
+    "Warning alert" : {
+
+    },
+    "weight: %@" : {
+
+    },
+    "X" : {
+
+    },
+    "Y" : {
+
     }
   },
   "version" : "1.0"

@@ -2,8 +2,11 @@ import SwiftUI
 
 /// Scroll behavior presets following Apple HIG.
 public enum PrismScrollBehavior: Sendable {
+    /// Represents view-aligned scroll snapping behavior.
     case viewAligned
+    /// Represents page-based scroll snapping behavior.
     case paging
+    /// Represents automatic (no custom snapping) scroll behavior.
     case automatic
 }
 

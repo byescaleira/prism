@@ -64,6 +64,7 @@ public struct PrismModelFormBuilder: View {
         self.onCancel = onCancel
     }
 
+    /// The view body.
     public var body: some View {
         NavigationStack {
             PrismModelForm {

@@ -12,9 +12,11 @@ public protocol PrismTheme: Sendable {
 /// Default theme using Apple HIG system colors.
 public struct DefaultTheme: PrismTheme, Sendable {
 
+    /// Creates a default theme instance.
     public init() {}
 
     // swiftlint:disable:next cyclomatic_complexity
+    /// Resolves a color token to a concrete color using system-adaptive defaults.
     public func color(_ token: ColorToken) -> Color {
         switch token {
         case .brand: .accentColor

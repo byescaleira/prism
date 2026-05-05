@@ -64,6 +64,7 @@ public struct PrismSyncStatusView: View {
         self.monitor = monitor
     }
 
+    /// The view body.
     public var body: some View {
         HStack(spacing: 6) {
             Image(systemName: iconName)
@@ -109,6 +110,7 @@ public struct PrismSyncStatusView: View {
 public struct PrismSyncStatusModifier: ViewModifier {
     let monitor: PrismCloudSyncMonitor
 
+    /// Applies the cloud sync status overlay to the content.
     public func body(content: Content) -> some View {
         content
             .overlay(alignment: .topTrailing) {

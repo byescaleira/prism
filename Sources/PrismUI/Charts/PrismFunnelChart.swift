@@ -36,6 +36,7 @@ public struct PrismFunnelChart: View {
         self.palette = palette ?? [.blue, .cyan, .teal, .green, .mint, .orange, .purple]
     }
 
+    /// The funnel chart view body with trapezoid stages and conversion labels.
     public var body: some View {
         GeometryReader { geo in
             let width = geo.size.width

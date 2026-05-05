@@ -14,6 +14,7 @@ public struct PrismButtonGroup<Content: View>: View {
     private let spacing: SpacingToken
     private let content: Content
 
+    /// Creates a button group with alignment, spacing, and button content.
     public init(
         alignment: HorizontalAlignment = .center,
         spacing: SpacingToken = .md,
@@ -24,6 +25,7 @@ public struct PrismButtonGroup<Content: View>: View {
         self.content = content()
     }
 
+    /// The content and behavior of the button group.
     public var body: some View {
         HStack(spacing: spacing.rawValue) {
             content
@@ -47,11 +49,13 @@ public struct PrismSegmentedButtons: View {
     let options: [String]
     @Binding var selection: String
 
+    /// Creates a segmented control with the given options and selection binding.
     public init(options: [String], selection: Binding<String>) {
         self.options = options
         self._selection = selection
     }
 
+    /// The content and behavior of the segmented buttons.
     public var body: some View {
         HStack(spacing: 0) {
             ForEach(options, id: \.self) { option in

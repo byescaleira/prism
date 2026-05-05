@@ -83,6 +83,7 @@ public struct PrismBidirectionalStack<Content: View>: View {
         self.content = content()
     }
 
+    /// The stack body that lays out children horizontally with environment-aware direction.
     public var body: some View {
         HStack(alignment: alignment, spacing: spacing) {
             content

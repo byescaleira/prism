@@ -20,6 +20,7 @@ public struct PrismExpandableCard<Header: View, Detail: View>: View {
     private let header: Header
     private let detail: Detail
 
+    /// Creates an expandable card with a header and collapsible detail section.
     public init(
         surface: ColorToken = .surface,
         radius: RadiusToken = .lg,
@@ -34,6 +35,7 @@ public struct PrismExpandableCard<Header: View, Detail: View>: View {
         self.detail = detail()
     }
 
+    /// The content and behavior of the expandable card.
     public var body: some View {
         VStack(alignment: .leading, spacing: 0) {
             Button {

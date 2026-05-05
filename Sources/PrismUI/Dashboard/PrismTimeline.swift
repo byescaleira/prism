@@ -43,6 +43,7 @@ public struct PrismTimelineEvent: Sendable, Identifiable {
     /// Optional SF Symbol name.
     public let icon: String?
 
+    /// Creates a timeline event with title, date, status, and optional description.
     public init(
         id: UUID = UUID(),
         title: String,
@@ -66,10 +67,12 @@ public struct PrismTimeline: View {
 
     private let events: [PrismTimelineEvent]
 
+    /// Creates a timeline from an ordered array of events.
     public init(events: [PrismTimelineEvent]) {
         self.events = events
     }
 
+    /// The timeline view body with connecting line and status-colored dots.
     public var body: some View {
         LazyVStack(alignment: .leading, spacing: 0) {
             ForEach(Array(events.enumerated()), id: \.element.id) { index, event in

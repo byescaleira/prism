@@ -26,6 +26,7 @@ public struct PrismMultiLocalePreview<Content: View>: View {
         self.content = content()
     }
 
+    /// The preview body rendering content side by side for each locale.
     public var body: some View {
         ScrollView(.horizontal) {
             HStack(alignment: .top, spacing: 16) {

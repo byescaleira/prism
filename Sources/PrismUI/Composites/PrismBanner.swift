@@ -11,6 +11,7 @@ public struct PrismBanner: View {
 
     @State private var isVisible = true
 
+    /// Creates a banner with the given message, style, and optional dismiss handler.
     public init(
         _ message: LocalizedStringKey,
         style: Style = .info,
@@ -21,6 +22,7 @@ public struct PrismBanner: View {
         self.onDismiss = onDismiss
     }
 
+    /// The banner view body with icon, message, and optional dismiss button.
     public var body: some View {
         if isVisible {
             HStack(spacing: SpacingToken.md.rawValue) {
@@ -63,10 +65,15 @@ public struct PrismBanner: View {
 
 extension PrismBanner {
 
+    /// Visual style for the banner appearance.
     public enum Style: Sendable {
+        /// Informational blue banner.
         case info
+        /// Success green banner.
         case success
+        /// Warning yellow banner.
         case warning
+        /// Error red banner.
         case error
 
         var icon: String {

@@ -14,10 +14,12 @@ public struct PrismSkeletonView: View {
 
     private let layout: Layout
 
+    /// Creates a skeleton placeholder with the specified layout.
     public init(_ layout: Layout = .text) {
         self.layout = layout
     }
 
+    /// The content and behavior of the skeleton view.
     public var body: some View {
         skeletonContent
             .onAppear {
@@ -106,11 +108,17 @@ public struct PrismSkeletonView: View {
 }
 
 extension PrismSkeletonView {
+    /// Predefined skeleton layout configurations.
     public enum Layout: Sendable {
+        /// Represents a multi-line text placeholder.
         case text
+        /// Represents an avatar with name placeholder.
         case avatar
+        /// Represents a card with image and text placeholders.
         case card
+        /// Represents a list of row placeholders.
         case list(rows: Int)
+        /// Represents a custom-sized rectangular placeholder.
         case custom(width: CGFloat, height: CGFloat, radius: RadiusToken)
     }
 }

@@ -8,6 +8,7 @@ public struct PrismTag: View {
     private let style: Style
     private let icon: String?
 
+    /// Creates a tag with text, style, and optional icon.
     public init(
         _ text: LocalizedStringKey,
         style: Style = .default,
@@ -18,6 +19,7 @@ public struct PrismTag: View {
         self.icon = icon
     }
 
+    /// The content and behavior of the tag.
     public var body: some View {
         HStack(spacing: SpacingToken.xs.rawValue) {
             if let icon {
@@ -61,12 +63,19 @@ public struct PrismTag: View {
 
 extension PrismTag {
 
+    /// Semantic style variants for the tag.
     public enum Style: Sendable {
+        /// Represents a neutral default tag style.
         case `default`
+        /// Represents a success/positive tag style.
         case success
+        /// Represents a warning/caution tag style.
         case warning
+        /// Represents an error/negative tag style.
         case error
+        /// Represents an informational tag style.
         case info
+        /// Represents a branded/accent tag style.
         case brand
     }
 }

@@ -22,6 +22,7 @@ public struct PrismPluralRule: Sendable {
     /// Shared instance with built-in rules for English, Arabic, Russian, and Japanese.
     public static let shared = PrismPluralRule()
 
+    /// Creates a plural rule resolver instance.
     public init() {}
 
     /// Returns the plural category for a given count and locale.
@@ -97,6 +98,7 @@ public struct PrismPluralizedText: View {
         self.rule = rule
     }
 
+    /// The view body displaying the resolved pluralized text.
     public var body: some View {
         Text(resolvedText)
     }

@@ -14,6 +14,7 @@ public struct PrismVolumeView<Content: View>: View {
     private let content: Content
     private let depth: CGFloat
 
+    /// Creates a volume view with the specified depth offset.
     public init(
         depth: CGFloat = 0,
         @ViewBuilder content: () -> Content
@@ -22,6 +23,7 @@ public struct PrismVolumeView<Content: View>: View {
         self.depth = depth
     }
 
+    /// The content and behavior of the volume view.
     public var body: some View {
         content
             .offset(z: depth)
@@ -35,10 +37,12 @@ public struct PrismOrnamentView<Content: View>: View {
 
     private let content: Content
 
+    /// Creates an ornament view wrapping the given content.
     public init(@ViewBuilder content: () -> Content) {
         self.content = content()
     }
 
+    /// The content and behavior of the ornament.
     public var body: some View {
         content
             .padding(SpacingToken.md.rawValue)

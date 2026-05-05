@@ -16,6 +16,7 @@ public struct PrismGauge<CurrentValueLabel: View>: View {
     private let label: LocalizedStringKey
     private let currentValueLabel: CurrentValueLabel
 
+    /// Creates a gauge with a value, bounds, label, and current value label.
     public init(
         value: Double,
         in bounds: ClosedRange<Double> = 0...1,
@@ -28,6 +29,7 @@ public struct PrismGauge<CurrentValueLabel: View>: View {
         self.currentValueLabel = currentValueLabel()
     }
 
+    /// The content and behavior of the gauge.
     public var body: some View {
         Gauge(value: value, in: bounds) {
             Text(label)
@@ -52,6 +54,7 @@ public struct PrismGauge<CurrentValueLabel: View>: View {
 
 extension PrismGauge where CurrentValueLabel == EmptyView {
 
+    /// Creates a gauge with a value, bounds, and label but no current value label.
     public init(
         value: Double,
         in bounds: ClosedRange<Double> = 0...1,

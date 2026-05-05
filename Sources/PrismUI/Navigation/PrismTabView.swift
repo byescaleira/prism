@@ -5,6 +5,7 @@ public struct PrismTabView<Selection: Hashable, Content: View>: View {
     @Binding private var selection: Selection
     private let content: Content
 
+    /// Creates a tab view bound to a selection value.
     public init(
         selection: Binding<Selection>,
         @ViewBuilder content: () -> Content
@@ -13,6 +14,7 @@ public struct PrismTabView<Selection: Hashable, Content: View>: View {
         self.content = content()
     }
 
+    /// The content and behavior of the tab view.
     public var body: some View {
         TabView(selection: $selection) {
             content

@@ -13,10 +13,12 @@ import SwiftUI
 public struct PrismPreviewCatalog<Content: View>: View {
     private let content: Content
 
+    /// Creates a preview catalog with the given content.
     public init(@ViewBuilder content: () -> Content) {
         self.content = content()
     }
 
+    /// The view body.
     public var body: some View {
         ScrollView {
             VStack(spacing: SpacingToken.xl.rawValue) {

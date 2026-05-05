@@ -14,10 +14,12 @@ public struct PrismTipView<T: Tip>: View {
 
     private let tip: T
 
+    /// Creates a themed tip view from the given TipKit tip.
     public init(_ tip: T) {
         self.tip = tip
     }
 
+    /// The tip view body with themed background and tint.
     public var body: some View {
         TipView(tip)
             .tipBackground(theme.color(.surface))

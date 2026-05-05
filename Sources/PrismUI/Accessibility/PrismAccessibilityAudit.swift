@@ -13,10 +13,12 @@ public struct PrismAccessibilityAudit: ViewModifier {
 
     private let context: String
 
+    /// Creates an accessibility audit modifier with an optional context label.
     public init(context: String = "") {
         self.context = context
     }
 
+    /// Wraps content and logs accessibility audit warnings in DEBUG builds.
     public func body(content: Content) -> some View {
         #if DEBUG
         content.onAppear {

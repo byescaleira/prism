@@ -12,10 +12,12 @@ import SwiftUI
 public struct PrismDevicePreview<Content: View>: View {
     private let content: Content
 
+    /// Creates a device preview matrix with the given content.
     public init(@ViewBuilder content: () -> Content) {
         self.content = content()
     }
 
+    /// The view body.
     public var body: some View {
         ScrollView {
             VStack(spacing: SpacingToken.xl.rawValue) {
@@ -56,10 +58,12 @@ public struct PrismDevicePreview<Content: View>: View {
 public struct PrismLocalePreview<Content: View>: View {
     private let content: Content
 
+    /// Creates a locale preview matrix with the given content.
     public init(@ViewBuilder content: () -> Content) {
         self.content = content()
     }
 
+    /// The view body.
     public var body: some View {
         ScrollView {
             VStack(spacing: SpacingToken.xl.rawValue) {

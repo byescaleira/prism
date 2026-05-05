@@ -18,10 +18,12 @@ public struct PrismMenuBarContent<Content: View>: View {
 
     private let content: Content
 
+    /// Creates a menu bar content wrapper with the given content.
     public init(@ViewBuilder content: () -> Content) {
         self.content = content()
     }
 
+    /// The content and behavior of the menu bar content.
     public var body: some View {
         VStack(spacing: 0) {
             content
@@ -38,6 +40,7 @@ public struct PrismMenuBarButton: View {
     private let icon: String?
     private let action: () -> Void
 
+    /// Creates a menu bar button with a title, optional system image, and action.
     public init(
         _ title: LocalizedStringKey,
         systemImage icon: String? = nil,
@@ -48,6 +51,7 @@ public struct PrismMenuBarButton: View {
         self.action = action
     }
 
+    /// The content and behavior of the menu bar button.
     public var body: some View {
         Button(action: action) {
             if let icon {

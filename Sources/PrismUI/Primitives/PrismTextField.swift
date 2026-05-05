@@ -12,6 +12,7 @@ public struct PrismTextField: View {
 
     @State private var errorMessage: LocalizedStringKey?
 
+    /// Creates a themed text field with a title, text binding, axis, and optional validation.
     public init(
         _ title: LocalizedStringKey,
         text: Binding<String>,
@@ -24,6 +25,7 @@ public struct PrismTextField: View {
         self.validation = validation
     }
 
+    /// The content and behavior of the text field.
     public var body: some View {
         VStack(alignment: .leading, spacing: SpacingToken.xs.rawValue) {
             textField
@@ -93,11 +95,17 @@ public struct PrismTextField: View {
 
 extension PrismTextField {
 
+    /// Validation rules for text field input.
     public enum Validation {
+        /// Requires a non-empty value.
         case required(LocalizedStringKey)
+        /// Requires a minimum character count.
         case minLength(Int, LocalizedStringKey)
+        /// Requires a maximum character count.
         case maxLength(Int, LocalizedStringKey)
+        /// Requires the text to match a regex pattern.
         case pattern(String, LocalizedStringKey)
+        /// Applies a custom validation closure returning an error message or nil.
         case custom((String) -> LocalizedStringKey?)
     }
 }

@@ -22,6 +22,7 @@ public struct PrismWidgetView<Content: View>: View {
     private let theme: any PrismTheme
     private let content: Content
 
+    /// Creates a widget container with an optional theme override.
     public init(
         theme: any PrismTheme = DefaultTheme(),
         @ViewBuilder content: () -> Content
@@ -30,6 +31,7 @@ public struct PrismWidgetView<Content: View>: View {
         self.content = content()
     }
 
+    /// The view body.
     public var body: some View {
         content
             .environment(\.prismTheme, theme)
@@ -44,6 +46,7 @@ public struct PrismWidgetGauge: View {
     private let label: LocalizedStringKey
     private let icon: String?
 
+    /// Creates a widget gauge with the given value (0-1), label, and optional icon.
     public init(
         value: Double,
         label: LocalizedStringKey,
@@ -54,6 +57,7 @@ public struct PrismWidgetGauge: View {
         self.icon = icon
     }
 
+    /// The view body.
     public var body: some View {
         Gauge(value: value) {
             if let icon {
@@ -85,6 +89,7 @@ public struct PrismWidgetStat: View {
     private let icon: String?
     private let trend: Trend?
 
+    /// Creates a widget stat display with a title, formatted value, and optional trend.
     public init(
         _ title: LocalizedStringKey,
         value: String,
@@ -97,6 +102,7 @@ public struct PrismWidgetStat: View {
         self.trend = trend
     }
 
+    /// The view body.
     public var body: some View {
         VStack(alignment: .leading, spacing: SpacingToken.xxs.rawValue) {
             HStack(spacing: SpacingToken.xs.rawValue) {
@@ -125,6 +131,7 @@ public struct PrismWidgetStat: View {
         }
     }
 
+    /// The directional trend shown alongside a stat value.
     public enum Trend: Sendable {
         case up, down, flat
 

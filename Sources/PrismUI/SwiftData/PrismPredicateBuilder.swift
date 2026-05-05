@@ -97,6 +97,7 @@ public struct PrismFilterBar: View {
         self._selectedField = State(initialValue: fields.first ?? "")
     }
 
+    /// The view body.
     public var body: some View {
         VStack(spacing: 8) {
             HStack(spacing: 8) {

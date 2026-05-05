@@ -15,6 +15,7 @@ public enum MotionToken: Sendable, CaseIterable {
     case bouncy
     case smooth
 
+    /// The duration in seconds for this motion token.
     public var duration: Double {
         switch self {
         case .instant: 0.1
@@ -28,6 +29,7 @@ public enum MotionToken: Sendable, CaseIterable {
         }
     }
 
+    /// The SwiftUI animation configured with this token's duration and curve.
     public var animation: Animation {
         switch self {
         case .instant:

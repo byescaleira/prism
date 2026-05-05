@@ -20,6 +20,7 @@ private struct PrismAnalyticsProviderKey: @preconcurrency EnvironmentKey {
 }
 
 extension EnvironmentValues {
+    /// The analytics provider used to track events in the view hierarchy.
     public var prismAnalyticsProvider: (any PrismAnalyticsProvider)? {
         get { self[PrismAnalyticsProviderKey.self] }
         set { self[PrismAnalyticsProviderKey.self] = newValue }

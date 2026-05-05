@@ -2,20 +2,26 @@ import SwiftUI
 
 /// Value type for a single cell in a comparison table.
 public enum PrismFeatureValue: Sendable {
+    /// Feature is available (checkmark).
     case check
+    /// Feature is unavailable (cross).
     case cross
+    /// Arbitrary text value.
     case text(String)
+    /// Numeric value.
     case number(Double)
 }
 
 /// A column definition in a comparison table.
 public struct PrismComparisonColumn: Sendable, Identifiable {
+    /// Unique identifier for this column.
     public let id = UUID()
     /// Column header text.
     public let header: String
     /// Ordered values for each feature row.
     public let values: [String]
 
+    /// Creates a comparison column with a header and its row values.
     public init(header: String, values: [String]) {
         self.header = header
         self.values = values
@@ -24,12 +30,14 @@ public struct PrismComparisonColumn: Sendable, Identifiable {
 
 /// A feature row definition in a comparison table.
 public struct PrismComparisonFeature: Sendable, Identifiable {
+    /// Unique identifier for this feature row.
     public let id = UUID()
     /// Feature name displayed in the first column.
     public let name: String
     /// Values for each comparison column.
     public let values: [PrismFeatureValue]
 
+    /// Creates a comparison feature row with a name and per-column values.
     public init(name: String, values: [PrismFeatureValue]) {
         self.name = name
         self.values = values
@@ -44,6 +52,7 @@ public struct PrismComparisonTable: View {
     private let features: [PrismComparisonFeature]
     private let highlightedColumn: Int?
 
+    /// Creates a comparison table with column headers, features, and optional highlighted column.
     public init(
         columnHeaders: [String],
         features: [PrismComparisonFeature],
@@ -54,6 +63,7 @@ public struct PrismComparisonTable: View {
         self.highlightedColumn = highlightedColumn
     }
 
+    /// The comparison table view body with scrollable header and feature rows.
     public var body: some View {
         ScrollView(.horizontal, showsIndicators: false) {
             VStack(spacing: 0) {

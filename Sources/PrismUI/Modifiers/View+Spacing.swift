@@ -34,6 +34,7 @@ private struct PrismStackSpacingKey: EnvironmentKey {
 }
 
 extension EnvironmentValues {
+    /// The spacing token applied to Prism stacks in the environment.
     public var prismStackSpacing: SpacingToken {
         get { self[PrismStackSpacingKey.self] }
         set { self[PrismStackSpacingKey.self] = newValue }

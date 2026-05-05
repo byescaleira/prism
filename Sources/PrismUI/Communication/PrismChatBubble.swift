@@ -36,6 +36,7 @@ public struct PrismChatBubble: View {
         self.status = status
     }
 
+    /// The chat bubble view body with styled background and delivery status.
     public var body: some View {
         HStack {
             if isOutgoing { Spacer(minLength: 48) }

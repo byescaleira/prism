@@ -21,6 +21,7 @@ public struct PrismSplitView<Sidebar: View, Detail: View>: View {
     private let sidebar: Sidebar
     private let detail: Detail
 
+    /// Creates a two-column split view with sidebar and detail panes.
     public init(
         columnVisibility: NavigationSplitViewVisibility? = nil,
         @ViewBuilder sidebar: () -> Sidebar,
@@ -31,6 +32,7 @@ public struct PrismSplitView<Sidebar: View, Detail: View>: View {
         self.detail = detail()
     }
 
+    /// The content and behavior of the split view.
     public var body: some View {
         if let columnVisibility {
             NavigationSplitView(columnVisibility: .constant(columnVisibility)) {
@@ -54,6 +56,7 @@ public struct PrismThreeColumnView<Sidebar: View, Content: View, Detail: View>: 
     private let content: Content
     private let detail: Detail
 
+    /// Creates a three-column split view with sidebar, content, and detail panes.
     public init(
         @ViewBuilder sidebar: () -> Sidebar,
         @ViewBuilder content: () -> Content,
@@ -64,6 +67,7 @@ public struct PrismThreeColumnView<Sidebar: View, Content: View, Detail: View>: 
         self.detail = detail()
     }
 
+    /// The content and behavior of the three-column split view.
     public var body: some View {
         NavigationSplitView {
             sidebar

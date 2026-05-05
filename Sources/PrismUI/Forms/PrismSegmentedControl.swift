@@ -8,6 +8,7 @@ public struct PrismSegmentedControl<SelectionValue: Hashable>: View {
     private let label: LocalizedStringKey?
     private let content: () -> AnyView
 
+    /// Creates a segmented control with optional label and selection binding.
     public init<C: View>(
         _ label: LocalizedStringKey? = nil,
         selection: Binding<SelectionValue>,
@@ -18,6 +19,7 @@ public struct PrismSegmentedControl<SelectionValue: Hashable>: View {
         self.content = { AnyView(content()) }
     }
 
+    /// The segmented control view body with optional label and system picker.
     public var body: some View {
         VStack(alignment: .leading, spacing: SpacingToken.xs.rawValue) {
             if let label {

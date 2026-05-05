@@ -30,6 +30,7 @@ public struct PrismDocumentView<Content: View>: View {
     private let title: LocalizedStringKey
     private let content: Content
 
+    /// Creates a document view with a title and content.
     public init(
         _ title: LocalizedStringKey = "Document",
         @ViewBuilder content: () -> Content
@@ -38,6 +39,7 @@ public struct PrismDocumentView<Content: View>: View {
         self.content = content()
     }
 
+    /// The document view body with navigation, undo/redo toolbar, and content.
     public var body: some View {
         NavigationStack {
             content

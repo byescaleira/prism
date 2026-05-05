@@ -2,13 +2,13 @@ import SwiftUI
 
 /// Metrics captured by the render profiler for a single named view.
 public struct PrismRenderMetrics: Sendable {
-    /// Total number of body evaluations recorded.
+    /// The total number of body evaluations recorded.
     public var renderCount: Int
 
-    /// Duration of the most recent render, if any.
+    /// The duration of the most recent render, if any.
     public var lastRenderTime: Duration?
 
-    /// Average duration across all recorded renders, if any.
+    /// The average duration across all recorded renders, if any.
     public var averageRenderTime: Duration?
 
     /// Creates default metrics with zero renders and nil times.
@@ -95,6 +95,7 @@ public struct PrismProfilerOverlay: View {
         self.profiler = profiler
     }
 
+    /// The content and behavior of the profiler overlay.
     public var body: some View {
         VStack(alignment: .leading, spacing: 4) {
             Text("Render Profiler")

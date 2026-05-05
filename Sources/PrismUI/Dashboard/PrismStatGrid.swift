@@ -2,6 +2,7 @@ import SwiftUI
 
 /// A single statistic item displayed inside a stat grid.
 public struct PrismStatItem: Sendable, Identifiable {
+    /// Unique identifier for this stat item.
     public let id = UUID()
     /// Display label for the stat.
     public let label: String
@@ -12,6 +13,7 @@ public struct PrismStatItem: Sendable, Identifiable {
     /// Optional trend direction.
     public let trend: PrismTrend?
 
+    /// Creates a stat item with label, formatted value, and optional icon and trend.
     public init(
         label: String,
         value: String,
@@ -32,6 +34,7 @@ public struct PrismStatGrid: View {
     private let items: [PrismStatItem]
     private let minimumColumnWidth: CGFloat
 
+    /// Creates a stat grid with adaptive columns based on minimum width.
     public init(
         items: [PrismStatItem],
         minimumColumnWidth: CGFloat = 160
@@ -40,6 +43,7 @@ public struct PrismStatGrid: View {
         self.minimumColumnWidth = minimumColumnWidth
     }
 
+    /// The stat grid view body with adaptive column layout.
     public var body: some View {
         LazyVGrid(
             columns: [GridItem(.adaptive(minimum: minimumColumnWidth), spacing: SpacingToken.md.rawValue)],

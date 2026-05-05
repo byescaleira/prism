@@ -48,6 +48,7 @@ public struct PrismCandlestickChart: View {
         self.bearishColor = bearishColor
     }
 
+    /// The candlestick chart view body with price grid and colored candle bodies.
     public var body: some View {
         GeometryReader { geo in
             let sorted = candles.sorted { $0.date < $1.date }

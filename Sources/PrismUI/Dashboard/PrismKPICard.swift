@@ -27,7 +27,9 @@ public enum PrismTrend: String, Sendable, CaseIterable {
 
 /// Display size for a KPI card.
 public enum PrismKPISize: Sendable {
+    /// Compact horizontal layout for tight spaces.
     case compact
+    /// Full vertical layout with optional sparkline.
     case expanded
 }
 
@@ -44,6 +46,7 @@ public struct PrismKPICard: View {
     private let sparklineData: [Double]?
     private let size: PrismKPISize
 
+    /// Creates a KPI card with metric value, optional trend, and sparkline data.
     public init(
         title: String,
         value: String,
@@ -64,6 +67,7 @@ public struct PrismKPICard: View {
         self.size = size
     }
 
+    /// The KPI card view body with compact or expanded layout.
     public var body: some View {
         PrismCard {
             switch size {

@@ -60,6 +60,7 @@ where Data.Index == Int {
     private let id: KeyPath<Data.Element, ID>
     private let content: (Data.Element) -> Content
 
+    /// Creates a reorderable list bound to a mutable collection with a custom ID key path.
     public init(
         _ data: Binding<Data>,
         id: KeyPath<Data.Element, ID>,
@@ -70,6 +71,7 @@ where Data.Index == Int {
         self.content = content
     }
 
+    /// The reorderable list view body with move support.
     public var body: some View {
         List {
             ForEach(data, id: id) { item in
@@ -85,6 +87,7 @@ where Data.Index == Int {
 
 extension PrismReorderableList where Data.Element: Identifiable, ID == Data.Element.ID {
 
+    /// Creates a reorderable list using the element's Identifiable conformance.
     public init(
         _ data: Binding<Data>,
         @ViewBuilder content: @escaping (Data.Element) -> Content

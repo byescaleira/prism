@@ -7,6 +7,7 @@ private struct PrismThemeKey: @preconcurrency EnvironmentKey {
 }
 
 extension EnvironmentValues {
+    /// The current Prism theme propagated through the environment.
     public var prismTheme: any PrismTheme {
         get { self[PrismThemeKey.self] }
         set { self[PrismThemeKey.self] = newValue }

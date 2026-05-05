@@ -2,12 +2,19 @@ import SwiftUI
 
 /// Toolbar placement presets.
 public enum PrismToolbarPlacement: Sendable {
+    /// Represents leading toolbar placement.
     case leading
+    /// Represents trailing toolbar placement.
     case trailing
+    /// Represents principal (center) toolbar placement.
     case principal
+    /// Represents primary action toolbar placement.
     case primaryAction
+    /// Represents secondary action toolbar placement.
     case secondaryAction
+    /// Represents navigation toolbar placement.
     case navigation
+    /// Represents status bar toolbar placement.
     case status
 
     var placement: ToolbarItemPlacement {
@@ -31,6 +38,7 @@ public struct PrismToolbarButton: View {
     private let icon: String
     private let action: () -> Void
 
+    /// Creates a toolbar button with a title, system image, and action.
     public init(
         _ title: LocalizedStringKey,
         systemImage icon: String,
@@ -41,6 +49,7 @@ public struct PrismToolbarButton: View {
         self.action = action
     }
 
+    /// The content and behavior of the toolbar button.
     public var body: some View {
         Button(action: action) {
             Label(title, systemImage: icon)
@@ -56,6 +65,7 @@ public struct PrismToolbarMenu<Content: View>: View {
     private let icon: String
     private let content: Content
 
+    /// Creates a toolbar menu with a system image icon and menu content.
     public init(
         systemImage icon: String = "ellipsis.circle",
         @ViewBuilder content: () -> Content
@@ -64,6 +74,7 @@ public struct PrismToolbarMenu<Content: View>: View {
         self.content = content()
     }
 
+    /// The content and behavior of the toolbar menu.
     public var body: some View {
         Menu {
             content

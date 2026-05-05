@@ -32,6 +32,7 @@ public final class PrismComponentDebugger {
     /// All registered component debug entries.
     public private(set) var components: [PrismDebugInfo] = []
 
+    /// Creates an empty component debugger.
     public init() {}
 
     /// Registers or updates a component entry with its current size and label.
@@ -118,6 +119,7 @@ public struct PrismDebugOverlay: View {
         self.debugger = debugger
     }
 
+    /// The debug overlay view body listing all registered components.
     public var body: some View {
         List {
             Section("Registered Components (\(debugger.components.count))") {

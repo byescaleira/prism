@@ -32,6 +32,7 @@ public struct PrismNumberFormatter: Sendable {
     /// Shared instance.
     public static let shared = PrismNumberFormatter()
 
+    /// Creates a number formatter instance.
     public init() {}
 
     /// Formats a numeric value according to the given style and locale.
@@ -69,6 +70,7 @@ public struct PrismDateFormatter: Sendable {
     /// Shared instance.
     public static let shared = PrismDateFormatter()
 
+    /// Creates a date formatter instance.
     public init() {}
 
     /// Formats a date according to the given style and locale.
@@ -113,6 +115,7 @@ public struct PrismRelativeTimeFormatter: Sendable {
     /// Shared instance.
     public static let shared = PrismRelativeTimeFormatter()
 
+    /// Creates a relative time formatter instance.
     public init() {}
 
     /// Formats the time difference between two dates as a human-readable string.

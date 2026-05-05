@@ -14,6 +14,7 @@ public struct PrismComplicationGauge: View {
     private let label: LocalizedStringKey
     private let icon: String?
 
+    /// Creates a gauge complication with the given value and label.
     public init(
         value: Double,
         label: LocalizedStringKey,
@@ -24,6 +25,7 @@ public struct PrismComplicationGauge: View {
         self.icon = icon
     }
 
+    /// The view body.
     public var body: some View {
         Gauge(value: value) {
             if let icon {
@@ -37,17 +39,20 @@ public struct PrismComplicationGauge: View {
     }
 }
 
+/// Themed text complication showing a title with optional subtitle.
 public struct PrismComplicationText: View {
     @Environment(\.prismTheme) private var theme
 
     private let title: LocalizedStringKey
     private let subtitle: LocalizedStringKey?
 
+    /// Creates a text complication with the given title and optional subtitle.
     public init(title: LocalizedStringKey, subtitle: LocalizedStringKey? = nil) {
         self.title = title
         self.subtitle = subtitle
     }
 
+    /// The view body.
     public var body: some View {
         VStack(spacing: 2) {
             Text(title)

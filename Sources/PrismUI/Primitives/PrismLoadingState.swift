@@ -5,10 +5,12 @@ public struct PrismLoadingState: View {
 
     private let state: State
 
+    /// Creates a loading state view for the given state.
     public init(_ state: State) {
         self.state = state
     }
 
+    /// The content and behavior of the loading state view.
     public var body: some View {
         switch state {
         case .loading:
@@ -25,9 +27,13 @@ public struct PrismLoadingState: View {
 
 extension PrismLoadingState {
 
+    /// The possible loading state values.
     public enum State {
+        /// Represents an active loading state with a spinner.
         case loading
+        /// Represents an empty content state with title, message, and icon.
         case empty(title: LocalizedStringKey, message: LocalizedStringKey?, icon: String?)
+        /// Represents an error state with a message and optional retry action.
         case error(LocalizedStringKey, retry: (() -> Void)?)
     }
 }

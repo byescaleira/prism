@@ -10,6 +10,7 @@ public struct PrismDepthStack<Content: View>: View {
     private let spacing: CGFloat
     private let content: Content
 
+    /// Creates a depth stack with the given spacing between layers.
     public init(
         spacing: CGFloat = SpacingToken.md.rawValue,
         @ViewBuilder content: () -> Content
@@ -18,6 +19,7 @@ public struct PrismDepthStack<Content: View>: View {
         self.content = content()
     }
 
+    /// The content and behavior of the depth stack.
     public var body: some View {
         ZStack {
             content

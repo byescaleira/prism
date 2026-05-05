@@ -16,8 +16,10 @@ public protocol PrismCustomCardStyle {
 
 /// Built-in elevated card style.
 public struct PrismElevatedCardStyle: PrismCustomCardStyle {
+    /// Creates an elevated card style instance.
     public init() {}
 
+    /// Renders the card content with elevation shadow and surface background.
     public func makeBody(content: AnyView, theme: any PrismTheme) -> some View {
         content
             .padding(SpacingToken.md.rawValue)
@@ -28,8 +30,10 @@ public struct PrismElevatedCardStyle: PrismCustomCardStyle {
 
 /// Built-in outlined card style.
 public struct PrismOutlinedCardStyle: PrismCustomCardStyle {
+    /// Creates an outlined card style instance.
     public init() {}
 
+    /// Renders the card content with a border stroke and no elevation.
     public func makeBody(content: AnyView, theme: any PrismTheme) -> some View {
         content
             .padding(SpacingToken.md.rawValue)
@@ -43,8 +47,10 @@ public struct PrismOutlinedCardStyle: PrismCustomCardStyle {
 
 /// Built-in flat card style (no elevation or border).
 public struct PrismFlatCardStyle: PrismCustomCardStyle {
+    /// Creates a flat card style instance.
     public init() {}
 
+    /// Renders the card content with a secondary surface background.
     public func makeBody(content: AnyView, theme: any PrismTheme) -> some View {
         content
             .padding(SpacingToken.md.rawValue)

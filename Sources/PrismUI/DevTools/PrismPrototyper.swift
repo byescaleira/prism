@@ -27,6 +27,7 @@ public struct PrismPrototypeFlow: View {
         self.screens = screens
     }
 
+    /// The prototype flow view body with horizontal scroll and navigation arrows.
     public var body: some View {
         ScrollView(.horizontal, showsIndicators: false) {
             HStack(spacing: SpacingToken.lg.rawValue) {
@@ -84,6 +85,7 @@ public struct PrismPrototyper: View {
         _screens = State(initialValue: screens)
     }
 
+    /// The prototyper view body with flow visualization and screen management.
     public var body: some View {
         NavigationStack {
             prototyperContent

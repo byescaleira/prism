@@ -2,12 +2,19 @@ import SwiftUI
 
 /// Responsive sizing presets for container-relative frames.
 public enum PrismResponsiveSize: Sendable {
+    /// Represents 100% of the container width.
     case full
+    /// Represents 50% of the container width.
     case half
+    /// Represents one-third of the container width.
     case third
+    /// Represents two-thirds of the container width.
     case twoThirds
+    /// Represents 25% of the container width.
     case quarter
+    /// Represents 75% of the container width.
     case threeQuarters
+    /// Represents a custom fraction of the container width.
     case custom(CGFloat)
 
     var fraction: CGFloat {
@@ -68,6 +75,7 @@ public struct PrismScaledView<Content: View>: View {
     @ScaledMetric private var scaledSize: CGFloat
     private let content: (CGFloat) -> Content
 
+    /// Creates a scaled view that adapts a base size to Dynamic Type settings.
     public init(
         baseSize: CGFloat,
         relativeTo textStyle: Font.TextStyle = .body,
@@ -77,6 +85,7 @@ public struct PrismScaledView<Content: View>: View {
         self.content = content
     }
 
+    /// The content and behavior of the scaled view.
     public var body: some View {
         content(scaledSize)
     }

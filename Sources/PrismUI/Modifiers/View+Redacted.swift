@@ -2,8 +2,11 @@ import SwiftUI
 
 /// Enhanced skeleton/redacted styles beyond basic shimmer.
 public enum PrismRedactedStyle: Sendable {
+    /// Represents a shimmer animation over redacted content.
     case shimmer
+    /// Represents a pulsing opacity animation over redacted content.
     case pulse
+    /// Represents a blur effect over redacted content.
     case blur
 }
 

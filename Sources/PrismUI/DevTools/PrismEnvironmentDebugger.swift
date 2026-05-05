@@ -42,6 +42,7 @@ public struct PrismEnvironmentDebugger: View {
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @Environment(\.accessibilityReduceTransparency) private var reduceTransparency
 
+    /// Creates an environment debugger view.
     public init() {}
 
     /// Returns a snapshot of the current environment.
@@ -56,6 +57,7 @@ public struct PrismEnvironmentDebugger: View {
         )
     }
 
+    /// The environment debugger view body listing current settings.
     public var body: some View {
         List {
             Section("Environment") {

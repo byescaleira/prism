@@ -13,6 +13,8 @@ extension View {
 /// Protocol for view models that integrate with Prism theming.
 @MainActor
 public protocol PrismViewModel: AnyObject, Observable {
+    /// The state type managed by this view model.
     associatedtype State
+    /// The current state of the view model.
     var state: State { get }
 }

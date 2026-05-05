@@ -9,6 +9,7 @@ public struct PrismAsyncImage<Placeholder: View>: View {
     private let radius: RadiusToken
     private let placeholder: Placeholder
 
+    /// Creates an async image with a URL, content mode, radius, and custom placeholder.
     public init(
         url: URL?,
         contentMode: ContentMode = .fill,
@@ -21,6 +22,7 @@ public struct PrismAsyncImage<Placeholder: View>: View {
         self.placeholder = placeholder()
     }
 
+    /// The content and behavior of the async image.
     public var body: some View {
         AsyncImage(url: url) { phase in
             switch phase {
@@ -55,6 +57,7 @@ public struct PrismAsyncImage<Placeholder: View>: View {
 
 extension PrismAsyncImage where Placeholder == PrismAsyncImageDefaultPlaceholder {
 
+    /// Creates an async image with a URL using the default progress placeholder.
     public init(
         url: URL?,
         contentMode: ContentMode = .fill,
@@ -67,9 +70,11 @@ extension PrismAsyncImage where Placeholder == PrismAsyncImageDefaultPlaceholder
     }
 }
 
+/// Default placeholder view showing a progress spinner on a themed surface.
 public struct PrismAsyncImageDefaultPlaceholder: View {
     @Environment(\.prismTheme) private var theme
 
+    /// The content and behavior of the default placeholder.
     public var body: some View {
         ZStack {
             theme.color(.surfaceSecondary)

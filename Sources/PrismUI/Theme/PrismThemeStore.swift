@@ -15,10 +15,12 @@ import SwiftUI
 @MainActor
 public final class PrismThemeStore: ObservableObject {
     @AppStorage("prism.theme.identifier") private var themeIdentifier: String = "default"
+    /// The currently active theme.
     @Published public private(set) var currentTheme: any PrismTheme
 
     private var registry: [String: any PrismTheme]
 
+    /// Creates a theme store with optional custom themes merged into the built-in registry.
     public init(
         customThemes: [String: any PrismTheme] = [:]
     ) {

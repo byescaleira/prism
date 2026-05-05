@@ -19,6 +19,7 @@ public struct PrismMap<Content: MapContent>: View {
     private let position: MapCameraPosition
     private let content: Content
 
+    /// Creates a themed map with camera position, selection binding, and map content.
     public init(
         position: MapCameraPosition = .automatic,
         selection: Binding<MKMapItem?> = .constant(nil),
@@ -29,6 +30,7 @@ public struct PrismMap<Content: MapContent>: View {
         self.content = content()
     }
 
+    /// The content and behavior of the map.
     public var body: some View {
         Map(initialPosition: position, selection: $selection) {
             content
@@ -46,6 +48,7 @@ public struct PrismMapMarker: MapContent {
     private let coordinate: CLLocationCoordinate2D
     private let tint: ColorToken
 
+    /// Creates a themed map marker with a title, coordinate, and tint color.
     public init(
         _ title: String,
         coordinate: CLLocationCoordinate2D,
@@ -56,6 +59,7 @@ public struct PrismMapMarker: MapContent {
         self.tint = tint
     }
 
+    /// The map content of the marker.
     public var body: some MapContent {
         Marker(title, coordinate: coordinate)
             .tint(theme.color(tint))
@@ -69,6 +73,7 @@ public struct PrismMapAnnotation<Content: View>: MapContent {
     private let anchor: UnitPoint
     private let content: Content
 
+    /// Creates a map annotation with a coordinate, anchor point, and custom content.
     public init(
         coordinate: CLLocationCoordinate2D,
         anchor: UnitPoint = .bottom,
@@ -79,6 +84,7 @@ public struct PrismMapAnnotation<Content: View>: MapContent {
         self.content = content()
     }
 
+    /// The map content of the annotation.
     public var body: some MapContent {
         Annotation("", coordinate: coordinate, anchor: anchor) {
             content

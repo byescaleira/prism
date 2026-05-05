@@ -14,6 +14,7 @@ public struct PrismBottomSheet<Content: View>: View {
     @State private var dragOffset: CGFloat = 0
     @GestureState private var isDragging = false
 
+    /// Creates a bottom sheet with configurable snap points and drag handle.
     public init(
         isPresented: Binding<Bool>,
         snapPoints: [CGFloat] = [0.4, 0.85],
@@ -26,6 +27,7 @@ public struct PrismBottomSheet<Content: View>: View {
         self.content = content()
     }
 
+    /// The bottom sheet view body with backdrop, drag gesture, and snap behavior.
     public var body: some View {
         GeometryReader { geometry in
             ZStack(alignment: .bottom) {

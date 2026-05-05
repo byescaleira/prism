@@ -4,8 +4,10 @@ import SwiftUI
 public struct PrismTokenInspector: View {
     @Environment(\.prismTheme) private var theme
 
+    /// Creates a token inspector view.
     public init() {}
 
+    /// The token inspector view body with categorized design token sections.
     public var body: some View {
         NavigationStack {
             List {

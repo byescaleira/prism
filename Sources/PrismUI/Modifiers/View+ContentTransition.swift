@@ -2,10 +2,15 @@ import SwiftUI
 
 /// Named content transition presets.
 public enum PrismContentTransition: Sendable {
+    /// Represents a numeric text counting-up transition.
     case numericText
+    /// Represents a numeric text counting-down transition.
     case numericTextCountdown
+    /// Represents an interpolated content transition.
     case interpolate
+    /// Represents an opacity crossfade transition.
     case opacity
+    /// Represents an identity transition with no visual change.
     case identity
 }
 

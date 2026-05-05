@@ -74,6 +74,7 @@ public struct PrismHeatmap: View {
         self.highColor = highColor
     }
 
+    /// The heatmap view body with color-interpolated grid cells.
     public var body: some View {
         let minValue = cells.map(\.value).min() ?? 0
         let maxValue = cells.map(\.value).max() ?? 1

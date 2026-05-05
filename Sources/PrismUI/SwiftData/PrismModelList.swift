@@ -27,6 +27,7 @@ public struct PrismModelList<Data: RandomAccessCollection, ID: Hashable, RowCont
     private let emptyMessage: LocalizedStringKey?
     private let rowContent: (Data.Element) -> RowContent
 
+    /// Creates a model list with an explicit identity key path.
     public init(
         _ data: Data,
         id: KeyPath<Data.Element, ID>,
@@ -43,6 +44,7 @@ public struct PrismModelList<Data: RandomAccessCollection, ID: Hashable, RowCont
         self.rowContent = rowContent
     }
 
+    /// The view body.
     public var body: some View {
         if data.isEmpty {
             PrismEmptyState(
@@ -63,6 +65,7 @@ public struct PrismModelList<Data: RandomAccessCollection, ID: Hashable, RowCont
 
 extension PrismModelList where Data.Element: Identifiable, ID == Data.Element.ID {
 
+    /// Creates a model list using the element's `Identifiable` conformance.
     public init(
         _ data: Data,
         emptyIcon: String = "tray",
@@ -85,10 +88,12 @@ public struct PrismModelForm<Content: View>: View {
 
     private let content: Content
 
+    /// Creates a model form with the given content.
     public init(@ViewBuilder content: () -> Content) {
         self.content = content()
     }
 
+    /// The view body.
     public var body: some View {
         Form {
             content

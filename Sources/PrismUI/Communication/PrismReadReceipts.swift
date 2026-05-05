@@ -32,6 +32,7 @@ public struct PrismReadReceiptIndicator: View {
         self.status = status
     }
 
+    /// The read receipt indicator view body with status-specific icons.
     public var body: some View {
         Group {
             switch status {
@@ -80,6 +81,7 @@ public struct PrismReadReceiptList: View {
         self.receipts = receipts
     }
 
+    /// The read receipt list view body with expandable reader details.
     public var body: some View {
         VStack(alignment: .leading, spacing: SpacingToken.xs.rawValue) {
             Button {

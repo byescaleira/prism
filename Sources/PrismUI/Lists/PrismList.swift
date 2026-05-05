@@ -9,6 +9,7 @@ where Data.Element: Identifiable {
     private let rowContent: (Data.Element) -> RowContent
     private let emptyContent: EmptyContent
 
+    /// Creates a themed list with data, row content, and a custom empty state view.
     public init(
         _ data: Data,
         @ViewBuilder rowContent: @escaping (Data.Element) -> RowContent,
@@ -19,6 +20,7 @@ where Data.Element: Identifiable {
         self.emptyContent = empty()
     }
 
+    /// The content and behavior of the list.
     public var body: some View {
         if data.isEmpty {
             emptyContent
@@ -37,6 +39,7 @@ where Data.Element: Identifiable {
 
 extension PrismList where EmptyContent == PrismLoadingState {
 
+    /// Creates a themed list with a default empty state using a title and icon.
     public init(
         _ data: Data,
         emptyTitle: LocalizedStringKey = "No items",

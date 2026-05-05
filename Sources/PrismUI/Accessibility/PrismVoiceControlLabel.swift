@@ -45,6 +45,7 @@ public struct PrismVoiceControlGroup<Content: View>: View {
         self.content = content()
     }
 
+    /// The group body with a shared accessibility label applied to the container.
     public var body: some View {
         Group {
             content

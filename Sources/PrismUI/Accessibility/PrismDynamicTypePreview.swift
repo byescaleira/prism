@@ -21,10 +21,12 @@ public struct PrismDynamicTypePreview<Content: View>: View {
         .accessibility3,
     ]
 
+    /// Creates a dynamic type preview with the given content.
     public init(@ViewBuilder content: () -> Content) {
         self.content = content()
     }
 
+    /// The preview body rendering content at multiple dynamic type sizes.
     public var body: some View {
         ScrollView {
             VStack(spacing: SpacingToken.xl.rawValue) {

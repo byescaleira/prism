@@ -23,8 +23,11 @@ private struct PrismSheetModifier<SheetContent: View>: ViewModifier {
 
 /// Sheet background style options.
 public enum PrismSheetBackground: Sendable {
+    /// Represents the system-default sheet background.
     case automatic
+    /// Represents an ultra-thin material sheet background.
     case material
+    /// Represents a transparent sheet background.
     case clear
 }
 

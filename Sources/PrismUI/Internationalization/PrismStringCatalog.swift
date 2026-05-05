@@ -33,6 +33,7 @@ public final class PrismStringExporter: Sendable {
     /// Shared instance for global key collection.
     public static let shared = PrismStringExporter()
 
+    /// Creates a string exporter instance.
     public init() {}
 
     /// Registers a localization key.

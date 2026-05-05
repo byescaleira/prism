@@ -14,6 +14,7 @@ public struct PrismLiveActivityCompact<Leading: View, Trailing: View>: View {
     private let leading: Leading
     private let trailing: Trailing
 
+    /// Creates a compact Live Activity layout with leading and trailing views.
     public init(
         @ViewBuilder leading: () -> Leading,
         @ViewBuilder trailing: () -> Trailing
@@ -22,6 +23,7 @@ public struct PrismLiveActivityCompact<Leading: View, Trailing: View>: View {
         self.trailing = trailing()
     }
 
+    /// The view body.
     public var body: some View {
         HStack(spacing: SpacingToken.sm.rawValue) {
             leading
@@ -39,6 +41,7 @@ public struct PrismLiveActivityExpanded<Content: View>: View {
     private let icon: String?
     private let content: Content
 
+    /// Creates an expanded Live Activity view with a title, optional icon, and content.
     public init(
         _ title: LocalizedStringKey,
         icon: String? = nil,
@@ -49,6 +52,7 @@ public struct PrismLiveActivityExpanded<Content: View>: View {
         self.content = content()
     }
 
+    /// The view body.
     public var body: some View {
         VStack(alignment: .leading, spacing: SpacingToken.md.rawValue) {
             HStack(spacing: SpacingToken.sm.rawValue) {
@@ -72,10 +76,12 @@ public struct PrismLiveActivityExpanded<Content: View>: View {
 public struct PrismLiveActivityMinimal<Content: View>: View {
     private let content: Content
 
+    /// Creates a minimal Live Activity presentation with the given content.
     public init(@ViewBuilder content: () -> Content) {
         self.content = content()
     }
 
+    /// The view body.
     public var body: some View {
         content
             .frame(minWidth: 44, minHeight: 44)

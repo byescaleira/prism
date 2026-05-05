@@ -9,6 +9,7 @@ public struct PrismToggle: View {
     private let description: LocalizedStringKey?
     private let icon: String?
 
+    /// Creates a themed toggle with title, optional description, and icon.
     public init(
         _ title: LocalizedStringKey,
         isOn: Binding<Bool>,
@@ -21,6 +22,7 @@ public struct PrismToggle: View {
         self.icon = icon
     }
 
+    /// The toggle view body with icon, label, and description.
     public var body: some View {
         Toggle(isOn: $isOn) {
             HStack(spacing: SpacingToken.md.rawValue) {

@@ -2,19 +2,36 @@ import SwiftUI
 
 /// Haptic feedback types aligned with Apple HIG feedback patterns.
 public enum PrismHapticType: Sendable {
+    /// Impact feedback with configurable weight.
     case impact(PrismImpactWeight)
+    /// Notification feedback for success, warning, or error events.
     case notification(PrismNotificationStyle)
+    /// Selection change feedback for picker-like interactions.
     case selection
 }
 
 /// Impact weight for haptic feedback.
 public enum PrismImpactWeight: Sendable {
-    case light, medium, heavy, soft, rigid
+    /// Light impact feedback.
+    case light
+    /// Medium impact feedback.
+    case medium
+    /// Heavy impact feedback.
+    case heavy
+    /// Soft impact feedback.
+    case soft
+    /// Rigid impact feedback.
+    case rigid
 }
 
 /// Notification haptic style.
 public enum PrismNotificationStyle: Sendable {
-    case success, warning, error
+    /// Success notification feedback.
+    case success
+    /// Warning notification feedback.
+    case warning
+    /// Error notification feedback.
+    case error
 }
 
 /// Platform-adaptive haptic feedback engine.
@@ -29,6 +46,7 @@ public enum PrismNotificationStyle: Sendable {
 @MainActor
 public enum PrismHaptics {
 
+    /// Plays haptic feedback of the given type on the current platform.
     public static func play(_ type: PrismHapticType) {
         #if canImport(UIKit) && !os(watchOS) && !os(tvOS)
         playUIKit(type)
@@ -39,6 +57,7 @@ public enum PrismHaptics {
         #endif
     }
 
+    /// Prepares the haptic engine for low-latency feedback on supported platforms.
     public static func prepare(_ type: PrismHapticType) {
         #if canImport(UIKit) && !os(watchOS) && !os(tvOS)
         prepareUIKit(type)

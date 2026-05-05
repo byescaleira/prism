@@ -12,6 +12,7 @@ public struct PrismShareButton<Data: Transferable>: View {
     private let item: Data
     private let preview: SharePreview<Never, Never>
 
+    /// Creates a share button with a title, transferable item, and share preview.
     public init(
         _ title: LocalizedStringKey = "Share",
         item: Data,
@@ -22,6 +23,7 @@ public struct PrismShareButton<Data: Transferable>: View {
         self.preview = preview
     }
 
+    /// The content and behavior of the share button.
     public var body: some View {
         ShareLink(item: item, preview: preview) {
             Label(title, systemImage: "square.and.arrow.up")
@@ -32,6 +34,7 @@ public struct PrismShareButton<Data: Transferable>: View {
 
 extension PrismShareButton where Data == String {
 
+    /// Creates a share button for a plain text string.
     public init(
         _ title: LocalizedStringKey = "Share",
         text: String
@@ -44,6 +47,7 @@ extension PrismShareButton where Data == String {
 
 extension PrismShareButton where Data == URL {
 
+    /// Creates a share button for a URL.
     public init(
         _ title: LocalizedStringKey = "Share",
         url: URL

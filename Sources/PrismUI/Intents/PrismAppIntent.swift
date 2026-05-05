@@ -26,10 +26,12 @@ public struct PrismIntentSnippet<Content: View>: View {
 
     private let content: Content
 
+    /// Creates a snippet view wrapping the given content for App Intent display.
     public init(@ViewBuilder content: () -> Content) {
         self.content = content()
     }
 
+    /// The snippet body with themed padding, surface background, and elevation.
     public var body: some View {
         content
             .padding(SpacingToken.lg.rawValue)
@@ -46,6 +48,7 @@ public struct PrismIntentConfirmation: View {
     private let message: LocalizedStringKey?
     private let icon: String
 
+    /// Creates a confirmation view with title, optional message, and icon.
     public init(
         _ title: LocalizedStringKey,
         message: LocalizedStringKey? = nil,
@@ -56,6 +59,7 @@ public struct PrismIntentConfirmation: View {
         self.icon = icon
     }
 
+    /// The confirmation body with icon, title, and optional message.
     public var body: some View {
         VStack(spacing: SpacingToken.md.rawValue) {
             Image(systemName: icon)

@@ -8,6 +8,7 @@ public struct PrismSection<Content: View, Header: View, Footer: View>: View {
     private let header: Header
     private let footer: Footer
 
+    /// Creates a section with custom content, header, and footer.
     public init(
         @ViewBuilder content: () -> Content,
         @ViewBuilder header: () -> Header,
@@ -18,6 +19,7 @@ public struct PrismSection<Content: View, Header: View, Footer: View>: View {
         self.footer = footer()
     }
 
+    /// The content and behavior of the section.
     public var body: some View {
         VStack(alignment: .leading, spacing: SpacingToken.xs.rawValue) {
             header
@@ -41,6 +43,7 @@ public struct PrismSection<Content: View, Header: View, Footer: View>: View {
 
 extension PrismSection where Footer == EmptyView {
 
+    /// Creates a section with content and header, omitting the footer.
     public init(
         @ViewBuilder content: () -> Content,
         @ViewBuilder header: () -> Header
@@ -53,6 +56,7 @@ extension PrismSection where Footer == EmptyView {
 
 extension PrismSection where Header == EmptyView, Footer == EmptyView {
 
+    /// Creates a section with content only, omitting header and footer.
     public init(@ViewBuilder content: () -> Content) {
         self.content = content()
         self.header = EmptyView()

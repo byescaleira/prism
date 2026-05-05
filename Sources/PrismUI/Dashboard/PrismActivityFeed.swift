@@ -15,6 +15,7 @@ public struct PrismActivity: Sendable, Identifiable {
     /// Optional SF Symbol name.
     public let icon: String?
 
+    /// Creates an activity entry with user, action, target, and timestamp.
     public init(
         id: UUID = UUID(),
         user: String,
@@ -39,6 +40,7 @@ public struct PrismActivityFeed: View {
     private let activities: [PrismActivity]
     private let groupByDate: Bool
 
+    /// Creates an activity feed with optional date grouping.
     public init(
         activities: [PrismActivity],
         groupByDate: Bool = false
@@ -47,6 +49,7 @@ public struct PrismActivityFeed: View {
         self.groupByDate = groupByDate
     }
 
+    /// The activity feed view body with flat or date-grouped layout.
     public var body: some View {
         if groupByDate {
             groupedContent
@@ -140,6 +143,7 @@ public struct PrismActivityFeed: View {
 
 /// Groups activities by calendar date for sectioned display.
 public struct PrismActivityGroup: Sendable, Identifiable {
+    /// Unique identifier for this activity group.
     public let id = UUID()
     /// Section title (e.g. "Today", "Yesterday", or a formatted date).
     public let title: String

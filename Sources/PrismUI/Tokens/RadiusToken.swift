@@ -15,10 +15,12 @@ public enum RadiusToken: CGFloat, Sendable, CaseIterable {
 }
 
 extension RadiusToken {
+    /// A continuous-cornered rounded rectangle using this radius value.
     public var shape: RoundedRectangle {
         RoundedRectangle(cornerRadius: rawValue, style: .continuous)
     }
 
+    /// An uneven rounded rectangle suitable for clipping with this radius on all corners.
     public var clipShape: UnevenRoundedRectangle {
         UnevenRoundedRectangle(
             cornerRadii: .init(

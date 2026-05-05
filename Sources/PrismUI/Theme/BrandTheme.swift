@@ -20,6 +20,7 @@ public struct BrandTheme: PrismTheme, Sendable {
     private let secondary: Color
     private let accent: Color
 
+    /// Creates a brand theme with the given primary, secondary, and accent colors.
     public init(
         primary: Color = .blue,
         secondary: Color = .cyan,
@@ -30,6 +31,7 @@ public struct BrandTheme: PrismTheme, Sendable {
         self.accent = accent
     }
 
+    /// Resolves a color token to a concrete color using the brand palette.
     public func color(_ token: ColorToken) -> Color {
         switch token {
         case .brand: primary

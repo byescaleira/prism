@@ -17,10 +17,12 @@ public struct PrismSettingsView<Content: View>: View {
 
     private let content: Content
 
+    /// Creates a settings view wrapping the given content in a grouped form.
     public init(@ViewBuilder content: () -> Content) {
         self.content = content()
     }
 
+    /// The content and behavior of the settings view.
     public var body: some View {
         Form {
             content
@@ -38,6 +40,7 @@ public struct PrismSettingsSection<Content: View>: View {
     private let footer: LocalizedStringKey?
     private let content: Content
 
+    /// Creates a settings section with a title, optional footer, and content.
     public init(
         _ title: LocalizedStringKey,
         footer: LocalizedStringKey? = nil,
@@ -48,6 +51,7 @@ public struct PrismSettingsSection<Content: View>: View {
         self.content = content()
     }
 
+    /// The content and behavior of the settings section.
     public var body: some View {
         if let footer {
             Section {

@@ -63,6 +63,7 @@ public struct PrismModelView<Model: PersistentModel>: View {
         self.makeNew = makeNew
     }
 
+    /// The view body.
     public var body: some View {
         PrismModelViewContent(
             title: title,
@@ -188,6 +189,7 @@ public struct PrismModelDetailView<Model: PersistentModel>: View {
         self.title = title
     }
 
+    /// The view body.
     public var body: some View {
         Form {
             let mirror = Mirror(reflecting: model)
