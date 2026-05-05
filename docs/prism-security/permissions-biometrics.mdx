@@ -1,0 +1,140 @@
+---
+title: "Permissions & Biometrics"
+description: "Unified API for 16 system permissions and simplified Face ID / Touch ID / Optic ID authentication."
+icon: "fingerprint"
+---
+
+# Permissions & Biometric Auth
+
+PrismSecurity wraps Apple's fragmented permission APIs into a single `PrismPermissionClient` and provides one-line biometric authentication via `PrismBiometricAuth`.
+
+## Permissions
+
+### Request a Single Permission
+
+```swift
+let client = PrismPermissionClient()
+let status = try await client.request(.camera)
+
+if status.isGranted {
+    // Open camera
+}
+```
+
+### Request Multiple Permissions
+
+```swift
+let statuses = try await client.request([.camera, .microphone, .photoLibrary])
+
+for (permission, status) in statuses {
+    print("\(permission.displayName): \(status)")
+}
+```
+
+### Check Without Prompting
+
+```swift
+let status = try await client.check(.contacts)
+if status.canRequest {
+    // Show rationale UI, then request
+}
+```
+
+### Available Permissions (16)
+
+| Permission | Framework | Usage Key |
+|-----------|-----------|-----------|
+| `.camera` | AVFoundation | `NSCameraUsageDescription` |
+| `.microphone` | AVFoundation | `NSMicrophoneUsageDescription` |
+| `.photoLibrary` | Photos | `NSPhotoLibraryUsageDescription` |
+| `.contacts` | Contacts | `NSContactsUsageDescription` |
+| `.calendars` | EventKit | `NSCalendarsFullAccessUsageDescription` |
+| `.reminders` | EventKit | `NSRemindersFullAccessUsageDescription` |
+| `.location` | CoreLocation | `NSLocationWhenInUseUsageDescription` |
+| `.locationAlways` | CoreLocation | `NSLocationAlwaysUsageDescription` |
+| `.notifications` | UserNotifications | — |
+| `.speechRecognition` | Speech | `NSSpeechRecognitionUsageDescription` |
+| `.motionAndFitness` | CoreMotion | `NSMotionUsageDescription` |
+| `.bluetooth` | CoreBluetooth | `NSBluetoothAlwaysUsageDescription` |
+| `.mediaLibrary` | MediaPlayer | `NSAppleMusicUsageDescription` |
+| `.tracking` | ATT | `NSUserTrackingUsageDescription` |
+| `.faceID` | LocalAuthentication | `NSFaceIDUsageDescription` |
+| `.healthKit` | HealthKit | `NSHealthShareUsageDescription` |
+
+### Permission Status
+
+```swift
+enum PrismPermissionStatus: Sendable {
+    case notDetermined  // canRequest = true
+    case authorized     // isGranted = true
+    case denied         // canRequest = false
+    case restricted     // system-level restriction
+    case limited        // isGranted = true (partial access)
+    case provisional    // isGranted = true (quiet notifications)
+}
+```
+
+### Monitor Changes
+
+```swift
+let monitor = PrismPermissionMonitor(
+    permissions: [.camera, .microphone],
+    interval: 2.0
+)
+
+for await change in monitor.changes {
+    print("\(change.permission) changed: \(change.oldStatus) → \(change.newStatus)")
+}
+```
+
+## Biometric Auth
+
+### One-Line Authentication
+
+```swift
+let bio = PrismBiometricAuth()
+try await bio.authenticate(reason: "Access your vault")
+```
+
+### Check Availability
+
+```swift
+let type = bio.availableType()  // .faceID, .touchID, .opticID, or .none
+
+if bio.isAvailable() {
+    try await bio.authenticate(reason: "Unlock")
+}
+```
+
+### Policy Options
+
+```swift
+// Biometrics only — no passcode fallback
+try await bio.authenticate(
+    reason: "High security action",
+    policy: .biometricsOnly
+)
+
+// Biometrics or device passcode (default)
+try await bio.authenticate(
+    reason: "Standard action",
+    policy: .biometricsOrPasscode
+)
+```
+
+### Result-Based API
+
+```swift
+let result = await bio.authenticateResult(reason: "Confirm payment")
+
+switch result {
+case .success:
+    processPayment()
+case .failure(let error):
+    showError(error)
+}
+```
+
+<Warning>
+  Add `NSFaceIDUsageDescription` to your Info.plist before requesting biometric auth. Missing this key causes a runtime crash on device.
+</Warning>

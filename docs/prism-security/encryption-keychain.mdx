@@ -1,0 +1,194 @@
+---
+title: "Encryption & Keychain"
+description: "AES-GCM and ChaChaPoly encryption, SHA hashing, HMAC, HKDF key derivation, Keychain CRUD, Secure Enclave, and high-level secure storage."
+icon: "lock"
+---
+
+# Encryption & Keychain
+
+PrismSecurity provides a full cryptographic toolkit built on CryptoKit — symmetric encryption, hashing, key derivation, keychain storage, Secure Enclave, and a high-level `PrismSecureStore` that combines encryption + keychain in one call.
+
+## Encryption
+
+### AES-GCM (Default)
+
+```swift
+let encryptor = PrismEncryptor()  // .aesGCM by default
+let key = encryptor.generateKey()
+
+let encrypted = try encryptor.encrypt(Data("secret".utf8), using: key)
+let decrypted = try encryptor.decrypt(encrypted, using: key)
+```
+
+### ChaChaPoly
+
+```swift
+let encryptor = PrismEncryptor(algorithm: .chaChaPoly)
+let key = encryptor.generateKey()
+
+let encrypted = try encryptor.encrypt(data, using: key)
+```
+
+### Codable Values
+
+```swift
+struct Credentials: Codable, Sendable {
+    let token: String
+    let refreshToken: String
+}
+
+let encrypted = try encryptor.encrypt(credentials, using: key)
+let decoded = try encryptor.decrypt(Credentials.self, from: encrypted, using: key)
+```
+
+### Key Export / Import
+
+```swift
+let keyData = encryptor.exportKey(key)   // Data
+let imported = encryptor.importKey(keyData)  // SymmetricKey
+```
+
+## Hashing
+
+### SHA-256 / 384 / 512
+
+```swift
+let hasher = PrismHasher()
+let hash = hasher.hash(Data("message".utf8))          // Data (SHA-256)
+let hex = hasher.hashHex(Data("message".utf8))         // String
+
+let sha384 = PrismHasher(algorithm: .sha384)
+let sha512 = PrismHasher(algorithm: .sha512)
+```
+
+### HMAC
+
+```swift
+let key = SymmetricKey(size: .bits256)
+let mac = hasher.hmac(for: data, using: key)   // Data
+let valid = hasher.verifyHMAC(mac, for: data, using: key)  // Bool
+```
+
+## Key Derivation
+
+### HKDF
+
+```swift
+let derived = PrismKeyDerivation.deriveKey(
+    from: sharedSecret,
+    salt: salt,
+    info: Data("context".utf8),
+    outputByteCount: 32
+)
+```
+
+### Password-Based
+
+```swift
+let salt = PrismKeyDerivation.generateSalt()
+let key = PrismKeyDerivation.deriveFromPassword("hunter2", salt: salt)
+```
+
+## Keychain
+
+### Save and Load
+
+```swift
+let keychain = PrismKeychain()
+let item = PrismKeychainItem(id: "apiKey", service: "MyApp")
+
+// String
+try keychain.save(string: "sk-secret-123", for: item)
+let key = try keychain.loadString(for: item)
+
+// Data
+try keychain.save(data: rawData, for: item)
+let data = try keychain.loadData(for: item)
+
+// Codable
+try keychain.save(codable: credentials, for: item)
+let creds = try keychain.load(Credentials.self, for: item)
+```
+
+### Access Control
+
+```swift
+let item = PrismKeychainItem(
+    id: "sensitiveKey",
+    accessControl: .biometricAny  // requires Face ID / Touch ID
+)
+
+// Presets: .default, .biometricAny, .biometricCurrentSet,
+//          .devicePasscode, .biometricOrPasscode
+```
+
+### Existence & Deletion
+
+```swift
+let exists = keychain.exists(item)
+try keychain.delete(item)
+try keychain.deleteAll(service: "MyApp")
+```
+
+## Secure Enclave
+
+Hardware-backed P256 key generation and signing — keys never leave the chip.
+
+```swift
+let enclave = PrismSecureEnclave()
+
+// Generate a key pair (stored in Secure Enclave)
+let publicKey = try enclave.generateKeyPair(tag: "com.app.signing")
+
+// Sign data
+let signature = try enclave.sign(data: message, tag: "com.app.signing")
+
+// Verify
+let valid = try enclave.verify(
+    signature: signature,
+    for: message,
+    tag: "com.app.signing"
+)
+
+// Delete
+try enclave.deleteKeyPair(tag: "com.app.signing")
+```
+
+<Note>
+  Secure Enclave is only available on devices with the T2 chip or later (iPhone 5s+, Apple Silicon Macs). Check availability before use.
+</Note>
+
+## Secure Store
+
+High-level API that combines encryption + keychain — encrypt data with a managed key and store the ciphertext in the keychain, all in one call.
+
+```swift
+let store = PrismSecureStore(configuration: .biometricProtected)
+
+// Save
+try store.save(myCredentials, forKey: "credentials")
+
+// Load
+let creds = try store.load(Credentials.self, forKey: "credentials")
+
+// Delete
+try store.delete(forKey: "credentials")
+```
+
+### Configurations
+
+| Preset | Encryption | Access Control |
+|--------|-----------|----------------|
+| `.default` | AES-GCM | Standard keychain |
+| `.biometricProtected` | AES-GCM | Biometric required |
+| `.highSecurity` | ChaChaPoly | Biometric (current set) |
+
+```swift
+// Custom
+let config = PrismSecureStoreConfiguration(
+    service: "VaultApp",
+    algorithm: .chaChaPoly,
+    accessControl: .biometricOrPasscode
+)
+let store = PrismSecureStore(configuration: config)
+```

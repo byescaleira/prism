@@ -1,0 +1,325 @@
+---
+title: "Audit, Tokens & Privacy"
+description: "Hash-chain audit logging, JWT token management with auto-refresh, PII redaction, screen protection, and clipboard security."
+icon: "eye-slash"
+---
+
+# Audit Log, Token Manager & Privacy Guard
+
+Security observability, authentication token lifecycle, and privacy protection — the operational side of PrismSecurity.
+
+## Security Audit Log
+
+Tamper-evident, append-only event log using SHA-256 hash chains. Each entry's hash depends on the previous — breaking one link invalidates the chain.
+
+### Record Events
+
+```swift
+let log = PrismSecurityAuditLog()
+
+log.record(PrismSecurityEvent(kind: .biometricSuccess, detail: "Face ID"))
+log.record(PrismSecurityEvent(
+    kind: .keychainRead,
+    detail: "read apiToken",
+    metadata: ["key": "apiToken"]
+))
+```
+
+### 24 Event Kinds
+
+| Category | Events |
+|----------|--------|
+| Biometric | `biometricSuccess`, `biometricFailure`, `biometricLockout` |
+| Keychain | `keychainRead`, `keychainWrite`, `keychainDelete` |
+| Encryption | `encryptionSuccess`, `encryptionFailure`, `decryptionSuccess`, `decryptionFailure` |
+| Token | `tokenRefresh`, `tokenExpired`, `tokenRevoked` |
+| Permission | `permissionGranted`, `permissionDenied` |
+| Integrity | `integrityViolation`, `jailbreakDetected`, `debuggerDetected` |
+| Transport | `certificatePinningSuccess`, `certificatePinningFailure` |
+| Privacy | `dataRedacted`, `clipboardCleared` |
+| Session | `sessionStarted`, `sessionEnded` |
+
+### Query and Filter
+
+```swift
+// All entries
+let all = log.allEntries
+
+// By kind
+let biometric = log.entries(ofKind: .biometricSuccess)
+
+// By date range
+let today = log.entries(from: startOfDay, to: .now)
+
+// Recent N
+let latest = log.recentEntries(10)
+
+// Count
+log.count
+```
+
+### Verify Integrity
+
+```swift
+if log.verifyIntegrity() {
+    // Hash chain intact — no entries tampered
+} else {
+    // ALERT: audit log has been modified
+}
+```
+
+### Export
+
+```swift
+let exporter = PrismAuditExporter()
+
+// JSON export (ISO 8601 dates)
+let jsonData = try exporter.exportJSON(log.allEntries)
+let jsonString = try exporter.exportJSONString(log.allEntries)
+
+// Summary
+let summary = exporter.exportSummary(log.allEntries)
+print(summary.totalEntries)                    // 42
+print(summary.eventCounts[.biometricSuccess])  // 15
+```
+
+### Capacity Management
+
+```swift
+// Cap at 1000 entries (oldest pruned automatically)
+let log = PrismSecurityAuditLog(maxEntries: 1000)
+
+// Manual clear
+log.clear()
+```
+
+<Tip>
+  The hash chain uses `SHA256(event.id + event.kind + event.detail + event.timestamp + previousHash)`. Verifying integrity is O(n) — call it periodically, not on every write.
+</Tip>
+
+## Token Manager
+
+Actor-based JWT token lifecycle with automatic refresh and concurrent request handling.
+
+### Store Tokens
+
+```swift
+let manager = PrismTokenManager()
+
+await manager.store(PrismTokenPair(
+    accessToken: jwtString,
+    refreshToken: refreshString
+))
+```
+
+### Get Valid Token (Auto-Refresh)
+
+```swift
+// Returns current token if valid, refreshes if expiring soon
+let token = try await manager.validAccessToken { pair in
+    // Called when token needs refresh
+    let newPair = try await authService.refresh(pair.refreshToken!)
+    return newPair
+}
+
+print(token.subject)    // "user123"
+print(token.isExpired)  // false
+```
+
+### Concurrent Refresh Handling
+
+Multiple concurrent callers won't trigger parallel refresh requests — the actor queues them and shares the result:
+
+```swift
+// 10 concurrent API calls — only ONE refresh request
+await withTaskGroup(of: Void.self) { group in
+    for _ in 0..<10 {
+        group.addTask {
+            let token = try await manager.validAccessToken(refresher: refresh)
+            // All 10 get the same refreshed token
+        }
+    }
+}
+```
+
+### JWT Decode
+
+```swift
+let token = try PrismAccessToken.decode(jwtString)
+
+token.subject       // "user123"
+token.issuer        // "auth.example.com"
+token.isExpired     // Bool
+token.expiresAt     // Date?
+token.issuedAt      // Date?
+
+// Custom claims
+let role: String? = token.claim("role")
+let org: Int? = token.claim("org_id")
+
+// Expiry check with buffer
+token.expiresWithin(300)  // true if < 5 min left
+```
+
+<Note>
+  `PrismAccessToken.decode` parses the JWT payload without verifying the signature — it's for client-side claim inspection only. Always validate tokens server-side.
+</Note>
+
+### Token Configuration
+
+```swift
+let config = PrismTokenConfiguration(
+    service: "MyAuth",
+    refreshThreshold: 60,           // refresh when < 60s left
+    refreshStrategy: .proactive     // refresh before expiry
+)
+
+let manager = PrismTokenManager(configuration: config)
+```
+
+| Strategy | Behavior |
+|----------|----------|
+| `.proactive` | Refresh before token expires (default, 300s threshold) |
+| `.reactive` | Refresh only when token is expired |
+| `.manual` | Only refresh when explicitly called |
+
+### Intercept Requests
+
+```swift
+let interceptor = PrismTokenInterceptor(manager: manager)
+
+var request = URLRequest(url: apiURL)
+request = try await interceptor.intercept(request)
+// Adds: Authorization: Bearer <token>
+```
+
+## Privacy Guard
+
+### PII Redaction
+
+Detect and redact personally identifiable information using regex patterns.
+
+```swift
+let redactor = PrismRedactor()
+
+redactor.redact("Email: john@example.com")
+// → "Email: j***@***.***"
+
+redactor.redact("Call 555-123-4567")
+// → "Call ***-***-4567"
+
+redactor.redact("Card: 4111 1111 1111 1234")
+// → "Card: ****-****-****-1234"
+
+redactor.redact("SSN: 123-45-6789")
+// → "SSN: ***-**-6789"
+
+redactor.redact("IP: 192.168.1.100")
+// → "IP: ***.***.***.***"
+```
+
+### Redaction Styles
+
+```swift
+// Mask (default) — partial reveal
+let mask = PrismRedactor(style: .mask)
+mask.redactValue("john@example.com", type: .email)
+// → "j***@***.***"
+
+// Remove — full replacement
+let remove = PrismRedactor(style: .remove)
+remove.redactValue("john@example.com", type: .email)
+// → "[REDACTED]"
+
+// Hash — first 8 hex chars
+let hash = PrismRedactor(style: .hash)
+hash.redactValue("john@example.com", type: .email)
+// → "a1b2c3d4..."
+```
+
+### PII Types
+
+| Type | Pattern |
+|------|---------|
+| `.email` | `user@domain.tld` |
+| `.phone` | `123-456-7890` |
+| `.creditCard` | `4111 1111 1111 1234` |
+| `.ssn` | `123-45-6789` |
+| `.ipAddress` | `192.168.1.1` |
+| `.custom` | User-defined regex |
+
+### Privacy Guard (Unified Facade)
+
+```swift
+let guard = PrismPrivacyGuard()
+
+// Redact PII in strings
+let safe = guard.redact("Email: test@test.com")
+
+// Classify field sensitivity
+guard.classify("password")    // .restricted
+guard.classify("email")       // .sensitive
+guard.classify("user_id")     // .internal
+guard.classify("name")        // .public
+
+// Auto-protect by field name
+guard.protect(field: "password", value: "secret123")
+// → "[RESTRICTED]"
+
+guard.protect(field: "email", value: "john@example.com")
+// → "j***@***.***"
+
+guard.protect(field: "name", value: "John")
+// → "John" (public — unchanged)
+```
+
+### Privacy Levels
+
+```swift
+enum PrismPrivacyLevel: Comparable {
+    case `public`     // display names, usernames
+    case `internal`   // user IDs, session IDs
+    case sensitive    // emails, phone numbers
+    case restricted   // passwords, tokens, SSNs
+}
+
+// Comparable: public < internal < sensitive < restricted
+```
+
+### Screen Protection (SwiftUI)
+
+Hide sensitive content when the app goes to background or appears in the app switcher.
+
+```swift
+SensitiveDataView()
+    .prismScreenProtection()
+```
+
+Or wrap in a secure container:
+
+```swift
+PrismSecureView {
+    Text("API Key: \(apiKey)")
+    Text("Balance: \(balance)")
+}
+```
+
+When the app leaves the foreground, a lock overlay with a shield icon replaces the content.
+
+### Clipboard Guard
+
+Auto-clear the clipboard after copying sensitive data.
+
+```swift
+let clipboard = PrismClipboardGuard(clearAfter: 30) // seconds
+
+clipboard.copySecurely("my-api-token")
+// Clipboard auto-clears after 30 seconds
+
+clipboard.clearNow()      // immediate clear
+clipboard.cancelClear()   // cancel pending auto-clear
+```
+
+<Warning>
+  Screen protection uses `@Environment(\.scenePhase)` — it must be applied inside a SwiftUI view hierarchy that receives scene phase changes. It won't work in isolated view previews.
+</Warning>

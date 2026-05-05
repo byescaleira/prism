@@ -1,0 +1,197 @@
+---
+title: "Secure Transport"
+description: "P256 ECDH key exchange, HKDF-derived symmetric encryption, encrypted channels, and signed envelopes with forward secrecy."
+icon: "satellite-dish"
+---
+
+# Secure Transport
+
+End-to-end encrypted communication using elliptic curve Diffie-Hellman key exchange, symmetric encryption, and digital signatures — all via CryptoKit.
+
+## Key Agreement
+
+P256 ECDH key exchange with HKDF-SHA256 key derivation.
+
+```swift
+let alice = PrismKeyAgreement()
+let bob = PrismKeyAgreement()
+
+// Exchange public keys (64 bytes, P256 raw)
+let alicePublic = alice.publicKeyData
+let bobPublic = bob.publicKeyData
+
+// Derive shared secret — same on both sides
+let aliceKey = try alice.deriveSharedSecret(with: bobPublic)
+let bobKey = try bob.deriveSharedSecret(with: alicePublic)
+// aliceKey == bobKey ✓
+```
+
+### Custom Salt
+
+```swift
+let key = try alice.deriveSharedSecret(
+    with: bobPublic,
+    salt: Data("session-2024".utf8)
+)
+```
+
+<Tip>
+  Different salts produce different derived keys from the same shared secret. Use unique salts for different purposes (encryption key, MAC key, etc.).
+</Tip>
+
+## Secure Envelope
+
+Encrypt-then-sign format with ephemeral keys for forward secrecy. Each message uses a fresh ECDH key pair — compromising the sender's long-term key doesn't decrypt past messages.
+
+### Seal and Open
+
+```swift
+import CryptoKit
+
+let senderSigning = P256.Signing.PrivateKey()
+let recipientAgreement = P256.KeyAgreement.PrivateKey()
+
+// Sender seals
+let envelope = try PrismSecureEnvelope.seal(
+    data: Data("Top secret".utf8),
+    recipientPublicKey: recipientAgreement.publicKey.rawRepresentation,
+    senderSigningKey: senderSigning
+)
+
+// Recipient opens (verifies signature + decrypts)
+let plaintext = try PrismSecureEnvelope.open(
+    envelope,
+    recipientPrivateKey: recipientAgreement,
+    senderVerifyKey: senderSigning.publicKey.rawRepresentation
+)
+```
+
+### Codable Values
+
+```swift
+struct SecureMessage: Codable, Sendable, Equatable {
+    let text: String
+    let priority: Int
+}
+
+// Seal a Codable value
+let envelope = try PrismSecureEnvelope.seal(
+    SecureMessage(text: "urgent", priority: 1),
+    recipientPublicKey: recipientPublic,
+    senderSigningKey: senderKey
+)
+
+// Open into typed value
+let message = try PrismSecureEnvelope.open(
+    SecureMessage.self,
+    from: envelope,
+    recipientPrivateKey: recipientKey,
+    senderVerifyKey: senderPublic
+)
+```
+
+### Envelope Structure
+
+| Field | Description |
+|-------|-------------|
+| `ephemeralPublicKey` | Fresh P256 key (forward secrecy) |
+| `ciphertext` | AES-GCM encrypted payload |
+| `signature` | P256 ECDSA over ciphertext + ephemeral key |
+| `createdAt` | Timestamp |
+
+```
+Sender:
+  1. Generate ephemeral P256 key pair
+  2. ECDH(ephemeral, recipient) → shared secret
+  3. HKDF(shared secret) → AES key
+  4. AES-GCM.encrypt(plaintext, key) → ciphertext
+  5. ECDSA.sign(ciphertext + ephemeral, sender signing key) → signature
+  6. Envelope = { ephemeral pub, ciphertext, signature }
+
+Recipient:
+  1. ECDSA.verify(ciphertext + ephemeral, sender verify key)
+  2. ECDH(recipient private, ephemeral) → shared secret
+  3. HKDF(shared secret) → AES key
+  4. AES-GCM.decrypt(ciphertext, key) → plaintext
+```
+
+### Wrong Sender Key Detection
+
+```swift
+let imposter = P256.Signing.PrivateKey()
+
+// Fails — signature doesn't match
+do {
+    try PrismSecureEnvelope.open(
+        envelope,
+        recipientPrivateKey: recipientKey,
+        senderVerifyKey: imposter.publicKey.rawRepresentation
+    )
+} catch {
+    // PrismSecurityError — signature verification failed
+}
+```
+
+## Secure Channel
+
+Bidirectional encrypted pipe between two parties. Establish once, encrypt/decrypt many times.
+
+### Basic Usage
+
+```swift
+let alice = PrismSecureChannel()
+let bob = PrismSecureChannel()
+
+// Establish (both sides)
+try alice.establish(with: bob.publicKeyData)
+try bob.establish(with: alice.publicKeyData)
+
+// Encrypt / Decrypt
+let encrypted = try alice.encrypt(Data("Hello Bob".utf8))
+let decrypted = try bob.decrypt(encrypted)
+```
+
+### Codable Through Channel
+
+```swift
+struct Payload: Codable, Sendable, Equatable {
+    let id: Int
+    let name: String
+}
+
+let encrypted = try alice.encrypt(Payload(id: 42, name: "test"))
+let decoded = try bob.decrypt(Payload.self, from: encrypted)
+```
+
+### Algorithm Selection
+
+```swift
+// Default: AES-GCM
+let channel = PrismSecureChannel(algorithm: .aesGCM)
+
+// Alternative: ChaChaPoly (faster on devices without AES-NI)
+let channel = PrismSecureChannel(algorithm: .chaChaPoly)
+```
+
+### Lifecycle
+
+```swift
+let channel = PrismSecureChannel()
+
+channel.isEstablished  // false
+
+try channel.establish(with: remotePublicKey)
+channel.isEstablished  // true
+
+// Use channel...
+
+channel.close()        // zeros shared key
+channel.isEstablished  // false
+
+// Throws PrismSecurityError.invalidKey
+try channel.encrypt(data)
+```
+
+<Note>
+  `PrismSecureChannel` uses `NSLock` for thread safety — safe to call from multiple threads. It's `Sendable` and works across actor boundaries.
+</Note>

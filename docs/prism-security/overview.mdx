@@ -1,0 +1,109 @@
+---
+title: "Security Overview"
+description: "Full security stack — permissions, biometrics, encryption, certificate pinning, secure transport, audit logging, token management, and privacy protection."
+icon: "shield-halved"
+---
+
+# PrismSecurity
+
+PrismSecurity provides a comprehensive security layer for Apple platforms — from system permissions and biometric auth to encrypted transport channels, tamper detection, and PII redaction. Built on CryptoKit, Security framework, and LocalAuthentication with Swift 6.3 strict concurrency.
+
+<CardGroup cols={3}>
+  <Card title="Permissions & Biometrics" icon="fingerprint">
+    Unified API for 16 system permissions plus Face ID / Touch ID / Optic ID authentication.
+  </Card>
+  <Card title="Encryption & Keychain" icon="lock">
+    AES-GCM, ChaChaPoly, HMAC, HKDF, Secure Enclave, and typed keychain storage.
+  </Card>
+  <Card title="Certificate Pinning" icon="certificate">
+    SHA-256 public key pinning with strict, report-only, and trust-on-first-use policies.
+  </Card>
+  <Card title="Secure Transport" icon="satellite-dish">
+    P256 ECDH key exchange, encrypted channels, and signed envelopes with forward secrecy.
+  </Card>
+  <Card title="Audit & Tokens" icon="clipboard-check">
+    Hash-chain audit log, JWT decode, actor-based token refresh, and Bearer injection.
+  </Card>
+  <Card title="Privacy Guard" icon="eye-slash">
+    PII redaction, screen protection on background, auto-clearing clipboard, field classification.
+  </Card>
+</CardGroup>
+
+## Architecture
+
+```
+┌──────────────────────────────────────────────────────────────┐
+│                       PrismSecurity                          │
+├───────────┬──────────┬───────────┬───────────┬──────────────┤
+│Permissions│Biometric │ Keychain  │Encryption │SecureEnclave │  ← Phase 1
+├───────────┴──────────┴───────────┴───────────┴──────────────┤
+│ CertPinning │ Integrity │ SecureTransport │ AuditLog       │  ← Phase 2
+├─────────────┴───────────┴─────────────────┴────────────────┤
+│    TokenManager    │     PrivacyGuard    │  SecureStore     │
+├────────────────────┴─────────────────────┴─────────────────┤
+│              CryptoKit + Security + LocalAuthentication      │
+└──────────────────────────────────────────────────────────────┘
+```
+
+## Quick Start
+
+```swift title="One Import, Full Security"
+import PrismSecurity
+
+// Request camera permission
+let client = PrismPermissionClient()
+let status = try await client.request(.camera)
+
+// Authenticate with Face ID
+let bio = PrismBiometricAuth()
+try await bio.authenticate(reason: "Access vault")
+
+// Encrypt and store securely
+let store = PrismSecureStore(configuration: .biometricProtected)
+try store.save(mySecret, forKey: "credentials")
+
+// Redact PII from logs
+let guard = PrismPrivacyGuard()
+let safe = guard.redact("Email: john@example.com")
+// → "Email: j***@***.***"
+```
+
+## Key Concepts
+
+| Concept | Type | Description |
+|---------|------|-------------|
+| Permission | `PrismPermissionClient` | Unified request/check for 16 system permissions |
+| Biometric | `PrismBiometricAuth` | One-line Face ID / Touch ID / Optic ID |
+| Keychain | `PrismKeychain` | Typed CRUD with access control |
+| Encryptor | `PrismEncryptor` | AES-GCM + ChaChaPoly via CryptoKit |
+| Secure Store | `PrismSecureStore` | Encrypt + keychain in one call |
+| Cert Pinning | `PrismPinningValidator` | Public key hash validation (actor) |
+| Integrity | `PrismIntegrityChecker` | Jailbreak / debugger / tamper detection |
+| Secure Channel | `PrismSecureChannel` | ECDH → symmetric encrypted pipe |
+| Audit Log | `PrismSecurityAuditLog` | Hash-chain tamper-evident event log |
+| Token Manager | `PrismTokenManager` | Actor-based JWT lifecycle + refresh |
+| Privacy Guard | `PrismPrivacyGuard` | PII redact, classify, screen protect |
+
+<Tip>
+  PrismSecurity depends only on `PrismFoundation` — no UIKit or SwiftUI in core types. SwiftUI imports are isolated to `PrismScreenProtection` and `PrismClipboardGuard` via `#if canImport`.
+</Tip>
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Permissions & Biometrics" icon="fingerprint" href="/docs/prism-security/permissions-biometrics">
+    Request permissions and authenticate with Face ID.
+  </Card>
+  <Card title="Encryption & Keychain" icon="lock" href="/docs/prism-security/encryption-keychain">
+    Encrypt data and store secrets in the keychain.
+  </Card>
+  <Card title="Cert Pinning & Integrity" icon="certificate" href="/docs/prism-security/cert-pinning-integrity">
+    Pin certificates and detect tampering.
+  </Card>
+  <Card title="Secure Transport" icon="satellite-dish" href="/docs/prism-security/secure-transport">
+    Encrypted channels with ECDH and forward secrecy.
+  </Card>
+  <Card title="Audit, Tokens & Privacy" icon="eye-slash" href="/docs/prism-security/audit-token-privacy">
+    Audit logging, JWT management, and PII protection.
+  </Card>
+</CardGroup>

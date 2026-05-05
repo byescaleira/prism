@@ -118,6 +118,17 @@
       ]
     },
     {
+      "group": "Security",
+      "pages": [
+        "docs/prism-security/overview",
+        "docs/prism-security/permissions-biometrics",
+        "docs/prism-security/encryption-keychain",
+        "docs/prism-security/cert-pinning-integrity",
+        "docs/prism-security/secure-transport",
+        "docs/prism-security/audit-token-privacy"
+      ]
+    },
+    {
       "group": "Capabilities",
       "pages": [
         "docs/capabilities/auth",

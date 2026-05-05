@@ -1,0 +1,204 @@
+---
+title: "Certificate Pinning & Integrity"
+description: "SHA-256 public key pinning with strict/reportOnly/TOFU policies, jailbreak detection, tamper-evident data sealing, and file integrity verification."
+icon: "certificate"
+---
+
+# Certificate Pinning & Integrity
+
+Defend against MITM attacks with certificate pinning and protect your app against runtime tampering with integrity checks and data sealing.
+
+## Certificate Pinning
+
+### Configure Pins
+
+```swift
+let pin = PrismCertificatePin(
+    host: "api.example.com",
+    publicKeyHash: "sha256/BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB=",
+    backupHashes: ["sha256/CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC="],
+    expiresAt: Date.now.addingTimeInterval(365 * 24 * 3600)
+)
+```
+
+### Hash a Public Key
+
+```swift
+let hash = PrismCertificatePin.hash(publicKeyDER: publicKeyData)
+// → "abc123..." (SHA-256 base64)
+```
+
+### Pinning Policies
+
+| Policy | Behavior |
+|--------|----------|
+| `.strict` | Reject connection if hash mismatch |
+| `.reportOnly` | Allow connection, call violation handler |
+| `.trustFirstUse` | Pin first-seen hash, reject changes |
+
+### Validate with URLSession
+
+```swift
+let validator = PrismPinningValidator(
+    pins: [pin],
+    policy: .strict,
+    onViolation: { result in
+        logger.warning("Pin mismatch: \(result.host)")
+    }
+)
+
+let delegate = PrismCertificatePinningDelegate(validator: validator)
+let session = URLSession(
+    configuration: .default,
+    delegate: delegate,
+    delegateQueue: nil
+)
+
+// All requests through this session are pinned
+let (data, _) = try await session.data(from: url)
+```
+
+### Dynamic Pin Management
+
+```swift
+// Add pin at runtime
+await validator.addPin(PrismCertificatePin(
+    host: "new-api.example.com",
+    publicKeyHash: "sha256/..."
+))
+
+// Remove pin
+await validator.removePin(forHost: "old-api.example.com")
+```
+
+### Manual Validation
+
+```swift
+let result = await validator.validate(
+    publicKeyHash: "sha256/...",
+    forHost: "api.example.com"
+)
+
+print(result.isValid)       // Bool
+print(result.matchedHash)   // String? — which pin matched
+print(result.serverHash)    // String — server's actual hash
+```
+
+## Integrity Checker
+
+Detect jailbreaks, debuggers, simulators, and reverse engineering tools at runtime.
+
+### Full Check
+
+```swift
+let checker = PrismIntegrityChecker()
+
+let violations = checker.checkAll()
+for v in violations {
+    print("\(v.kind): \(v.detail)")
+}
+
+if checker.isSecure {
+    // No violations found
+}
+```
+
+### Individual Checks
+
+```swift
+checker.isJailbroken()              // suspicious paths, writable /private
+checker.isDebuggerAttached()        // sysctl P_TRACED flag
+checker.isSimulator()               // TARGET_OS_SIMULATOR
+checker.hasReverseEngineeringTools() // frida, objection
+```
+
+### Detection Methods
+
+| Check | Technique |
+|-------|-----------|
+| Jailbreak | Suspicious file paths (`/Applications/Cydia.app`, `/usr/sbin/sshd`), writable system directories, URL schemes |
+| Debugger | `sysctl` with `CTL_KERN` / `KERN_PROC` checking `P_TRACED` |
+| Simulator | Preprocessor `#if targetEnvironment(simulator)` |
+| Reverse Engineering | Known tool binaries (`frida-server`, `objection`), `DYLD_INSERT_LIBRARIES` |
+
+### Integrity Policy
+
+```swift
+// Default — log only
+let policy = PrismIntegrityPolicy.default  // actions: [.log]
+
+// Strict — log + wipe + notify
+let policy = PrismIntegrityPolicy.strict   // actions: [.log, .wipeSecureStore, .notify]
+```
+
+## Data Seal
+
+HMAC-SHA256 tamper-evident sealing for Codable values — proves data hasn't been modified since sealing.
+
+### Seal and Unseal
+
+```swift
+let key = SymmetricKey(size: .bits256)
+let seal = PrismDataSeal(key: key)
+
+struct UserToken: Codable, Sendable, Equatable {
+    let value: String
+    let expiresAt: Date
+}
+
+// Seal
+let sealed = try seal.seal(UserToken(value: "abc", expiresAt: .now))
+
+// Unseal (throws if tampered)
+let token = try seal.unseal(UserToken.self, from: sealed)
+```
+
+### Verify Without Unsealing
+
+```swift
+let data = Data("important config".utf8)
+let sealed = seal.sealData(data)
+
+if seal.verify(sealed) {
+    // Integrity confirmed
+}
+```
+
+### Raw MAC Verification
+
+```swift
+let mac = Data(HMAC<SHA256>.authenticationCode(for: data, using: key))
+let valid = seal.verify(data: data, mac: mac)
+```
+
+## File Integrity
+
+Track SHA-256 hashes of critical files — detect unexpected modifications.
+
+```swift
+let integrity = PrismFileIntegrity()
+
+// Register a file (stores hash in keychain)
+try integrity.registerFile(at: configURL)
+
+// Verify integrity
+let valid = try integrity.verify(at: configURL)
+
+// Verify all registered files
+let results = try integrity.verifyAll()
+for (url, isValid) in results {
+    if !isValid {
+        logger.error("File tampered: \(url.lastPathComponent)")
+    }
+}
+
+// Update hash after legitimate change
+try integrity.updateHash(for: configURL)
+
+// Unregister
+integrity.unregister(at: configURL)
+```
+
+<Warning>
+  Jailbreak detection is not foolproof — sophisticated tools can bypass these checks. Use defense-in-depth: combine integrity checks with certificate pinning, data sealing, and server-side validation.
+</Warning>
