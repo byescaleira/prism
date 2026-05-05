@@ -67,9 +67,7 @@ secrets/
 CHANGELOG.md
 CLAUDE.md
 CONTRIBUTING.md
-LICENSE
 Makefile
-README.md
 SECURITY.md
 scripts/
 playground/
